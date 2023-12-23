@@ -21,12 +21,12 @@
 	if (!$gradebook) {
 		$gradebook = getCache('gradebook');
 
-		// $studentAccount.grades().then((grades) => {
-		// 	$gradebook = grades;
-		// 	localStorage.setItem('gradebook', JSON.stringify(grades));
+		$studentAccount.grades().then((grades) => {
+			$gradebook = grades;
+			localStorage.setItem('gradebook', JSON.stringify(grades));
 
-		// 	dataLoaded = true;
-		// });
+			dataLoaded = true;
+		});
 	} else dataLoaded = true;
 
 	$: course = $gradebook.Courses.Course
@@ -35,8 +35,6 @@
 </script>
 
 <LoadingBanner show={!dataLoaded} loadingMsg="Loading grades..." />
-
-{JSON.stringify($gradebook)}
 
 {#if course}
 	<Heading tag="h1" class="mt-16 ml-8 w-fit">{removeClassID(course._Title)}</Heading>

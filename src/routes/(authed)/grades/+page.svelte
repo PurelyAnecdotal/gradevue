@@ -9,12 +9,12 @@
 	if (!$gradebook) {
 		$gradebook = getCache('gradebook');
 
-		// $studentAccount.grades().then((grades) => {
-		// 	$gradebook = grades;
-		// 	localStorage.setItem('gradebook', JSON.stringify(grades));
+		$studentAccount.grades().then((grades) => {
+			$gradebook = grades;
+			localStorage.setItem('gradebook', JSON.stringify(grades));
 
-		// 	dataLoaded = true;
-		// });
+			dataLoaded = true;
+		});
 	} else dataLoaded = true;
 
 	function getColorForGrade(grade: string) {
@@ -27,8 +27,6 @@
 </script>
 
 <LoadingBanner show={!dataLoaded} loadingMsg="Loading classes..." />
-
-{JSON.stringify($gradebook)}
 
 {#if $gradebook}
 	<ol>
