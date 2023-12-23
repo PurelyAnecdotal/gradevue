@@ -1,55 +1,79 @@
 <script lang="ts">
-	import type { Gradebook } from '$lib/Gradebook';
-	import { studentAccount } from '$lib/stores';
+	import Assignments from '$lib/Assignments.svelte';
+	import { studentAccount, gradebook } from '$lib/stores';
 	import { getCache } from '$lib/cache';
 	import { page } from '$app/stores';
-	import type { CourseEntity } from '$lib/Gradebook';
+	import LoadingBanner from '$lib/LoadingBanner.svelte';
+	import removeClassID from '$lib/removeClassId';
+	import {
+		Heading,
+		Table,
+		TableBody,
+		TableBodyCell,
+		TableBodyRow,
+		TableHead,
+		TableHeadCell,
+		Tabs,
+		TabItem
+	} from 'flowbite-svelte';
 
-	let gradebook: Gradebook = getCache('gradebook');
 	let dataLoaded = false;
+	if (!$gradebook) {
+		$gradebook = getCache('gradebook');
 
-	$: course = gradebook.Courses.Course
-		? gradebook.Courses.Course[parseInt($page.params.index)]
+		$studentAccount.grades().then((grades) => {
+			$gradebook = grades;
+			localStorage.setItem('gradebook', JSON.stringify(grades));
+
+			dataLoaded = true;
+		});
+	} else dataLoaded = true;
+
+	$: course = $gradebook.Courses.Course
+		? $gradebook.Courses.Course[parseInt($page.params.index)]
 		: null;
-
-	$studentAccount.grades().then((grades) => {
-		gradebook = grades;
-		dataLoaded = true;
-		console.log(gradebook);
-
-		localStorage.setItem('gradebook', JSON.stringify(gradebook));
-	});
 </script>
 
-<a href="/grades">Back</a>
-
-{#if !dataLoaded}
-	Loading Grades...
-{/if}
-
-<br />
+<LoadingBanner show={!dataLoaded} loadingMsg="Loading grades..." />
 
 {#if course}
-	{course._Title}: {course.Marks.Mark._CalculatedScoreString}
-	{course.Marks.Mark._CalculatedScoreRaw}%
+	<Heading tag="h1" class="mt-16 ml-8 w-fit">{removeClassID(course._Title)}</Heading>
 	{#if typeof course.Marks.Mark.GradeCalculationSummary != 'string'}
-		<ul>
-			{#each course.Marks.Mark.GradeCalculationSummary.AssignmentGradeCalc ?? [] as category}
-				<li>
-					{category._Type}: {category._CalculatedMark}
-					{category._WeightedPct}/{category._Weight}
-					{category._Points}/{category._PointsPossible}
-				</li>
+		<div class="m-4">
+			<Table shadow>
+				<TableHead>
+					<TableHeadCell>Category</TableHeadCell>
+					<TableHeadCell>Grade</TableHeadCell>
+					<TableHeadCell>Weight</TableHeadCell>
+					<TableHeadCell>Points</TableHeadCell>
+				</TableHead>
+				<TableBody>
+					{#each course.Marks.Mark.GradeCalculationSummary.AssignmentGradeCalc ?? [] as category}
+						<TableBodyRow>
+							<TableBodyCell>{category._Type}</TableBodyCell>
+							<TableBodyCell>{category._CalculatedMark}</TableBodyCell>
+							<TableBodyCell>{category._Weight}</TableBodyCell>
+							<TableBodyCell
+								>{parseFloat(category._Points)} / {parseFloat(
+									category._PointsPossible
+								)}</TableBodyCell
+							>
+						</TableBodyRow>
+					{/each}
+				</TableBody>
+			</Table>
+		</div>
+		<Tabs class="ml-4" contentClass="p-4 bg-gray-50 rounded-lg dark:bg-gray-900">
+			<TabItem open title="All">
+				<Assignments {course} />
+			</TabItem>
+			{#each course.Marks.Mark.GradeCalculationSummary.AssignmentGradeCalc?.filter((category) => category._Type !== 'TOTAL') ?? [] as category}
+				<TabItem title={category._Type}>
+					<Assignments {course} category={category._Type} />
+				</TabItem>
 			{/each}
-		</ul>
-	{/if}
-	{#if course.Marks.Mark.Assignments.Assignment}
-		<ul>
-			{#each course.Marks.Mark.Assignments.Assignment as assignment}
-				<li>
-					{assignment._Measure}: {assignment._Score} ({assignment._Date}, {assignment._Type})
-				</li>
-			{/each}
-		</ul>
+		</Tabs>
+	{:else if course.Marks.Mark.Assignments.Assignment}
+		<div class="m-4"><Assignments {course} /></div>
 	{/if}
 {/if}
