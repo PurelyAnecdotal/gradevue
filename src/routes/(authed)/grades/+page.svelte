@@ -3,7 +3,7 @@
 	import { gradebook, studentAccount } from '$lib/stores';
 	import { getCache } from '$lib/cache';
 	import LoadingBanner from '$lib/LoadingBanner.svelte';
-	import removeClassID from '$lib/removeClassId';
+	import { getColorForGrade, removeClassID } from '$lib/index';
 
 	let dataLoaded = false;
 	if (!$gradebook) {
@@ -16,14 +16,6 @@
 			dataLoaded = true;
 		});
 	} else dataLoaded = true;
-
-	function getColorForGrade(grade: string) {
-		if (!dataLoaded) return 'gray';
-		if (grade.match(/^A\+?-?$/)) return 'green';
-		else if (grade.match(/^B\+?-?$/)) return 'yellow';
-		else if (grade.match(/^[CDEF]\+?-?$/)) return 'red';
-		return 'gray';
-	}
 </script>
 
 <LoadingBanner show={!dataLoaded} loadingMsg="Loading classes..." />
@@ -44,11 +36,12 @@
 						<span class="ml-2 mr-2">{course.Marks.Mark._CalculatedScoreRaw}%</span>
 
 						<Progressbar
-							color={getColorForGrade(course.Marks.Mark._CalculatedScoreString)}
+							color={!dataLoaded
+								? 'gray'
+								: getColorForGrade(course.Marks.Mark._CalculatedScoreString)}
 							progress={course.Marks.Mark._CalculatedScoreRaw}
 							animate={true}
 							class="max-w-xs"
-							divClass="w-full bg-gray-200 rounded-full dark:bg-gray-700 transition-colors duration-500 ease-in-out"
 						/>
 					</Card>
 				</a>
