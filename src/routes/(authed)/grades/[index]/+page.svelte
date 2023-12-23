@@ -32,11 +32,15 @@
 	$: course = $gradebook.Courses.Course
 		? $gradebook.Courses.Course[parseInt($page.params.index)]
 		: null;
+
+	function copyGrades() {
+		navigator.clipboard.writeText(JSON.stringify($gradebook));
+	}
 </script>
 
 <LoadingBanner show={!dataLoaded} loadingMsg="Loading grades..." />
 
-{JSON.stringify($gradebook)}
+<button on:click={copyGrades}>Copy Grades</button>
 
 {#if course}
 	<Heading tag="h1" class="mt-16 ml-8 w-fit">{removeClassID(course._Title)}</Heading>
