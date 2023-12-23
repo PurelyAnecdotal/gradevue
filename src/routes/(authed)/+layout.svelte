@@ -23,7 +23,7 @@
 
 <div class="flex">
 	<Sidebar activeUrl={$page.url.pathname} class="flex-none h-screen">
-		<SidebarWrapper class="h-screen">
+		<SidebarWrapper class="h-screen flex flex-col justify-between">
 			<SidebarGroup>
 				<SidebarBrand
 					site={{
@@ -37,7 +37,9 @@
 						<OpenBookSolid />
 					</svelte:fragment>
 				</SidebarItem>
-				<SidebarItem on:click={() => localStorage.clear()} label="Log Out" href="/login">
+			</SidebarGroup>
+			<SidebarGroup>
+				<SidebarItem on:click={() => localStorage.clear()} label="Log Out" href="/login" class="mt-auto">
 					<svelte:fragment slot="icon">
 						<ArrowRightToBracketSolid />
 					</svelte:fragment>
