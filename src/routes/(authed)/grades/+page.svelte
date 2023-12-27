@@ -1,24 +1,9 @@
 <script lang="ts">
 	import { Card, Progressbar } from 'flowbite-svelte';
-	import { gradebook, studentAccount } from '$lib/stores';
-	import { getCache } from '$lib/cache';
-	import LoadingBanner from '$lib/LoadingBanner.svelte';
+	import { gradebook, gradebookLoaded } from '$lib/stores';
+	import { loadGradebook } from '$lib/cache';
 	import { getColorForGrade, removeClassID } from '$lib/index';
-
-	let dataLoaded = false;
-	if (!$gradebook) {
-		$gradebook = getCache('gradebook');
-
-		$studentAccount.grades().then((grades) => {
-			$gradebook = grades;
-			localStorage.setItem('gradebook', JSON.stringify(grades));
-
-			dataLoaded = true;
-		});
-	} else dataLoaded = true;
 </script>
-
-<LoadingBanner show={!dataLoaded} loadingMsg="Loading classes..." />
 
 {#if $gradebook}
 	<ol>
@@ -36,7 +21,7 @@
 						</span>
 
 						<Progressbar
-							color={!dataLoaded
+							color={!$gradebookLoaded
 								? 'gray'
 								: getColorForGrade(course.Marks.Mark._CalculatedScoreString)}
 							progress={course.Marks.Mark._CalculatedScoreRaw}

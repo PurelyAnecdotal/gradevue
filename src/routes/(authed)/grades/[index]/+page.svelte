@@ -1,9 +1,7 @@
 <script lang="ts">
 	import Assignments from '$lib/Assignments.svelte';
-	import { studentAccount, gradebook } from '$lib/stores';
-	import { getCache } from '$lib/cache';
+	import { gradebook } from '$lib/stores';
 	import { page } from '$app/stores';
-	import LoadingBanner from '$lib/LoadingBanner.svelte';
 	import removeClassID from '$lib/removeClassId';
 	import {
 		Heading,
@@ -17,24 +15,10 @@
 		TabItem
 	} from 'flowbite-svelte';
 
-	let dataLoaded = false;
-	if (!$gradebook) {
-		$gradebook = getCache('gradebook');
-
-		$studentAccount.grades().then((grades) => {
-			$gradebook = grades;
-			localStorage.setItem('gradebook', JSON.stringify(grades));
-
-			dataLoaded = true;
-		});
-	} else dataLoaded = true;
-
 	$: course = $gradebook.Courses.Course
 		? $gradebook.Courses.Course[parseInt($page.params.index)]
 		: null;
 </script>
-
-<LoadingBanner show={!dataLoaded} loadingMsg="Loading grades..." />
 
 {#if course}
 	<Heading tag="h1" class="mt-16 ml-8 w-fit">{removeClassID(course._Title)}</Heading>

@@ -6,3 +6,5 @@ import type { Gradebook } from './Gradebook';
 export const studentAccount: Writable<StudentAccount> = writable();
 
 export const gradebook: Writable<Gradebook> = writable();
+
+export const gradebookLoaded = writable(false);
