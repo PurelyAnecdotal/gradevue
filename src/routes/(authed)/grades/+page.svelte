@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { Card, Progressbar } from 'flowbite-svelte';
 	import { gradebook, gradebookLoaded } from '$lib/stores';
-	import { loadGradebook } from '$lib/cache';
 	import { getColorForGrade, removeClassID } from '$lib/index';
 </script>
 
