@@ -29,11 +29,11 @@
 						padding="md"
 						class="dark:text-white text-xl max-w-none flex flex-row justify-between items-center"
 					>
-						<span>{removeClassID(course._Title)}</span>
-						<span class="text-2xl ml-auto">
+						<span class="line-clamp-1 mr-2">{removeClassID(course._Title)}</span>
+						<span class="shrink-0 ml-auto mr-2">
 							{course.Marks.Mark._CalculatedScoreString}
+							{course.Marks.Mark._CalculatedScoreRaw}%
 						</span>
-						<span class="ml-2 mr-2">{course.Marks.Mark._CalculatedScoreRaw}%</span>
 
 						<Progressbar
 							color={!dataLoaded
@@ -41,7 +41,7 @@
 								: getColorForGrade(course.Marks.Mark._CalculatedScoreString)}
 							progress={course.Marks.Mark._CalculatedScoreRaw}
 							animate={true}
-							class="max-w-xs"
+							class="hidden sm:block w-1/3"
 						/>
 					</Card>
 				</a>
