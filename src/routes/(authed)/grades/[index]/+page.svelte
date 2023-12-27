@@ -2,7 +2,7 @@
 	import Assignments from '$lib/Assignments.svelte';
 	import { gradebook } from '$lib/stores';
 	import { page } from '$app/stores';
-	import removeClassID from '$lib/removeClassId';
+	import { removeClassID } from '$lib/index';
 	import {
 		Heading,
 		Table,
@@ -21,9 +21,9 @@
 </script>
 
 {#if course}
-	<Heading tag="h1" class="mt-16 ml-8 w-fit">{removeClassID(course._Title)}</Heading>
+	<Heading tag="h1" class="sm:mt-12 ml-4 w-fit">{removeClassID(course._Title)}</Heading>
 	{#if typeof course.Marks.Mark.GradeCalculationSummary != 'string'}
-		<div class="m-4">
+		<div class="mt-4 mb-4 sm:m-4">
 			<Table shadow>
 				<TableHead>
 					<TableHeadCell>Category</TableHeadCell>
