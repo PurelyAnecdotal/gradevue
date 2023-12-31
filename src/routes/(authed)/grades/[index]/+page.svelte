@@ -22,16 +22,28 @@
 			? course?.Marks.Mark.GradeCalculationSummary.AssignmentGradeCalc
 			: null;
 
+	$: sortedCategories = gradeCategories?.toSorted((a, b) => {
+		if (a._Type == 'TOTAL') return 1;
+		if (b._Type == 'TOTAL') return -1;
+		return a._Type.localeCompare(b._Type);
+	});
+
 	$: assignmentCategories = [
 		...new Set(
 			course?.Marks.Mark.Assignments.Assignment?.map((assignment) => assignment._Type) ?? []
 		)
-	];
+	].toSorted();
 </script>
 
 {#if course}
-	<Heading tag="h1" class="md:mt-12 ml-4 w-fit">{removeClassID(course._Title)}</Heading>
-	{#if gradeCategories}
+	<div class="md:mt-12 mx-4 space-y-4 md:flex md:justify-between md:space-y-0">
+		<Heading tag="h1" class="w-fit text-4xl md:line-clamp-1">{removeClassID(course._Title)}</Heading>
+		<Heading tag="h1" class="w-fit text-4xl shrink-0">
+			{course.Marks.Mark._CalculatedScoreString}
+			{course.Marks.Mark._CalculatedScoreRaw}%
+		</Heading>
+	</div>
+	{#if gradeCategories && sortedCategories}
 		<div class="mt-4 sm:m-4">
 			<Table shadow>
 				<TableHead>
@@ -41,9 +53,9 @@
 					<TableHeadCell>Points</TableHeadCell>
 				</TableHead>
 				<TableBody>
-					{#each gradeCategories as category}
+					{#each sortedCategories as category}
 						<TableBodyRow>
-							<TableBodyCell>{category._Type}</TableBodyCell>
+							<TableBodyCell>{category._Type == 'TOTAL' ? 'Total' : category._Type}</TableBodyCell>
 							<TableBodyCell>{category._CalculatedMark}</TableBodyCell>
 							<TableBodyCell>{category._Weight}</TableBodyCell>
 							<TableBodyCell>
