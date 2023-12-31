@@ -8,6 +8,11 @@
 		SidebarItem
 	} from 'flowbite-svelte';
 	import { ArrowRightToBracketSolid, BellOutline, AdressBookOutline } from 'flowbite-svelte-icons';
+
+	function logOut() {
+		localStorage.clear();
+		location.assign('/login');
+	}
 </script>
 
 <Sidebar activeUrl={$page.url.pathname} class="flex-none h-screen">
@@ -32,12 +37,7 @@
 			</SidebarItem>
 		</SidebarGroup>
 		<SidebarGroup>
-			<SidebarItem
-				on:click={() => localStorage.clear()}
-				label="Log Out"
-				href="/login"
-				class="mt-auto"
-			>
+			<SidebarItem on:click={logOut} label="Log Out" class="mt-auto" href="/login">
 				<svelte:fragment slot="icon">
 					<ArrowRightToBracketSolid />
 				</svelte:fragment>

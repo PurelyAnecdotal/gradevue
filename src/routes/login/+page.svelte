@@ -2,7 +2,7 @@
 	import { goto } from '$app/navigation';
 	import { StudentAccount } from '$lib/synergy';
 	import { studentAccount } from '../../lib/stores';
-	import { Card, Input, Label, Helper, Button } from 'flowbite-svelte';
+	import { Card, Input, Label, Helper, Button, Accordion, AccordionItem } from 'flowbite-svelte';
 	import { EyeSlashOutline } from 'flowbite-svelte-icons';
 
 	if (localStorage.getItem('token')) {
@@ -30,9 +30,9 @@
 <div class="flex items-center justify-center min-h-screen">
 	<Card>
 		<form on:submit|preventDefault={login}>
-			<h3 class="text-xl mb-2 font-medium text-gray-900 dark:text-white">Sign in to Gradebook</h3>
-			<div class="mb-2">
-				<Label for="username" class="mb-2">Username</Label>
+			<h3 class="text-xl mb-4 dark:text-white">Sign in to Gradebook</h3>
+			<Label class="space-y-2 mb-4">
+				<span>Username</span>
 				<Input
 					type="text"
 					id="username"
@@ -40,18 +40,28 @@
 					placeholder="student@school.net"
 					required
 				/>
-			</div>
-			<div class="mb-2">
-				<Label for="password" class="mb-2">Password</Label>
+			</Label>
+			<Label class="space-y-2 mb-4">
+				<span>Password</span>
 				<Input type="password" id="password" bind:value={password} class="mb-2" required />
 				<Helper class="text-xs flex">
-					<EyeSlashOutline class='m-2'/>Your device connects directly to Synergy, so we won't see your password.
+					<EyeSlashOutline class="m-2" />Your device connects directly to Synergy, so we won't see
+					your password.
 				</Helper>
-			</div>
-			<div class="mb-2">
-				<Label for="domain" class="mb-2">Domain</Label>
-				<Input type="text" id="domain" bind:value={domain} required />
-			</div>
+			</Label>
+			<Accordion flush class="mb-4">
+				<AccordionItem
+					paddingFlush="mb-2"
+					borderBottomClass=""
+					class="text-white"
+				>
+					<span slot="header" class="text-sm dark:text-gray-300">Advanced</span>
+					<Label class="space-y-2">
+						<span>Domain</span>
+						<Input type="text" id="domain" bind:value={domain} required />
+					</Label>
+				</AccordionItem>
+			</Accordion>
 			<Button type="submit" class="w-full">Log in</Button>
 		</form>
 	</Card>
