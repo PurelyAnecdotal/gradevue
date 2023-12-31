@@ -3,6 +3,7 @@
 	import { StudentAccount } from '$lib/synergy';
 	import { studentAccount } from '../../lib/stores';
 	import { Card, Input, Label, Helper, Button } from 'flowbite-svelte';
+	import { EyeSlashOutline } from 'flowbite-svelte-icons';
 
 	if (localStorage.getItem('token')) {
 		if (!$studentAccount) {
@@ -43,8 +44,8 @@
 			<div class="mb-2">
 				<Label for="password" class="mb-2">Password</Label>
 				<Input type="password" id="password" bind:value={password} class="mb-2" required />
-				<Helper class="text-xs">
-					Your device connects directly to Synergy, so we won't see your password.
+				<Helper class="text-xs flex">
+					<EyeSlashOutline class='m-2'/>Your device connects directly to Synergy, so we won't see your password.
 				</Helper>
 			</div>
 			<div class="mb-2">
