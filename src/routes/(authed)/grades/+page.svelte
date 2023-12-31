@@ -25,7 +25,7 @@
 								: getColorForGrade(course.Marks.Mark._CalculatedScoreString)}
 							progress={course.Marks.Mark._CalculatedScoreRaw}
 							animate={true}
-							class="hidden sm:block w-1/3"
+							class="hidden sm:block w-1/3 shrink-0"
 						/>
 					</Card>
 				</a>
