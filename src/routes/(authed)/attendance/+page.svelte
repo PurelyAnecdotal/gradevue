@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { Attendance, PeriodEntity } from '$lib/Attendance';
 	import { studentAccount } from '$lib/stores';
-	import { Badge, Card } from 'flowbite-svelte';
+	import { Badge, Card, Accordion, AccordionItem } from 'flowbite-svelte';
 	import { removeClassID } from '$lib';
 
 	let attendance: Attendance;
@@ -12,17 +12,15 @@
 	const dateFormatter = new Intl.DateTimeFormat('en-US', { dateStyle: 'full' });
 
 	function getAbsenceType(periods: PeriodEntity[]) {
-		const types = periods
-			.map((period: PeriodEntity) => period._Name)
-			.map((reason: string) => {
-				if (reason == 'Absent') return 'Absent';
-				if (reason.match(/Tardy/)) return 'Tardy';
-				if (reason.match(/Field Trip|School Pass|Excused|Medical\/Dent/)) return 'Excused';
-				return 'unknown';
-			});
-		if (types.includes('Absent')) return 'Absent';
-		if (types.includes('Tardy')) return 'Tardy'
-		if (types.includes('Excused')) return 'Excused';
+		const reasons = periods.map((period: PeriodEntity) => period._Name);
+
+		if (reasons.some((reason) => reason == 'Absent')) return 'Absent';
+
+		if (reasons.some((reason) => reason.match(/Tardy/))) return 'Tardy';
+
+		if (reasons.some((reason) => reason.match(/Field Trip|School Pass|Excused|Medical\/Dent/)))
+			return 'Excused';
+
 		return 'Unknown';
 	}
 
@@ -31,7 +29,7 @@
 			case 'Absent':
 				return 'red';
 			case 'Tardy':
-				return 'yellow'
+				return 'yellow';
 			case 'Excused':
 				return 'green';
 			default:
@@ -41,25 +39,25 @@
 </script>
 
 {#if attendance}
-	<ol>
+	<Accordion class="m-4">
 		{#each attendance.Absences.Absence ?? [] as absence}
-			<li class="m-4">
-				<Card padding="md" class="dark:text-white max-w-none">
-					<div>
-						{dateFormatter.format(new Date(absence._AbsenceDate))}
-						{#if getAbsenceType(absence.Periods.Period ?? [])}
-							<Badge color={getAbsenceColor(getAbsenceType(absence.Periods.Period ?? []) ?? 'unknown')}>
-								{getAbsenceType(absence.Periods.Period ?? [])}
-							</Badge>
-						{/if}
-					</div>
-					<ol>
-						{#each absence.Periods.Period?.filter((course) => course._Name) ?? [] as period}
-							<li>{removeClassID(period._Course)}: {period._Name}</li>
-						{/each}
-					</ol>
-				</Card>
-			</li>
+			<AccordionItem class="dark:">
+				<div slot="header">
+					{dateFormatter.format(new Date(absence._AbsenceDate))}
+					{#if getAbsenceType(absence.Periods.Period ?? [])}
+						<Badge
+							color={getAbsenceColor(getAbsenceType(absence.Periods.Period ?? []) ?? 'unknown')}
+						>
+							{getAbsenceType(absence.Periods.Period ?? [])}
+						</Badge>
+					{/if}
+				</div>
+				<ol>
+					{#each absence.Periods.Period?.filter((course) => course._Name) ?? [] as period}
+						<li>{removeClassID(period._Course)}: {period._Name}</li>
+					{/each}
+				</ol>
+			</AccordionItem>
 		{/each}
-	</ol>
+	</Accordion>
 {/if}
