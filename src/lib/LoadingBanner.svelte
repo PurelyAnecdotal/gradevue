@@ -8,7 +8,7 @@
 
 {#if show}
     <div class="flex justify-center">
-        <div class="absolute top-6 bg-gray-900 rounded-lg opacity-90 z-10" out:fly={{ y: '-50%' }}>
+        <div class="fixed top-6 bg-gray-900 rounded-lg opacity-90 z-10" out:fly={{ y: '-50%' }}>
             <Spinner class="m-4" />
             <span class="dark:text-white mr-4">{loadingMsg}</span>
         </div>

@@ -3,11 +3,11 @@
 	import { studentAccount } from '$lib/stores';
 	import { StudentAccount } from '$lib/synergy';
 	import { sineIn } from 'svelte/easing';
-
 	import { Drawer, Navbar, NavBrand, NavHamburger } from 'flowbite-svelte';
 	import AppSidebar from '$lib/AppSidebar.svelte';
+	import { navigating } from '$app/stores';
 
-	let sidebarHidden = true;
+	let drawerHidden = true;
 
 	if (!$studentAccount) {
 		if (localStorage.getItem('token')) {
@@ -17,7 +17,7 @@
 	}
 
 	function showSidebar() {
-		sidebarHidden = false;
+		drawerHidden = false;
 	}
 
 	let transitionParams = {
@@ -25,25 +25,26 @@
 		duration: 200,
 		easing: sineIn
 	};
+
+	navigating.subscribe((navigating) => {
+		if (navigating) drawerHidden = true;
+	});
 </script>
 
-<div class="md:hidden">
-	<Drawer {transitionParams} bind:hidden={sidebarHidden} class="p-0 m-0 w-auto">
+<div class="fixed top-0 w-full z-10 md:hidden">
+	<Navbar>
+		<NavHamburger onClick={showSidebar} />
+		<NavBrand href="/grades" class="mr-auto text-xl">Gradebook</NavBrand>
+	</Navbar>
+	<Drawer {transitionParams} bind:hidden={drawerHidden} class="p-0 m-0 w-auto">
 		<AppSidebar />
 	</Drawer>
 </div>
-<div class="md:flex">
-	<div class="hidden md:block">
-		<AppSidebar />
-	</div>
-	<div class="md:hidden">
-		<Navbar>
-			<NavHamburger onClick={showSidebar}></NavHamburger>
-			<NavBrand href="/grades" class="mr-auto">
-				<span class="text-xl">Gradebook</span>
-			</NavBrand>
-		</Navbar>
-	</div>
 
-	<main class="w-full h-screen overflow-scroll"><slot /></main>
+<div class="hidden md:block md:fixed">
+	<AppSidebar />
 </div>
+
+<main class="flex flex-col mt-16 md:mt-0 md:ml-64">
+	<slot />
+</main>

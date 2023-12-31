@@ -30,7 +30,7 @@
 </script>
 
 {#if course}
-	<Heading tag="h1" class="sm:mt-12 ml-4 w-fit">{removeClassID(course._Title)}</Heading>
+	<Heading tag="h1" class="md:mt-12 ml-4 w-fit">{removeClassID(course._Title)}</Heading>
 	{#if gradeCategories}
 		<div class="mt-4 sm:m-4">
 			<Table shadow>
