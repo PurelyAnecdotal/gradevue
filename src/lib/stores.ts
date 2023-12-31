@@ -6,10 +6,10 @@ import type { Attendance } from './Attendance';
 
 export const studentAccount: Writable<StudentAccount> = writable();
 
-export const gradebook: Writable<Gradebook> = writable();
+export const gradebook: Writable<Gradebook> | Writable<undefined> = writable(undefined);
 
 export const gradebookLoaded = writable(false);
 
-export const attendance: Writable<Attendance> = writable();
+export const attendance: Writable<Attendance> | Writable<undefined> = writable(undefined);
 
 export const attendanceLoaded = writable(false);

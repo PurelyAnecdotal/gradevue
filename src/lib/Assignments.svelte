@@ -24,7 +24,7 @@
 		const [num, denom] = scores;
 		if (!denom) return 0;
 		return (num / denom) * 100;
-	}
+	};
 
 	const getCategoryColor = (category: string) => {
 		if (category.match(/final/i)) return 'red';
@@ -41,13 +41,18 @@
 				<Card
 					class="dark:text-white sm:p-4 mb-4 max-w-none flex flex-row justify-between items-center"
 				>
-					{assignment._Measure}: ({assignment._Date})
-					{#if !category}
-						<Badge color={getCategoryColor(assignment._Type)} class="ml-2">{assignment._Type}</Badge
-						>
-					{/if}
+					<div>
+						<span class="mr-2">{assignment._Measure}</span>
+						{#if !category}
+							<Badge color={getCategoryColor(assignment._Type)}>
+								{assignment._Type}
+							</Badge>
+						{/if}
 
-					<span class="ml-auto">
+						<Badge color="dark">{assignment._Date}</Badge>
+					</div>
+
+					<span class="ml-auto shrink-0">
 						{#if !extractScore(assignment._Points)[1]}
 							{extractScore(assignment._Points)[0]}
 						{:else}
@@ -59,7 +64,7 @@
 						color={getColorForGrade(calculateScore(extractScore(assignment._Points)))}
 						progress={Math.min(calculateScore(extractScore(assignment._Points)), 100)}
 						animate={true}
-						class="max-w-xs ml-2"
+						class="hidden md:block w-1/3 shrink-0 ml-2"
 					/>
 				</Card>
 			</li>
