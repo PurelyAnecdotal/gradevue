@@ -18,10 +18,8 @@
 	<Card>
 		<h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">Gradebook</h5>
 		<p class="font-normal text-gray-700 dark:text-gray-400 leading-tight">
-			Like synergyplus, but private.
+			An improved StudentVue experience.
 		</p>
 		<Button href="/login" class="mt-4">Log in</Button>
 	</Card>
 </div>
-
-<a href="/login">Login</a>
