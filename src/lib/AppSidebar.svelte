@@ -15,7 +15,7 @@
 	}
 </script>
 
-<Sidebar activeUrl={$page.url.pathname} class="flex-none h-screen">
+<Sidebar activeUrl={$page.url.pathname} class="h-screen">
 	<SidebarWrapper class="h-screen flex flex-col justify-between">
 		<SidebarGroup>
 			<SidebarBrand
