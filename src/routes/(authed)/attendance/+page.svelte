@@ -1,13 +1,12 @@
 <script lang="ts">
-	import type { Attendance, PeriodEntity } from '$lib/Attendance';
-	import { studentAccount } from '$lib/stores';
-	import { Badge, Card, Accordion, AccordionItem } from 'flowbite-svelte';
+	import type { PeriodEntity } from '$lib/Attendance';
+	import { attendance, attendanceLoaded } from '$lib/stores';
+	import { loadAttendance } from '$lib/cache';
+	import LoadingBanner from '$lib/LoadingBanner.svelte';
+	import { Badge, Accordion, AccordionItem } from 'flowbite-svelte';
 	import { removeClassID } from '$lib';
 
-	let attendance: Attendance;
-	$studentAccount.attendance().then((data) => {
-		attendance = data;
-	});
+	if (!$attendance) loadAttendance();
 
 	const dateFormatter = new Intl.DateTimeFormat('en-US', { dateStyle: 'full' });
 
@@ -38,15 +37,18 @@
 	}
 </script>
 
-{#if attendance}
+<LoadingBanner show={!$attendanceLoaded} loadingMsg="Loading attendance..." />
+
+{#if $attendance}
 	<Accordion class="m-4">
-		{#each attendance.Absences.Absence ?? [] as absence}
+		{#each $attendance.Absences.Absence ?? [] as absence}
 			<AccordionItem class="dark:">
 				<div slot="header">
 					{dateFormatter.format(new Date(absence._AbsenceDate))}
 					{#if getAbsenceType(absence.Periods.Period ?? [])}
 						<Badge
 							color={getAbsenceColor(getAbsenceType(absence.Periods.Period ?? []) ?? 'unknown')}
+							large
 						>
 							{getAbsenceType(absence.Periods.Period ?? [])}
 						</Badge>
