@@ -53,7 +53,7 @@
 					color="gray"
 					progress={Math.min(calculateScore(`${points} / ${pointsPossible}`), 100)}
 					animate={true}
-					class="hidden md:block w-1/3 shrink-0 ml-2"
+					class="hidden sm:block w-1/3 shrink-0 ml-2"
 				/>
 			</Card>
 		</li>
@@ -86,7 +86,7 @@
 					color={getScoreColor(assignment._Points)}
 					progress={Math.min(calculateScore(assignment._Points), 100)}
 					animate={true}
-					class="hidden md:block w-1/3 shrink-0 ml-2"
+					class="hidden sm:block w-1/3 shrink-0 ml-2"
 				/>
 			</Card>
 		</li>

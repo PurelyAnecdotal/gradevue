@@ -67,11 +67,11 @@
 </script>
 
 {#if course}
-	<div class="md:mt-12 mx-4 space-y-4 md:flex md:justify-between md:space-y-0">
-		<Heading tag="h1" class="w-fit text-4xl md:line-clamp-1">
+	<div class="mx-4 flex justify-between md:mt-12">
+		<Heading tag="h1" class="w-fit line-clamp-1 text-3xl sm:text-4xl ">
 			{removeClassID(course._Title)}
 		</Heading>
-		<Heading tag="h1" class="w-fit text-4xl shrink-0">
+		<Heading tag="h1" class="w-fit shrink-0 text-3xl sm:text-4xl">
 			{course.Marks.Mark._CalculatedScoreString}
 			{course.Marks.Mark._CalculatedScoreRaw}%
 		</Heading>
