@@ -1,7 +1,8 @@
 <script lang="ts">
-	import { Card, Badge, Progressbar } from 'flowbite-svelte';
+	import { Card, Badge, Progressbar, Popover } from 'flowbite-svelte';
 	import type { AssignmentEntity } from './Gradebook';
 	import { extractPoints, getColorForGrade } from '$lib/index';
+	import { InfoCircleOutline } from 'flowbite-svelte-icons';
 
 	export let assignments: AssignmentEntity[];
 	export let category: string | undefined = undefined;
@@ -44,7 +45,9 @@
 			>
 				<div>
 					<span class="mr-2">{categoryName}</span>
-					<Badge border color="dark">Hidden Assignments</Badge>
+					<Badge border color="dark" id="hidden-{encodeURIComponent(categoryName)}">
+						<InfoCircleOutline size="xs" class="mr-1" /> Hidden Assignments
+					</Badge>
 				</div>
 				<span class="ml-auto shrink-0">
 					{points}/{pointsPossible}
@@ -58,6 +61,10 @@
 			</Card>
 		</li>
 	{/each}
+	<Popover triggeredBy="[id^='hidden-']" class="max-w-md">
+		Teachers can choose to have assignments hidden from the assignment list but still calculated
+		toward your grade. Gradebook can reveal these assignments.
+	</Popover>
 	{#each filteredAssignments as assignment}
 		<li>
 			<Card
