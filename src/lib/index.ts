@@ -13,3 +13,11 @@ export function getColorForGrade(grade: string | number) {
 }
 
 export const removeClassID = (name: string) => name.replace(/ \([A-Z]+\)( \([0-9]+\))?$/, '');
+
+export function extractPoints(score: string): [number, number] | [number] {
+	if (score.match(/ Points Possible$/))
+		return [parseFloat(score.replace(/ Points Possible$/, ''))];
+
+	const [num, denom] = score.split(' / ').map((num) => parseFloat(num));
+	return [num, denom];
+}

@@ -2,7 +2,7 @@
 	import Assignments from '$lib/Assignments.svelte';
 	import { gradebook } from '$lib/stores';
 	import { page } from '$app/stores';
-	import { removeClassID } from '$lib/index';
+	import { removeClassID, extractPoints } from '$lib/index';
 	import {
 		Heading,
 		Table,
@@ -17,33 +17,66 @@
 
 	$: course = $gradebook?.Courses.Course?.[parseInt($page.params.index)];
 
-	$: gradeCategories =
+	$: categories =
 		typeof course?.Marks.Mark.GradeCalculationSummary != 'string'
 			? course?.Marks.Mark.GradeCalculationSummary.AssignmentGradeCalc
 			: null;
 
-	$: sortedCategories = gradeCategories?.toSorted((a, b) => {
-		if (a._Type == 'TOTAL') return 1;
-		if (b._Type == 'TOTAL') return -1;
-		return a._Type.localeCompare(b._Type);
-	});
+	$: gradeCategories = categories?.filter((grade) => grade._Type != 'TOTAL');
+
+	$: totalCategory = categories?.find((grade) => grade._Type == 'TOTAL');
 
 	$: assignmentCategories = [
-		...new Set(
-			course?.Marks.Mark.Assignments.Assignment?.map((assignment) => assignment._Type) ?? []
-		)
+		...new Set(course?.Marks.Mark.Assignments.Assignment?.map((assignment) => assignment._Type))
 	].toSorted();
+
+	$: assignments = course?.Marks.Mark.Assignments.Assignment;
+
+	let hiddenPointsByCategory: { [categoryName: string]: [number, number] } = {};
+
+	$: {
+		if (categories) {
+			let pointsByCategory: { [categoryName: string]: [number, number] } = {};
+
+			gradeCategories?.forEach((category) => {
+				pointsByCategory[category._Type] = [0, 0];
+			});
+
+			assignments?.forEach((assignment) => {
+				const [categoryPoints, categoryPointsPossible] = pointsByCategory[assignment._Type];
+
+				const [points, pointsPossible] = extractPoints(assignment._Points);
+				if (pointsPossible === undefined) return;
+
+				pointsByCategory[assignment._Type] = [
+					categoryPoints + points,
+					categoryPointsPossible + pointsPossible
+				];
+			});
+
+			gradeCategories?.forEach((category) => {
+				const [points, pointsPossible] = pointsByCategory[category._Type];
+
+				hiddenPointsByCategory[category._Type] = [
+					parseFloat(category._Points) - points,
+					parseFloat(category._PointsPossible) - pointsPossible
+				];
+			});
+		}
+	}
 </script>
 
 {#if course}
 	<div class="md:mt-12 mx-4 space-y-4 md:flex md:justify-between md:space-y-0">
-		<Heading tag="h1" class="w-fit text-4xl md:line-clamp-1">{removeClassID(course._Title)}</Heading>
+		<Heading tag="h1" class="w-fit text-4xl md:line-clamp-1">
+			{removeClassID(course._Title)}
+		</Heading>
 		<Heading tag="h1" class="w-fit text-4xl shrink-0">
 			{course.Marks.Mark._CalculatedScoreString}
 			{course.Marks.Mark._CalculatedScoreRaw}%
 		</Heading>
 	</div>
-	{#if gradeCategories && sortedCategories}
+	{#if gradeCategories}
 		<div class="mt-4 sm:m-4">
 			<Table shadow>
 				<TableHead>
@@ -53,9 +86,9 @@
 					<TableHeadCell>Points</TableHeadCell>
 				</TableHead>
 				<TableBody>
-					{#each sortedCategories as category}
+					{#each gradeCategories.toSorted() as category}
 						<TableBodyRow>
-							<TableBodyCell>{category._Type == 'TOTAL' ? 'Total' : category._Type}</TableBodyCell>
+							<TableBodyCell>{category._Type}</TableBodyCell>
 							<TableBodyCell>{category._CalculatedMark}</TableBodyCell>
 							<TableBodyCell>{category._Weight}</TableBodyCell>
 							<TableBodyCell>
@@ -63,18 +96,30 @@
 							</TableBodyCell>
 						</TableBodyRow>
 					{/each}
+					{#if totalCategory}
+						<TableBodyRow>
+							<TableBodyCell>Total</TableBodyCell>
+							<TableBodyCell>{totalCategory._CalculatedMark}</TableBodyCell>
+							<TableBodyCell />
+							<TableBodyCell>
+								{parseFloat(totalCategory._Points)} / {parseFloat(totalCategory._PointsPossible)}
+							</TableBodyCell>
+						</TableBodyRow>
+					{/if}
 				</TableBody>
 			</Table>
 		</div>
 	{/if}
-	<Tabs class="ml-4 mt-4" contentClass="p-4 bg-gray-50 rounded-lg dark:bg-gray-900">
-		<TabItem open title="All">
-			<Assignments {course} />
-		</TabItem>
-		{#each assignmentCategories as category}
-			<TabItem title={category}>
-				<Assignments {course} {category} />
+	{#if assignments}
+		<Tabs class="ml-4 mt-4" contentClass="p-4 bg-gray-50 rounded-lg dark:bg-gray-900">
+			<TabItem open title="All">
+				<Assignments {assignments} {hiddenPointsByCategory} />
 			</TabItem>
-		{/each}
-	</Tabs>
+			{#each assignmentCategories as category}
+				<TabItem title={category}>
+					<Assignments {assignments} {category} {hiddenPointsByCategory} />
+				</TabItem>
+			{/each}
+		</Tabs>
+	{/if}
 {/if}
