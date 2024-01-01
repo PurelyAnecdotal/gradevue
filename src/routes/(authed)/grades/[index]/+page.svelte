@@ -12,7 +12,8 @@
 		TableHead,
 		TableHeadCell,
 		Tabs,
-		TabItem
+		TabItem,
+		Checkbox
 	} from 'flowbite-svelte';
 
 	$: course = $gradebook?.Courses.Course?.[parseInt($page.params.index)];
@@ -45,8 +46,9 @@
 			assignments?.forEach((assignment) => {
 				const [categoryPoints, categoryPointsPossible] = pointsByCategory[assignment._Type];
 
-				const [points, pointsPossible] = extractPoints(assignment._Points);
-				if (pointsPossible === undefined) return;
+				const pointsArray = extractPoints(assignment._Points);
+				if (!pointsArray) return;
+				const [points, pointsPossible] = pointsArray;
 
 				pointsByCategory[assignment._Type] = [
 					categoryPoints + points,
@@ -64,6 +66,8 @@
 			});
 		}
 	}
+
+	let hypotheticalMode = false;
 </script>
 
 {#if course}
@@ -111,13 +115,19 @@
 		</div>
 	{/if}
 	{#if assignments}
+		<Checkbox bind:checked={hypotheticalMode} class="ml-4 mt-4">Hypothetical Mode</Checkbox>
 		<Tabs class="ml-4 mt-4" contentClass="p-4 bg-gray-50 rounded-lg dark:bg-gray-900">
 			<TabItem open title="All">
-				<Assignments {assignments} {hiddenPointsByCategory} />
+				<Assignments {assignments} {hiddenPointsByCategory} {hypotheticalMode} />
 			</TabItem>
 			{#each assignmentCategories as category}
 				<TabItem title={category}>
-					<Assignments {assignments} {category} {hiddenPointsByCategory} />
+					<Assignments
+						{assignments}
+						categoryFilter={category}
+						{hiddenPointsByCategory}
+						{hypotheticalMode}
+					/>
 				</TabItem>
 			{/each}
 		</Tabs>
