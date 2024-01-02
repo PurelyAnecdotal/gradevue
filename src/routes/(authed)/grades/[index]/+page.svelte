@@ -14,9 +14,10 @@
 		Tabs,
 		TabItem,
 		Checkbox,
-		Alert
+		Alert,
+		Popover
 	} from 'flowbite-svelte';
-	import {InfoCircleSolid} from 'flowbite-svelte-icons';
+	import { InfoCircleOutline, InfoCircleSolid } from 'flowbite-svelte-icons';
 
 	$: course = $gradebook?.Courses.Course?.[parseInt($page.params.index)];
 
@@ -117,13 +118,23 @@
 			</Table>
 		</div>
 	{:else}
-	<Alert class="m-4" color="dark">
-		<InfoCircleSolid slot="icon" class="w-4 h-4" />
-		Gradebook cannot show hidden assignments because your class does not have grade categories.
-	</Alert>
+		<Alert class="m-4" color="dark">
+			<InfoCircleSolid slot="icon" size="sm" />
+			Gradebook cannot show hidden assignments because your class does not have grade categories.
+		</Alert>
 	{/if}
 	{#if assignments}
-		<Checkbox bind:checked={hypotheticalMode} class="ml-4">Hypothetical Mode</Checkbox>
+		<Checkbox bind:checked={hypotheticalMode} class="ml-4">
+			<div id="hypothetical-toggle" class="flex items-center">
+				Hypothetical Mode
+				<InfoCircleOutline class="ml-2" size="sm" /> 
+			</div>
+		</Checkbox>
+		<Popover triggeredBy="#hypothetical-toggle" class="max-w-md">
+			Hypothetical mode allows you to see what your grade would be if you got a certain score on an
+			assignment.
+		</Popover>
+
 		<Tabs class="ml-4 mt-4" contentClass="p-4 bg-gray-50 rounded-lg dark:bg-gray-900">
 			<TabItem open title="All">
 				<Assignments {assignments} {hiddenPointsByCategory} {hypotheticalMode} />

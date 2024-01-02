@@ -20,7 +20,7 @@
 				<div>
 					<span class="mr-2">{categoryName}</span>
 					<Badge border color="dark" id="hidden-{encodeURIComponent(categoryName)}">
-						<InfoCircleOutline size="xs" class="mr-1" /> Hidden Assignments
+						Hidden Assignments <InfoCircleOutline size="xs" class="ml-1" />
 					</Badge>
 				</div>
 				<span class="ml-auto shrink-0">
