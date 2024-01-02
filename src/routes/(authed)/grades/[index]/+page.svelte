@@ -100,6 +100,7 @@
 			{course.Marks.Mark._CalculatedScoreRaw}%
 		</Heading>
 	</div>
+	
 	{#if gradeCategories}
 		<div class="my-4 sm:m-4">
 			<Table shadow>
@@ -139,6 +140,7 @@
 			Gradebook cannot show hidden assignments because your class does not have grade categories.
 		</Alert>
 	{/if}
+
 	{#if assignments}
 		<Checkbox bind:checked={hypotheticalMode} class="ml-4">
 			<div id="hypothetical-toggle" class="flex items-center">
@@ -151,10 +153,16 @@
 			assignment.
 		</Popover>
 
+		<Popover triggeredBy=".hidden-badge" class="max-w-md">
+			Teachers can choose to have assignments hidden from the assignment list but still calculated
+			toward your grade. Gradebook can reveal these assignments.
+		</Popover>
+
 		<Tabs class="ml-4 mt-4" contentClass="p-4">
 			<TabItem open title="All">
 				<Assignments {assignments} {hiddenPointsByCategory} {hypotheticalMode} />
 			</TabItem>
+
 			{#each assignmentCategories as category}
 				<TabItem title={category}>
 					<Assignments

@@ -10,11 +10,6 @@
 	export let hypotheticalMode = false;
 </script>
 
-<Popover triggeredBy=".hidden-badge" class="max-w-md">
-	Teachers can choose to have assignments hidden from the assignment list but still calculated
-	toward your grade. Gradebook can reveal these assignments.
-</Popover>
-
 <ol class="space-y-4">
 	{#each Object.entries(hiddenPointsByCategory) as [categoryName, [pointsEarned, pointsPossible]]}
 		<li>
