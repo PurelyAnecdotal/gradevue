@@ -1,6 +1,6 @@
 <script lang="ts">
 	import Assignments from '$lib/Assignments.svelte';
-	import { gradebook } from '$lib/stores';
+	import { gradebook, hypotheticalGradebook } from '$lib/stores';
 	import { page } from '$app/stores';
 	import { removeClassID, extractPoints } from '$lib/index';
 	import {
@@ -72,7 +72,25 @@
 	}
 
 	let hypotheticalMode = false;
+
+	$: {
+		let hypotheticalPoints: { [gradebookID: string]: [number, number] } = {};
+
+		assignments?.forEach((assignment) => {
+			hypotheticalPoints[assignment._GradebookID] = extractPoints(assignment._Points);
+		});
+
+		Object.entries(hiddenPointsByCategory).forEach(
+			([categoryName, [pointsEarned, pointsPossible]]) => {
+				hypotheticalPoints[`hidden-${categoryName}`] = [pointsEarned, pointsPossible];
+			}
+		);
+
+		$hypotheticalGradebook = hypotheticalPoints;
+	}
 </script>
+
+{JSON.stringify($hypotheticalGradebook)}
 
 {#if course}
 	<div class="mx-4 flex justify-between md:mt-12">
@@ -127,7 +145,7 @@
 		<Checkbox bind:checked={hypotheticalMode} class="ml-4">
 			<div id="hypothetical-toggle" class="flex items-center">
 				Hypothetical Mode
-				<InfoCircleOutline class="ml-2" size="sm" /> 
+				<InfoCircleOutline class="ml-2" size="sm" />
 			</div>
 		</Checkbox>
 		<Popover triggeredBy="#hypothetical-toggle" class="max-w-md">

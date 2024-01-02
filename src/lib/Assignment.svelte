@@ -2,10 +2,12 @@
 	import { Card, Badge, Progressbar, Input } from 'flowbite-svelte';
 	import { getColorForGrade } from '$lib/index';
 	import { InfoCircleOutline } from 'flowbite-svelte-icons';
+	import { hypotheticalGradebook } from './stores';
 
 	export let name: string;
 	export let pointsEarned: number;
 	export let pointsPossible: number;
+	export let id: string;
 	export let category: string | undefined = undefined;
 	export let date: string | undefined = undefined;
 	export let hypotheticalMode = false;
@@ -18,11 +20,8 @@
 		return 'primary';
 	};
 
-	export let hypotheticalPointsEarned = isNaN(pointsEarned) ? '' : pointsEarned.toString();
-	export let hypotheticalPointsPossible = pointsPossible.toString();
-
 	$: percentage = hypotheticalMode
-		? (parseFloat(hypotheticalPointsEarned) / parseFloat(hypotheticalPointsPossible)) * 100
+		? ($hypotheticalGradebook[id][0] / $hypotheticalGradebook[id][1]) * 100
 		: (pointsEarned / pointsPossible) * 100;
 </script>
 
@@ -37,7 +36,7 @@
 		{#if date}
 			<Badge color="dark">{date}</Badge>
 		{/if}
-		{#if hypotheticalMode ? hypotheticalPointsEarned == '' : isNaN(pointsEarned)}
+		{#if hypotheticalMode ? !$hypotheticalGradebook[id][0] : isNaN(pointsEarned)}
 			<Badge color="dark">Not Graded</Badge>
 		{/if}
 		{#if hidden}
@@ -50,9 +49,9 @@
 	<div class="ml-auto mr-2 shrink-0">
 		{#if hypotheticalMode}
 			<div class="w-32 flex items-center">
-				<Input type="number" size="sm" bind:value={hypotheticalPointsEarned} />
+				<Input type="number" size="sm" bind:value={$hypotheticalGradebook[id][0]} />
 				<span class="mx-1"> / </span>
-				<Input type="number" size="sm" bind:value={hypotheticalPointsPossible} />
+				<Input type="number" size="sm" bind:value={$hypotheticalGradebook[id][1]} />
 			</div>
 		{:else if isNaN(pointsEarned)}
 			{pointsPossible}

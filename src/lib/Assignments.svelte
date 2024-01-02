@@ -18,7 +18,14 @@
 <ol class="space-y-4">
 	{#each Object.entries(hiddenPointsByCategory) as [categoryName, [pointsEarned, pointsPossible]]}
 		<li>
-			<Assignment name={categoryName} {pointsEarned} {pointsPossible} {hypotheticalMode} hidden />
+			<Assignment
+				name={categoryName}
+				{pointsEarned}
+				{pointsPossible}
+				{hypotheticalMode}
+				id={`hidden-${categoryName}`}
+				hidden
+			/>
 		</li>
 	{/each}
 
@@ -30,6 +37,7 @@
 				date={assignment._Date}
 				pointsEarned={extractPoints(assignment._Points)[0]}
 				pointsPossible={extractPoints(assignment._Points)[1]}
+				id={assignment._GradebookID}
 				{hypotheticalMode}
 			/>
 		</li>
