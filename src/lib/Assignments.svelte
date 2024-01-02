@@ -32,6 +32,7 @@
 				pointsEarned={extractPoints(assignment._Points)[0]}
 				pointsPossible={extractPoints(assignment._Points)[1]}
 				id={assignment._GradebookID}
+				notForGrade={assignment._Notes == '(Not For Grading)'}
 				{hypotheticalMode}
 			/>
 		</li>

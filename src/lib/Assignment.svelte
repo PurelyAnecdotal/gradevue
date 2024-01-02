@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Card, Badge, Progressbar, Input } from 'flowbite-svelte';
+	import { Card, Badge, Progressbar, Input, Checkbox } from 'flowbite-svelte';
 	import { getColorForGrade } from '$lib/index';
 	import { InfoCircleOutline } from 'flowbite-svelte-icons';
 	import { hypotheticalGradebook } from './stores';
@@ -12,6 +12,7 @@
 	export let date: string | undefined = undefined;
 	export let hypotheticalMode = false;
 	export let hidden = false;
+	export let notForGrade = true;
 
 	const getCategoryColor = (category: string) => {
 		if (category.match(/final/i)) return 'red';
@@ -38,6 +39,17 @@
 		{/if}
 		{#if hypotheticalMode ? !$hypotheticalGradebook[id][0] : isNaN(pointsEarned)}
 			<Badge color="dark">Not Graded</Badge>
+		{/if}
+		{#if notForGrade}
+			<Badge color="dark">
+				{#if hypotheticalMode}
+					<Checkbox bind:checked={$hypotheticalGradebook[id][2]}>
+						<span class="text-xs">Not For Grade</span>
+					</Checkbox>
+				{:else}
+					Not For Grade
+				{/if}
+			</Badge>
 		{/if}
 		{#if hidden}
 			<Badge border color="dark" class="hidden-badge">
