@@ -85,7 +85,7 @@
 		</Heading>
 	</div>
 	{#if gradeCategories}
-		<div class="mt-4 sm:m-4">
+		<div class="my-4 sm:m-4">
 			<Table shadow>
 				<TableHead>
 					<TableHeadCell>Category</TableHeadCell>
@@ -135,7 +135,7 @@
 			assignment.
 		</Popover>
 
-		<Tabs class="ml-4 mt-4" contentClass="p-4 bg-gray-50 rounded-lg dark:bg-gray-900">
+		<Tabs class="ml-4 mt-4" contentClass="p-4">
 			<TabItem open title="All">
 				<Assignments {assignments} {hiddenPointsByCategory} {hypotheticalMode} />
 			</TabItem>

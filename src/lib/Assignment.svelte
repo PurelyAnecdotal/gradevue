@@ -24,9 +24,9 @@
 		: (pointsEarned / pointsPossible) * 100;
 </script>
 
-<Card class="dark:text-white sm:p-4 mb-4 max-w-none flex flex-row justify-between items-center">
-	<div>
-		<span class="mr-2">{assignment._Measure}</span>
+<Card class="dark:text-white max-w-none flex flex-row items-center sm:p-4">
+	<div class="mr-2">
+		<span>{assignment._Measure}</span>
 		{#if showCategory}
 			<Badge color={getCategoryColor(assignment._Type)}>
 				{assignment._Type}
@@ -40,7 +40,7 @@
 		{/if}
 	</div>
 
-	<div class="ml-auto shrink-0">
+	<div class="ml-auto mr-2 shrink-0">
 		{#if hypotheticalMode}
 			<div class="w-32 flex items-center">
 				<Input type="number" size="sm" bind:value={hypotheticalPointsEarned} />
@@ -58,6 +58,6 @@
 		color={getColorForGrade(percentage)}
 		progress={Math.min(isNaN(percentage) ? 0 : percentage, 100)}
 		animate={true}
-		class="hidden sm:block w-1/3 shrink-0 ml-2"
+		class="hidden sm:block w-1/3 shrink-0"
 	/>
 </Card>

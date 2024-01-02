@@ -37,7 +37,7 @@
 			</SidebarItem>
 		</SidebarGroup>
 		<SidebarGroup>
-			<SidebarItem on:click={logOut} label="Log Out" class="mt-auto" href="/login">
+			<SidebarItem on:click={logOut} label="Log Out" href="/login">
 				<svelte:fragment slot="icon">
 					<ArrowRightToBracketSolid />
 				</svelte:fragment>

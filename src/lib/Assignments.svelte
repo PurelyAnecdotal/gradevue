@@ -11,34 +11,33 @@
 	export let hypotheticalMode = false;
 </script>
 
-<ol>
+<Popover triggeredBy="[id^='hidden-']" class="max-w-md">
+	Teachers can choose to have assignments hidden from the assignment list but still calculated
+	toward your grade. Gradebook can reveal these assignments.
+</Popover>
+
+<ol class="space-y-4">
 	{#each Object.entries(hiddenPointsByCategory) as [categoryName, [points, pointsPossible]]}
 		<li>
-			<Card
-				class="dark:text-white sm:p-4 mb-4 max-w-none flex flex-row justify-between items-center"
-			>
-				<div>
-					<span class="mr-2">{categoryName}</span>
+			<Card class="dark:text-white max-w-none flex flex-row items-center sm:p-4">
+				<div class="flex items-center space-x-2">
+					<span>{categoryName}</span>
 					<Badge border color="dark" id="hidden-{encodeURIComponent(categoryName)}">
 						Hidden Assignments <InfoCircleOutline size="xs" class="ml-1" />
 					</Badge>
 				</div>
-				<span class="ml-auto shrink-0">
+				<span class="ml-auto mr-2 shrink-0">
 					{points}/{pointsPossible}
 				</span>
 				<Progressbar
 					color="gray"
 					progress={Math.min(calculatePercent(`${points} / ${pointsPossible}`), 100)}
 					animate={true}
-					class="hidden sm:block w-1/3 shrink-0 ml-2"
+					class="w-1/3 shrink-0 hidden sm:block"
 				/>
 			</Card>
 		</li>
 	{/each}
-	<Popover triggeredBy="[id^='hidden-']" class="max-w-md">
-		Teachers can choose to have assignments hidden from the assignment list but still calculated
-		toward your grade. Gradebook can reveal these assignments.
-	</Popover>
 
 	{#each assignments as assignment}
 		<li>
