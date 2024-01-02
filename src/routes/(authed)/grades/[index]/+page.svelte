@@ -13,8 +13,10 @@
 		TableHeadCell,
 		Tabs,
 		TabItem,
-		Checkbox
+		Checkbox,
+		Alert
 	} from 'flowbite-svelte';
+	import {InfoCircleSolid} from 'flowbite-svelte-icons';
 
 	$: course = $gradebook?.Courses.Course?.[parseInt($page.params.index)];
 
@@ -44,14 +46,14 @@
 			});
 
 			assignments?.forEach((assignment) => {
-				const [categoryPoints, categoryPointsPossible] = pointsByCategory[assignment._Type];
+				const [categoryPointsEarned, categoryPointsPossible] = pointsByCategory[assignment._Type];
 
-				const pointsArray = extractPoints(assignment._Points);
-				if (!pointsArray) return;
-				const [points, pointsPossible] = pointsArray;
+				const points = extractPoints(assignment._Points);
+				if (!points) return;
+				const [pointsEarned, pointsPossible] = points;
 
 				pointsByCategory[assignment._Type] = [
-					categoryPoints + points,
+					categoryPointsEarned + pointsEarned,
 					categoryPointsPossible + pointsPossible
 				];
 			});
@@ -59,10 +61,11 @@
 			gradeCategories?.forEach((category) => {
 				const [points, pointsPossible] = pointsByCategory[category._Type];
 
-				hiddenPointsByCategory[category._Type] = [
-					parseFloat(category._Points) - points,
-					parseFloat(category._PointsPossible) - pointsPossible
-				];
+				const hiddenPointsEarned = parseFloat(category._Points) - points;
+				const hiddenPointsPossible = parseFloat(category._PointsPossible) - pointsPossible;
+
+				if (hiddenPointsEarned && hiddenPointsPossible)
+					hiddenPointsByCategory[category._Type] = [hiddenPointsEarned, hiddenPointsPossible];
 			});
 		}
 	}
@@ -113,9 +116,14 @@
 				</TableBody>
 			</Table>
 		</div>
+	{:else}
+	<Alert class="m-4" color="dark">
+		<InfoCircleSolid slot="icon" class="w-4 h-4" />
+		Gradebook cannot show hidden assignments because your class does not have grade categories.
+	</Alert>
 	{/if}
 	{#if assignments}
-		<Checkbox bind:checked={hypotheticalMode} class="ml-4 mt-4">Hypothetical Mode</Checkbox>
+		<Checkbox bind:checked={hypotheticalMode} class="ml-4">Hypothetical Mode</Checkbox>
 		<Tabs class="ml-4 mt-4" contentClass="p-4 bg-gray-50 rounded-lg dark:bg-gray-900">
 			<TabItem open title="All">
 				<Assignments {assignments} {hiddenPointsByCategory} {hypotheticalMode} />
@@ -123,9 +131,13 @@
 			{#each assignmentCategories as category}
 				<TabItem title={category}>
 					<Assignments
-						{assignments}
-						categoryFilter={category}
-						{hiddenPointsByCategory}
+						assignments={assignments.filter((assignment) => assignment._Type == category)}
+						showCategories={false}
+						hiddenPointsByCategory={Object.fromEntries(
+							Object.entries(hiddenPointsByCategory).filter(
+								([categoryName]) => categoryName == category
+							)
+						)}
 						{hypotheticalMode}
 					/>
 				</TabItem>

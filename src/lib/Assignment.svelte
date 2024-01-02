@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { Card, Badge, Progressbar, Input } from 'flowbite-svelte';
-	import { calculatePercent, extractPoints, getColorForGrade } from '$lib/index';
+	import { extractPoints, getColorForGrade } from '$lib/index';
 	import type { AssignmentEntity } from './Gradebook';
 
 	export let assignment: AssignmentEntity;
@@ -16,8 +16,8 @@
 
 	const [pointsEarned, pointsPossible] = extractPoints(assignment._Points);
 
-	let hypotheticalPointsEarned = isNaN(pointsEarned) ? '' : pointsEarned.toString();
-	let hypotheticalPointsPossible = pointsPossible.toString();
+	export let hypotheticalPointsEarned = isNaN(pointsEarned) ? '' : pointsEarned.toString();
+	export let hypotheticalPointsPossible = pointsPossible.toString();
 
 	$: percentage = hypotheticalMode
 		? (parseFloat(hypotheticalPointsEarned) / parseFloat(hypotheticalPointsPossible)) * 100
