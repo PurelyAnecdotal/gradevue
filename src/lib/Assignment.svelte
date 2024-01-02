@@ -1,11 +1,15 @@
 <script lang="ts">
 	import { Card, Badge, Progressbar, Input } from 'flowbite-svelte';
-	import { extractPoints, getColorForGrade } from '$lib/index';
-	import type { AssignmentEntity } from './Gradebook';
+	import { getColorForGrade } from '$lib/index';
+	import { InfoCircleOutline } from 'flowbite-svelte-icons';
 
-	export let assignment: AssignmentEntity;
-	export let showCategory = true;
+	export let name: string;
+	export let pointsEarned: number;
+	export let pointsPossible: number;
+	export let category: string | undefined = undefined;
+	export let date: string | undefined = undefined;
 	export let hypotheticalMode = false;
+	export let hidden = false;
 
 	const getCategoryColor = (category: string) => {
 		if (category.match(/final/i)) return 'red';
@@ -13,8 +17,6 @@
 		if (category.match(/homework|classwork|activity|activities/i)) return 'green';
 		return 'primary';
 	};
-
-	const [pointsEarned, pointsPossible] = extractPoints(assignment._Points);
 
 	export let hypotheticalPointsEarned = isNaN(pointsEarned) ? '' : pointsEarned.toString();
 	export let hypotheticalPointsPossible = pointsPossible.toString();
@@ -26,17 +28,22 @@
 
 <Card class="dark:text-white max-w-none flex flex-row items-center sm:p-4">
 	<div class="mr-2">
-		<span>{assignment._Measure}</span>
-		{#if showCategory}
-			<Badge color={getCategoryColor(assignment._Type)}>
-				{assignment._Type}
+		<span>{name}</span>
+		{#if category}
+			<Badge color={getCategoryColor(category)}>
+				{category}
 			</Badge>
 		{/if}
-
-		<Badge color="dark">{assignment._Date}</Badge>
-
+		{#if date}
+			<Badge color="dark">{date}</Badge>
+		{/if}
 		{#if hypotheticalMode ? hypotheticalPointsEarned == '' : isNaN(pointsEarned)}
 			<Badge color="dark">Not Graded</Badge>
+		{/if}
+		{#if hidden}
+			<Badge border color="dark" class="hidden-badge">
+				Hidden Assignments <InfoCircleOutline size="xs" class="ml-1" />
+			</Badge>
 		{/if}
 	</div>
 
