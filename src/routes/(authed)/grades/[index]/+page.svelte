@@ -4,7 +4,6 @@
 	import { page } from '$app/stores';
 	import { removeClassID, extractPoints } from '$lib/index';
 	import {
-		Heading,
 		Table,
 		TableBody,
 		TableBodyCell,
@@ -151,19 +150,7 @@
 </script>
 
 {#if course}
-	<div class="mx-4 flex justify-between md:mt-12">
-		<Heading tag="h1" class="w-fit line-clamp-1 text-3xl sm:text-4xl ">
-			{removeClassID(course._Title)}
-		</Heading>
-		<Heading tag="h1" class="w-fit shrink-0 text-3xl sm:text-4xl">
-			{#if hypotheticalMode}
-				{Math.round(hypotheticalGrade * 100000) / 1000}%
-			{:else}
-				{course.Marks.Mark._CalculatedScoreString}
-				{course.Marks.Mark._CalculatedScoreRaw}%
-			{/if}
-		</Heading>
-	</div>
+	<div class="h-8 md:h-14" />
 
 	{#if gradeCategories}
 		<div class="my-4 sm:m-4">
@@ -243,4 +230,22 @@
 			{/each}
 		</Tabs>
 	{/if}
+
+	<div class="top-12 left-0 w-full fixed md:top-0">
+		<div class="absolute w-full md:pl-64">
+			<div class="p-4 rounded-b-lg bg-gray-900 rounded flex justify-between">
+				<span class="line-clamp-1 text-2xl">
+					{removeClassID(course._Title)}
+				</span>
+				<span class="shrink-0 text-2xl">
+					{#if hypotheticalMode}
+						{Math.round(hypotheticalGrade * 100000) / 1000}%
+					{:else}
+						{course.Marks.Mark._CalculatedScoreString}
+						{course.Marks.Mark._CalculatedScoreRaw}%
+					{/if}
+				</span>
+			</div>
+		</div>
+	</div>
 {/if}

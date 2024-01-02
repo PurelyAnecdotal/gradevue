@@ -45,6 +45,6 @@
 	<AppSidebar />
 </div>
 
-<main class="flex flex-col mt-16 md:mt-0 md:ml-64">
+<main class="mt-16 md:mt-0 md:ml-64">
 	<slot />
 </main>
