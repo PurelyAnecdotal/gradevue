@@ -90,8 +90,6 @@
 	}
 </script>
 
-{JSON.stringify($hypotheticalGradebook)}
-
 {#if course}
 	<div class="mx-4 flex justify-between md:mt-12">
 		<Heading tag="h1" class="w-fit line-clamp-1 text-3xl sm:text-4xl ">
