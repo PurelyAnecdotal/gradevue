@@ -21,7 +21,7 @@
 	};
 
 	$: percentage = hypotheticalMode
-		? ($hypotheticalGradebook[id][0] / $hypotheticalGradebook[id][1]) * 100
+		? (parseFloat($hypotheticalGradebook[id][0]) / parseFloat($hypotheticalGradebook[id][1])) * 100
 		: (pointsEarned / pointsPossible) * 100;
 </script>
 

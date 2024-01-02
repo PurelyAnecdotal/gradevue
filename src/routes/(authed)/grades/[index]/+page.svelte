@@ -86,7 +86,59 @@
 			}
 		);
 
-		$hypotheticalGradebook = hypotheticalPoints;
+		$hypotheticalGradebook = Object.fromEntries(
+			Object.entries(hypotheticalPoints).map(([id, [pointsEarned, pointsPossible]]) => [
+				id,
+				[pointsEarned.toString(), pointsPossible.toString()]
+			])
+		);
+	}
+
+	let hypotheticalGrade = 0;
+	$: {
+		let pointsByCategory: { [categoryName: string]: [number, number] } = {};
+
+		assignments?.forEach((assignment) => {
+			const points = pointsByCategory[assignment._Type] ?? [0, 0];
+			const hypotheticalPoints = [
+				parseFloat($hypotheticalGradebook[assignment._GradebookID][0]),
+				parseFloat($hypotheticalGradebook[assignment._GradebookID][1])
+			];
+
+			if (isNaN(hypotheticalPoints[0])) return;
+
+			pointsByCategory[assignment._Type] = [
+				points[0] + hypotheticalPoints[0],
+				points[1] + hypotheticalPoints[1]
+			];
+		});
+
+		Object.keys(hiddenPointsByCategory).forEach((categoryName) => {
+			const points = pointsByCategory[categoryName] ?? [0, 0];
+			const hypotheticalPoints = [
+				parseFloat($hypotheticalGradebook[`hidden-${categoryName}`][0]),
+				parseFloat($hypotheticalGradebook[`hidden-${categoryName}`][1])
+			];
+
+			if (isNaN(hypotheticalPoints[0])) return;
+
+			pointsByCategory[categoryName] = [
+				points[0] + hypotheticalPoints[0],
+				points[1] + hypotheticalPoints[1]
+			];
+		});
+
+		let weight = 0;
+
+		Object.entries(pointsByCategory).forEach(([categoryName, [pointsEarned, pointsPossible]]) => {
+			const category = gradeCategories?.find((category) => category._Type == categoryName);
+			if (!category) return;
+
+			hypotheticalGrade += (pointsEarned / pointsPossible) * parseFloat(category._Weight);
+			weight += parseFloat(category._Weight);
+		});
+
+		hypotheticalGrade /= weight;
 	}
 </script>
 
@@ -96,11 +148,15 @@
 			{removeClassID(course._Title)}
 		</Heading>
 		<Heading tag="h1" class="w-fit shrink-0 text-3xl sm:text-4xl">
-			{course.Marks.Mark._CalculatedScoreString}
-			{course.Marks.Mark._CalculatedScoreRaw}%
+			{#if hypotheticalMode}
+				{Math.round(hypotheticalGrade * 100000) / 1000}%
+			{:else}
+				{course.Marks.Mark._CalculatedScoreString}
+				{course.Marks.Mark._CalculatedScoreRaw}%
+			{/if}
 		</Heading>
 	</div>
-	
+
 	{#if gradeCategories}
 		<div class="my-4 sm:m-4">
 			<Table shadow>

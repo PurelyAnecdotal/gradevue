@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { Popover } from 'flowbite-svelte';
 	import type { AssignmentEntity } from './Gradebook';
 	import Assignment from './Assignment.svelte';
 	import { extractPoints } from '$lib';

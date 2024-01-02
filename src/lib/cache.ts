@@ -8,7 +8,7 @@ export function loadGradebook() {
 	if (cache) gradebook.set(JSON.parse(cache));
 
 	get(studentAccount)
-		.grades()
+		?.grades()
 		.then((grades) => {
 			gradebook.set(grades);
 			localStorage.setItem('gradebook', JSON.stringify(grades));
@@ -24,7 +24,7 @@ export function loadAttendance() {
 	if (cache) attendance.set(JSON.parse(cache))
 
 	get(studentAccount)
-		.attendance()
+		?.attendance()
 		.then((attendanceRecord) => {
 			attendance.set(attendanceRecord);
 			localStorage.setItem('attendance', JSON.stringify(attendanceRecord));
