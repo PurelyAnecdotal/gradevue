@@ -4,11 +4,9 @@
 	import { loadAttendance } from '$lib/cache';
 	import LoadingBanner from '$lib/LoadingBanner.svelte';
 	import { Badge, Accordion, AccordionItem } from 'flowbite-svelte';
-	import { removeClassID } from '$lib';
+	import { fullDateFormatter, removeClassID } from '$lib';
 
 	if (!$attendance) loadAttendance();
-
-	const dateFormatter = new Intl.DateTimeFormat('en-US', { dateStyle: 'full' });
 
 	function getAbsenceType(periods: PeriodEntity[]) {
 		const reasons = periods.map((period: PeriodEntity) => period._Name);
@@ -44,7 +42,7 @@
 		{#each $attendance.Absences.Absence ?? [] as absence}
 			<AccordionItem class="dark:">
 				<div slot="header">
-					{dateFormatter.format(new Date(absence._AbsenceDate))}
+					{fullDateFormatter.format(new Date(absence._AbsenceDate))}
 					{#if getAbsenceType(absence.Periods.Period ?? [])}
 						<Badge
 							color={getAbsenceColor(getAbsenceType(absence.Periods.Period ?? []) ?? 'unknown')}

@@ -1,6 +1,6 @@
 <script lang="ts">
-	import { Card, Badge, Progressbar, Input, Checkbox } from 'flowbite-svelte';
-	import { getColorForGrade } from '$lib/index';
+	import { Card, Badge, Progressbar, Input, Checkbox, Popover } from 'flowbite-svelte';
+	import { fullDateFormatter, getColorForGrade, getRelativeTime, shortDateFormatter } from '$lib/index';
 	import { InfoCircleOutline } from 'flowbite-svelte-icons';
 	import { hypotheticalGradebook } from './stores';
 
@@ -9,7 +9,7 @@
 	export let pointsPossible: number;
 	export let id: string;
 	export let category: string | undefined = undefined;
-	export let date: string | undefined = undefined;
+	export let date: Date | undefined = undefined;
 	export let hypotheticalMode = false;
 	export let hidden = false;
 	export let notForGrade = true;
@@ -57,7 +57,11 @@
 			</Badge>
 		{/if}
 		{#if date}
-			<Badge color="dark">{date}</Badge>
+			<Badge id="date-{id}" color="dark">{shortDateFormatter.format(date)}</Badge>
+			<Popover triggeredBy="#date-{id}">
+				{fullDateFormatter.format(date)}
+				({getRelativeTime(date)})
+			</Popover>
 		{/if}
 	</div>
 

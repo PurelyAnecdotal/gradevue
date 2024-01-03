@@ -28,7 +28,7 @@
 			<Assignment
 				name={assignment._Measure}
 				category={showCategories ? assignment._Type : undefined}
-				date={assignment._Date}
+				date={new Date(assignment._Date)}
 				pointsEarned={extractPoints(assignment._Points)[0]}
 				pointsPossible={extractPoints(assignment._Points)[1]}
 				id={assignment._GradebookID}
