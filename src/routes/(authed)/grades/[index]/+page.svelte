@@ -14,9 +14,10 @@
 		TabItem,
 		Checkbox,
 		Alert,
-		Popover
+		Popover,
+		Button
 	} from 'flowbite-svelte';
-	import { InfoCircleOutline, InfoCircleSolid } from 'flowbite-svelte-icons';
+	import { GridPlusOutline, InfoCircleOutline, InfoCircleSolid } from 'flowbite-svelte-icons';
 
 	$: course = $gradebook?.Courses.Course?.[parseInt($page.params.index)];
 
@@ -135,25 +136,39 @@
 		});
 
 		hypotheticalGrade = 0;
-		let weight = 0;
 
-		Object.entries(pointsByCategory).forEach(([categoryName, [pointsEarned, pointsPossible]]) => {
-			const category = gradeCategories?.find((category) => category._Type == categoryName);
-			if (!category) return;
+		if (gradeCategories) {
+			let weight = 0;
 
-			hypotheticalGrade += (pointsEarned / pointsPossible) * parseFloat(category._Weight);
-			weight += parseFloat(category._Weight);
-		});
+			Object.entries(pointsByCategory).forEach(([categoryName, [pointsEarned, pointsPossible]]) => {
+				const category = gradeCategories?.find((category) => category._Type == categoryName);
+				if (!category) return;
 
-		hypotheticalGrade = hypotheticalGrade / weight;
+				hypotheticalGrade += (pointsEarned / pointsPossible) * parseFloat(category._Weight);
+				weight += parseFloat(category._Weight);
+			});
+
+			hypotheticalGrade = hypotheticalGrade / weight;
+		} else {
+			let totalPoints = 0;
+
+			Object.entries(pointsByCategory).forEach(
+				([_categoryName, [pointsEarned, pointsPossible]]) => {
+					hypotheticalGrade += pointsEarned;
+					totalPoints += pointsPossible;
+				}
+			);
+
+			hypotheticalGrade = hypotheticalGrade / totalPoints;
+		}
 	}
 </script>
 
 {#if course}
-	<div class="h-8 md:h-14" />
+	<div class="h-12 md:h-14" />
 
 	{#if gradeCategories}
-		<div class="my-4 sm:m-4">
+		<div class="sm:mx-4">
 			<Table shadow>
 				<TableHead>
 					<TableHeadCell>Category</TableHeadCell>
@@ -193,23 +208,32 @@
 	{/if}
 
 	{#if assignments}
-		<Checkbox bind:checked={hypotheticalMode} class="ml-4">
-			<div id="hypothetical-toggle" class="flex items-center">
-				Hypothetical Mode
-				<InfoCircleOutline class="ml-2" size="sm" />
-			</div>
-		</Checkbox>
-		<Popover triggeredBy="#hypothetical-toggle" class="max-w-md">
-			Hypothetical mode allows you to see what your grade would be if you got a certain score on an
-			assignment.
-		</Popover>
+		<div class="flex flex-wrap justify-between items-center">
+			<Checkbox bind:checked={hypotheticalMode} class="m-4">
+				<div id="hypothetical-toggle" class="flex items-center mr-2">
+					Hypothetical Mode
+					<InfoCircleOutline class="ml-2" size="sm" />
+				</div>
+			</Checkbox>
+			<Popover triggeredBy="#hypothetical-toggle" class="max-w-md">
+				Hypothetical mode allows you to see what your grade would be if you got a certain score on
+				an assignment.
+			</Popover>
+
+			{#if hypotheticalMode}
+				<Button color="light" class="mx-4">
+					<GridPlusOutline size="sm" class="mr-2 focus:outline-none" />
+					Add Hypothetical Assignment
+				</Button>
+			{/if}
+		</div>
 
 		<Popover triggeredBy=".hidden-badge" class="max-w-md">
 			Teachers can choose to have assignments hidden from the assignment list but still calculated
 			toward your grade. Gradebook can reveal these assignments.
 		</Popover>
 
-		<Tabs class="ml-4 mt-4" contentClass="p-4">
+		<Tabs class="m-4 mb-0" contentClass="m-4">
 			<TabItem open title="All">
 				<Assignments {assignments} {hiddenPointsByCategory} {hypotheticalMode} />
 			</TabItem>
