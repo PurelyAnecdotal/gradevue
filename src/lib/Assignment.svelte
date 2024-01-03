@@ -34,14 +34,14 @@
 				{category}
 			</Badge>
 		{/if}
-		{#if date}
-			<Badge color="dark">{date}</Badge>
+		{#if percentage == Infinity}
+			<Badge border color="indigo">Extra Credit</Badge>
 		{/if}
-		{#if hypotheticalMode ? !$hypotheticalGradebook[id][0] : isNaN(pointsEarned)}
-			<Badge color="dark">Not Graded</Badge>
+		{#if hypotheticalMode ? isNaN(parseFloat($hypotheticalGradebook[id][0])) : isNaN(pointsEarned)}
+			<Badge border color="purple">Not Graded</Badge>
 		{/if}
 		{#if notForGrade}
-			<Badge color="dark">
+			<Badge border color="pink">
 				{#if hypotheticalMode}
 					<Checkbox bind:checked={$hypotheticalGradebook[id][2]}>
 						<span class="text-xs">Not For Grade</span>
@@ -56,6 +56,9 @@
 				Hidden Assignments <InfoCircleOutline size="xs" class="ml-1" />
 			</Badge>
 		{/if}
+		{#if date}
+			<Badge color="dark">{date}</Badge>
+		{/if}
 	</div>
 
 	<div class="ml-auto mr-2 shrink-0">
@@ -69,7 +72,9 @@
 			{pointsPossible}
 		{:else}
 			{pointsEarned}/{pointsPossible}
-			{Math.round(percentage * 100) / 100}%
+			{#if percentage != Infinity}
+				{Math.round(percentage * 100) / 100}%
+			{/if}
 		{/if}
 	</div>
 	<Progressbar
