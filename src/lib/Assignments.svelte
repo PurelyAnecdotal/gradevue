@@ -7,9 +7,32 @@
 	export let showCategories = true;
 	export let hiddenPointsByCategory: { [categoryName: string]: [number, number] } = {};
 	export let hypotheticalMode = false;
+	export let hypotheticalAssignments: {
+		name: string;
+		pointsEarned: number;
+		pointsPossible: number;
+		id: string;
+		category?: string;
+	}[] = [];
+	export let hypotheticalCategoryOptions: string[] = [];
 </script>
 
 <ol class="space-y-4">
+	{#each hypotheticalAssignments as hypotheticalAssignment}
+		<li>
+			<Assignment
+				name={hypotheticalAssignment.name}
+				pointsEarned={hypotheticalAssignment.pointsEarned}
+				pointsPossible={hypotheticalAssignment.pointsPossible}
+				id={hypotheticalAssignment.id}
+				category={hypotheticalAssignment.category}
+				{hypotheticalMode}
+				hypothetical
+				{hypotheticalCategoryOptions}
+			/>
+		</li>
+	{/each}
+
 	{#each Object.entries(hiddenPointsByCategory) as [categoryName, [pointsEarned, pointsPossible]]}
 		<li>
 			<Assignment

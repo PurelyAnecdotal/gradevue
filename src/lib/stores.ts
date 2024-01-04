@@ -10,7 +10,14 @@ export const gradebook: Writable<Gradebook | undefined> = writable();
 
 export const gradebookLoaded = writable(false);
 
-export const hypotheticalGradebook: Writable<{ [id: string]: [string, string, boolean] }> = writable({});
+export const hypotheticalGradebook: Writable<{
+	[id: string]: {
+		pointsEarned: string;
+		pointsPossible: string;
+		notForGrade: boolean;
+		category?: string;
+	};
+}> = writable({});
 
 export const attendance: Writable<Attendance | undefined> = writable();
 

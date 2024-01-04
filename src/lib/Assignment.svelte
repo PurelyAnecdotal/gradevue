@@ -1,7 +1,22 @@
 <script lang="ts">
-	import { Card, Badge, Progressbar, Input, Checkbox, Popover } from 'flowbite-svelte';
-	import { fullDateFormatter, getColorForGrade, getRelativeTime, shortDateFormatter } from '$lib/index';
-	import { InfoCircleOutline } from 'flowbite-svelte-icons';
+	import {
+		Card,
+		Badge,
+		Progressbar,
+		Input,
+		Checkbox,
+		Popover,
+		Dropdown,
+		DropdownItem,
+		Button
+	} from 'flowbite-svelte';
+	import {
+		fullDateFormatter,
+		getColorForGrade,
+		getRelativeTime,
+		shortDateFormatter
+	} from '$lib/index';
+	import { ChevronDownSolid, InfoCircleOutline } from 'flowbite-svelte-icons';
 	import { hypotheticalGradebook } from './stores';
 
 	export let name: string;
@@ -12,7 +27,12 @@
 	export let date: Date | undefined = undefined;
 	export let hypotheticalMode = false;
 	export let hidden = false;
-	export let notForGrade = true;
+	export let notForGrade = false;
+	export let hypothetical = false;
+	export let hypotheticalCategoryOptions: string[] = [];
+	export let hypotheticalCategory: string | undefined = undefined;
+
+	let categoryDropdownOpen = true;
 
 	const getCategoryColor = (category: string) => {
 		if (category.match(/final/i)) return 'red';
@@ -22,13 +42,40 @@
 	};
 
 	$: percentage = hypotheticalMode
-		? (parseFloat($hypotheticalGradebook[id][0]) / parseFloat($hypotheticalGradebook[id][1])) * 100
+		? (parseFloat($hypotheticalGradebook[id].pointsEarned) /
+				parseFloat($hypotheticalGradebook[id].pointsPossible)) *
+			100
 		: (pointsEarned / pointsPossible) * 100;
+
+	function setHypotheticalCategory(category: string) {
+		hypotheticalCategory = category;
+		$hypotheticalGradebook[id].category = category;
+		categoryDropdownOpen = false;
+	}
 </script>
 
 <Card class="dark:text-white max-w-none flex flex-row items-center sm:p-4">
 	<div class="mr-2">
-		<span>{name}</span>
+		{#if hypotheticalMode && hypothetical}
+			<Input bind:value={name} class="w-48 inline" />
+
+			{#if hypotheticalCategoryOptions.length > 0}
+				<Button color="light">
+					{hypotheticalCategory ?? 'Category'}
+					<ChevronDownSolid size="xs" class="ml-2 focus:outline-none" />
+				</Button>
+
+				<Dropdown bind:open={categoryDropdownOpen}>
+					{#each hypotheticalCategoryOptions as category}
+						<DropdownItem on:click={() => setHypotheticalCategory(category)}>
+							{category}
+						</DropdownItem>
+					{/each}
+				</Dropdown>
+			{/if}
+		{:else}
+			<span>{name}</span>
+		{/if}
 		{#if category}
 			<Badge color={getCategoryColor(category)}>
 				{category}
@@ -37,13 +84,13 @@
 		{#if percentage == Infinity}
 			<Badge border color="indigo">Extra Credit</Badge>
 		{/if}
-		{#if hypotheticalMode ? isNaN(parseFloat($hypotheticalGradebook[id][0])) : isNaN(pointsEarned)}
+		{#if hypotheticalMode ? isNaN(parseFloat($hypotheticalGradebook[id].pointsEarned)) : isNaN(pointsEarned)}
 			<Badge border color="purple">Not Graded</Badge>
 		{/if}
 		{#if notForGrade}
 			<Badge border color="pink">
 				{#if hypotheticalMode}
-					<Checkbox bind:checked={$hypotheticalGradebook[id][2]}>
+					<Checkbox bind:checked={$hypotheticalGradebook[id].notForGrade}>
 						<span class="text-xs">Not For Grade</span>
 					</Checkbox>
 				{:else}
@@ -53,8 +100,11 @@
 		{/if}
 		{#if hidden}
 			<Badge border color="dark" class="hidden-badge">
-				Hidden Assignments <InfoCircleOutline size="xs" class="ml-1" />
+				Hidden Assignments <InfoCircleOutline size="xs" class="ml-1 focus:outline-none" />
 			</Badge>
+		{/if}
+		{#if hypothetical && name != 'Hypothetical Assignment'}
+			<Badge border color="dark">Hypothetical Assignment</Badge>
 		{/if}
 		{#if date}
 			<Badge id="date-{id}" color="dark">{shortDateFormatter.format(date)}</Badge>
@@ -68,9 +118,9 @@
 	<div class="ml-auto mr-2 shrink-0">
 		{#if hypotheticalMode}
 			<div class="w-32 flex items-center">
-				<Input type="number" size="sm" bind:value={$hypotheticalGradebook[id][0]} />
+				<Input type="number" size="sm" bind:value={$hypotheticalGradebook[id].pointsEarned} />
 				<span class="mx-1"> / </span>
-				<Input type="number" size="sm" bind:value={$hypotheticalGradebook[id][1]} />
+				<Input type="number" size="sm" bind:value={$hypotheticalGradebook[id].pointsPossible} />
 			</div>
 		{:else if isNaN(pointsEarned)}
 			{pointsPossible}

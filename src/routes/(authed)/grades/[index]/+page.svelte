@@ -76,26 +76,39 @@
 	let hypotheticalMode = false;
 
 	$: {
-		let hypotheticalPoints: { [gradebookID: string]: [number, number, boolean] } = {};
+		let hypotheticalGradebookInit: {
+			[gradebookID: string]: { pointsEarned: number; pointsPossible: number; notForGrade: boolean };
+		} = {};
 
 		assignments?.forEach((assignment) => {
-			hypotheticalPoints[assignment._GradebookID] = [
-				...extractPoints(assignment._Points),
-				assignment._Notes == '(Not For Grading)'
-			];
+			hypotheticalGradebookInit[assignment._GradebookID] = {
+				pointsEarned: extractPoints(assignment._Points)[0],
+				pointsPossible: extractPoints(assignment._Points)[1],
+				notForGrade: assignment._Notes == '(Not For Grading)'
+			};
 		});
 
 		Object.entries(hiddenPointsByCategory).forEach(
 			([categoryName, [pointsEarned, pointsPossible]]) => {
-				hypotheticalPoints[`hidden-${categoryName}`] = [pointsEarned, pointsPossible, false];
+				hypotheticalGradebookInit[`hidden-${categoryName}`] = {
+					pointsEarned,
+					pointsPossible,
+					notForGrade: false
+				};
 			}
 		);
 
 		$hypotheticalGradebook = Object.fromEntries(
-			Object.entries(hypotheticalPoints).map(([id, [pointsEarned, pointsPossible]]) => [
-				id,
-				[pointsEarned.toString(), pointsPossible.toString(), hypotheticalPoints[id][2]]
-			])
+			Object.entries(hypotheticalGradebookInit).map(
+				([id, { pointsEarned, pointsPossible, notForGrade }]) => [
+					id,
+					{
+						pointsEarned: pointsEarned.toString(),
+						pointsPossible: pointsPossible.toString(),
+						notForGrade
+					}
+				]
+			)
 		);
 	}
 
@@ -104,12 +117,12 @@
 		let pointsByCategory: { [categoryName: string]: [number, number] } = {};
 
 		assignments?.forEach((assignment) => {
-			if ($hypotheticalGradebook[assignment._GradebookID][2] == true) return;
+			if ($hypotheticalGradebook[assignment._GradebookID].notForGrade == true) return;
 
 			const points = pointsByCategory[assignment._Type] ?? [0, 0];
 			const hypotheticalPoints = [
-				parseFloat($hypotheticalGradebook[assignment._GradebookID][0]),
-				parseFloat($hypotheticalGradebook[assignment._GradebookID][1])
+				parseFloat($hypotheticalGradebook[assignment._GradebookID].pointsEarned),
+				parseFloat($hypotheticalGradebook[assignment._GradebookID].pointsPossible)
 			];
 
 			if (isNaN(hypotheticalPoints[0])) return;
@@ -123,8 +136,8 @@
 		Object.keys(hiddenPointsByCategory).forEach((categoryName) => {
 			const points = pointsByCategory[categoryName] ?? [0, 0];
 			const hypotheticalPoints = [
-				parseFloat($hypotheticalGradebook[`hidden-${categoryName}`][0]),
-				parseFloat($hypotheticalGradebook[`hidden-${categoryName}`][1])
+				parseFloat($hypotheticalGradebook[`hidden-${categoryName}`].pointsEarned),
+				parseFloat($hypotheticalGradebook[`hidden-${categoryName}`].pointsPossible)
 			];
 
 			if (isNaN(hypotheticalPoints[0])) return;
@@ -161,6 +174,29 @@
 
 			hypotheticalGrade = hypotheticalGrade / totalPoints;
 		}
+	}
+
+	let hypotheticalAssignments: {
+		name: string;
+		pointsEarned: number;
+		pointsPossible: number;
+		id: string;
+		category?: string;
+	}[] = [];
+	
+	function addHypotheticalAssignment() {
+		const id = `hypothetical-${hypotheticalAssignments.length}`;
+
+		hypotheticalAssignments = [
+			{ name: 'Hypothetical Assignment', pointsEarned: 0, pointsPossible: 0, id },
+			...hypotheticalAssignments
+		];
+
+		$hypotheticalGradebook[id] = {
+			pointsEarned: '0',
+			pointsPossible: '0',
+			notForGrade: false
+		};
 	}
 </script>
 
@@ -202,32 +238,32 @@
 		</div>
 	{:else}
 		<Alert class="m-4" color="dark">
-			<InfoCircleSolid slot="icon" size="sm" />
+			<InfoCircleSolid slot="icon" size="sm" class="focus:outline-none" />
 			Gradebook cannot show hidden assignments because your class does not have grade categories.
 		</Alert>
 	{/if}
 
+	<div class="flex flex-wrap justify-between items-center">
+		<Checkbox bind:checked={hypotheticalMode} class="m-4">
+			<div id="hypothetical-toggle" class="flex items-center mr-2">
+				Hypothetical Mode
+				<InfoCircleOutline size="sm" class="ml-2 focus:outline-none" />
+			</div>
+		</Checkbox>
+		<Popover triggeredBy="#hypothetical-toggle" class="max-w-md">
+			Hypothetical mode allows you to see what your grade would be if you got a certain score on an
+			assignment.
+		</Popover>
+
+		{#if hypotheticalMode}
+			<Button color="light" class="mx-4" on:click={addHypotheticalAssignment}>
+				<GridPlusOutline size="sm" class="mr-2 focus:outline-none" />
+				Add Hypothetical Assignment
+			</Button>
+		{/if}
+	</div>
+
 	{#if assignments}
-		<div class="flex flex-wrap justify-between items-center">
-			<Checkbox bind:checked={hypotheticalMode} class="m-4">
-				<div id="hypothetical-toggle" class="flex items-center mr-2">
-					Hypothetical Mode
-					<InfoCircleOutline class="ml-2" size="sm" />
-				</div>
-			</Checkbox>
-			<Popover triggeredBy="#hypothetical-toggle" class="max-w-md">
-				Hypothetical mode allows you to see what your grade would be if you got a certain score on
-				an assignment.
-			</Popover>
-
-			{#if hypotheticalMode}
-				<Button color="light" class="mx-4">
-					<GridPlusOutline size="sm" class="mr-2 focus:outline-none" />
-					Add Hypothetical Assignment
-				</Button>
-			{/if}
-		</div>
-
 		<Popover triggeredBy=".hidden-badge" class="max-w-md">
 			Teachers can choose to have assignments hidden from the assignment list but still calculated
 			toward your grade. Gradebook can reveal these assignments.
@@ -235,7 +271,13 @@
 
 		<Tabs class="m-4 mb-0" contentClass="m-4">
 			<TabItem open title="All">
-				<Assignments {assignments} {hiddenPointsByCategory} {hypotheticalMode} />
+				<Assignments
+					{assignments}
+					{hiddenPointsByCategory}
+					{hypotheticalMode}
+					hypotheticalAssignments={hypotheticalMode ? hypotheticalAssignments : []}
+					hypotheticalCategoryOptions={gradeCategories?.map((category) => category._Type) ?? []}
+				/>
 			</TabItem>
 
 			{#each assignmentCategories as category}
@@ -249,6 +291,7 @@
 							)
 						)}
 						{hypotheticalMode}
+						{hypotheticalAssignments}
 					/>
 				</TabItem>
 			{/each}
