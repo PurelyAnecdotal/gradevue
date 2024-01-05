@@ -40,7 +40,7 @@
 		course?.Marks.Mark.Assignments.Assignment?.map((assignment) => assignment._Type).toSorted()
 	);
 
-	$: assignments = course?.Marks.Mark.Assignments.Assignment;
+	$: assignments = course?.Marks.Mark.Assignments.Assignment ?? [];
 
 	let hiddenPointsByCategory: { [categoryName: string]: [number, number] } = {};
 
@@ -152,6 +152,7 @@
 			);
 
 			let rawGrade = (totalPointsEarned / totalPointsPossible) * 100;
+			if (isNaN(rawGrade)) rawGrade = 0;
 			let synergyGrade = parseFloat(course.Marks.Mark._CalculatedScoreRaw);
 
 			let decimalPlaces = 0;
@@ -222,6 +223,8 @@
 
 			hypotheticalGrade = hypotheticalGrade / totalPoints;
 		}
+
+		if (isNaN(hypotheticalGrade)) hypotheticalGrade = 0;
 	}
 
 	function addHypotheticalAssignment() {
@@ -309,7 +312,7 @@
 		{/if}
 	</div>
 
-	{#if assignments}
+	{#if assignments.length > 0 || hypotheticalMode}
 		<Popover triggeredBy=".hidden-badge" class="max-w-md">
 			Teachers can choose to have assignments hidden from the assignment list but still calculated
 			toward your grade. Gradebook can reveal these assignments.
