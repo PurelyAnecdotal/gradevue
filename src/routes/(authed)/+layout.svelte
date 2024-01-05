@@ -41,7 +41,7 @@
 	</Drawer>
 </div>
 
-<div class="hidden md:block md:fixed">
+<div class="hidden md:block md:fixed top-0">
 	<AppSidebar />
 </div>
 
