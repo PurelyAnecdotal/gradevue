@@ -2,36 +2,32 @@
 	import type { AssignmentEntity } from './Gradebook';
 	import Assignment from './Assignment.svelte';
 	import { extractPoints } from '$lib';
+	import { hypotheticalGradebook } from './stores';
 
 	export let assignments: AssignmentEntity[];
 	export let showCategories = true;
 	export let hiddenPointsByCategory: { [categoryName: string]: [number, number] } = {};
 	export let hypotheticalMode = false;
-	export let hypotheticalAssignments: {
-		name: string;
-		pointsEarned: number;
-		pointsPossible: number;
-		id: string;
-		category?: string;
-	}[] = [];
 	export let hypotheticalCategoryOptions: string[] = [];
 </script>
 
 <ol class="space-y-4">
-	{#each hypotheticalAssignments as hypotheticalAssignment}
-		<li>
-			<Assignment
-				name={hypotheticalAssignment.name}
-				pointsEarned={hypotheticalAssignment.pointsEarned}
-				pointsPossible={hypotheticalAssignment.pointsPossible}
-				id={hypotheticalAssignment.id}
-				category={hypotheticalAssignment.category}
-				{hypotheticalMode}
-				hypothetical
-				{hypotheticalCategoryOptions}
-			/>
-		</li>
-	{/each}
+	{#if hypotheticalMode}
+		{#each Object.keys($hypotheticalGradebook).filter((x) => x.startsWith('hypothetical-')) as id}
+			<li>
+				<Assignment
+					name={$hypotheticalGradebook[id].name ?? 'Hypothetical Assignment'}
+					pointsEarned={parseFloat($hypotheticalGradebook[id].pointsEarned)}
+					pointsPossible={parseFloat($hypotheticalGradebook[id].pointsPossible)}
+					{id}
+					category={$hypotheticalGradebook[id].category}
+					{hypotheticalMode}
+					hypothetical
+					{hypotheticalCategoryOptions}
+				/>
+			</li>
+		{/each}
+	{/if}
 
 	{#each Object.entries(hiddenPointsByCategory) as [categoryName, [pointsEarned, pointsPossible]]}
 		<li>

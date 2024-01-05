@@ -30,9 +30,8 @@
 	export let notForGrade = false;
 	export let hypothetical = false;
 	export let hypotheticalCategoryOptions: string[] = [];
-	export let hypotheticalCategory: string | undefined = undefined;
 
-	let categoryDropdownOpen = true;
+	$: categoryDropdownOpen = !category;
 
 	const getCategoryColor = (category: string) => {
 		if (category.match(/final/i)) return 'red';
@@ -46,12 +45,6 @@
 				parseFloat($hypotheticalGradebook[id].pointsPossible)) *
 			100
 		: (pointsEarned / pointsPossible) * 100;
-
-	function setHypotheticalCategory(category: string) {
-		hypotheticalCategory = category;
-		$hypotheticalGradebook[id].category = category;
-		categoryDropdownOpen = false;
-	}
 </script>
 
 <Card class="dark:text-white max-w-none flex flex-row items-center sm:p-4">
@@ -61,13 +54,17 @@
 
 			{#if hypotheticalCategoryOptions.length > 0}
 				<Button color="light">
-					{hypotheticalCategory ?? 'Category'}
+					{category ?? 'Category'}
 					<ChevronDownSolid size="xs" class="ml-2 focus:outline-none" />
 				</Button>
 
 				<Dropdown bind:open={categoryDropdownOpen}>
 					{#each hypotheticalCategoryOptions as category}
-						<DropdownItem on:click={() => setHypotheticalCategory(category)}>
+						<DropdownItem
+							on:click={() => {
+								$hypotheticalGradebook[id].category = category;
+							}}
+						>
 							{category}
 						</DropdownItem>
 					{/each}
@@ -76,7 +73,7 @@
 		{:else}
 			<span>{name}</span>
 		{/if}
-		{#if category}
+		{#if category && !hypothetical}
 			<Badge color={getCategoryColor(category)}>
 				{category}
 			</Badge>

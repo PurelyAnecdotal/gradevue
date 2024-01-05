@@ -17,7 +17,13 @@
 		Popover,
 		Button
 	} from 'flowbite-svelte';
-	import { GridPlusOutline, InfoCircleOutline, InfoCircleSolid } from 'flowbite-svelte-icons';
+	import {
+		ExclamationCircleOutline,
+		ExclamationCircleSolid,
+		GridPlusOutline,
+		InfoCircleOutline,
+		InfoCircleSolid
+	} from 'flowbite-svelte-icons';
 
 	$: course = $gradebook?.Courses.Course?.[parseInt($page.params.index)];
 
@@ -30,9 +36,9 @@
 
 	$: totalCategory = categories?.find((grade) => grade._Type == 'TOTAL');
 
-	$: assignmentCategories = [
-		...new Set(course?.Marks.Mark.Assignments.Assignment?.map((assignment) => assignment._Type))
-	].toSorted();
+	$: assignmentCategories = new Set(
+		course?.Marks.Mark.Assignments.Assignment?.map((assignment) => assignment._Type).toSorted()
+	);
 
 	$: assignments = course?.Marks.Mark.Assignments.Assignment;
 
@@ -113,6 +119,7 @@
 	}
 
 	let hypotheticalGrade = 0;
+	let rawGradeCalcMatches = true;
 	$: {
 		let pointsByCategory: { [categoryName: string]: [number, number] } = {};
 
@@ -133,6 +140,27 @@
 			];
 		});
 
+		if (!gradeCategories && course) {
+			let totalPointsEarned = 0;
+			let totalPointsPossible = 0;
+
+			Object.entries(pointsByCategory).forEach(
+				([_categoryName, [pointsEarned, pointsPossible]]) => {
+					totalPointsEarned += pointsEarned;
+					totalPointsPossible += pointsPossible;
+				}
+			);
+
+			let rawGrade = (totalPointsEarned / totalPointsPossible) * 100;
+			let synergyGrade = parseFloat(course.Marks.Mark._CalculatedScoreRaw);
+
+			let decimalPlaces = 0;
+			if (synergyGrade % 1 != 0) decimalPlaces = synergyGrade.toString().split('.')[1].length;
+
+			if (Math.floor(rawGrade * 10 ** decimalPlaces) / 10 ** decimalPlaces != synergyGrade)
+				rawGradeCalcMatches = false;
+		}
+
 		Object.keys(hiddenPointsByCategory).forEach((categoryName) => {
 			const points = pointsByCategory[categoryName] ?? [0, 0];
 			const hypotheticalPoints = [
@@ -147,6 +175,26 @@
 				points[1] + hypotheticalPoints[1]
 			];
 		});
+
+		Object.keys($hypotheticalGradebook)
+			.filter((id) => id.startsWith('hypothetical-'))
+			.map((id) => $hypotheticalGradebook[id])
+			.forEach((assignment) => {
+				if (assignment.notForGrade == true || (gradeCategories && !assignment.category)) return;
+
+				const points = pointsByCategory[assignment.category ?? 'hypothetical'] ?? [0, 0];
+				const hypotheticalPoints = [
+					parseFloat(assignment.pointsEarned),
+					parseFloat(assignment.pointsPossible)
+				];
+
+				if (isNaN(hypotheticalPoints[0])) return;
+
+				pointsByCategory[assignment.category ?? 'hypothetical'] = [
+					points[0] + hypotheticalPoints[0],
+					points[1] + hypotheticalPoints[1]
+				];
+			});
 
 		hypotheticalGrade = 0;
 
@@ -176,26 +224,12 @@
 		}
 	}
 
-	let hypotheticalAssignments: {
-		name: string;
-		pointsEarned: number;
-		pointsPossible: number;
-		id: string;
-		category?: string;
-	}[] = [];
-	
 	function addHypotheticalAssignment() {
-		const id = `hypothetical-${hypotheticalAssignments.length}`;
-
-		hypotheticalAssignments = [
-			{ name: 'Hypothetical Assignment', pointsEarned: 0, pointsPossible: 0, id },
-			...hypotheticalAssignments
-		];
-
-		$hypotheticalGradebook[id] = {
+		$hypotheticalGradebook[`hypothetical-${Math.random().toString(36).substring(2, 15)}`] = {
 			pointsEarned: '0',
 			pointsPossible: '0',
-			notForGrade: false
+			notForGrade: false,
+			name: 'Hypothetical Assignment'
 		};
 	}
 </script>
@@ -236,11 +270,23 @@
 				</TableBody>
 			</Table>
 		</div>
-	{:else}
-		<Alert class="m-4" color="dark">
-			<InfoCircleSolid slot="icon" size="sm" class="focus:outline-none" />
-			Gradebook cannot show hidden assignments because your class does not have grade categories.
-		</Alert>
+	{/if}
+
+	{#if !gradeCategories}
+		{#if rawGradeCalcMatches}
+			<Alert class="m-4" color="dark">
+				<InfoCircleSolid slot="icon" size="sm" class="focus:outline-none" />
+				Gradebook cannot show hidden assignments for this class. If there are any, they have not significantly
+				affected the grade percentage.
+			</Alert>
+		{:else}
+			<Alert class="m-4" color="red" border>
+				<ExclamationCircleSolid slot="icon" size="sm" class="focus:outline-none" />
+				Your class's grade percentage does not match the calculated grade percentage. This indicates
+				the presence of hidden assignments that cannot be revealed.
+				<span class="font-bold">Hypothetical grade calculations will be inaccurate.</span>
+			</Alert>
+		{/if}
 	{/if}
 
 	<div class="flex flex-wrap justify-between items-center">
@@ -275,7 +321,6 @@
 					{assignments}
 					{hiddenPointsByCategory}
 					{hypotheticalMode}
-					hypotheticalAssignments={hypotheticalMode ? hypotheticalAssignments : []}
 					hypotheticalCategoryOptions={gradeCategories?.map((category) => category._Type) ?? []}
 				/>
 			</TabItem>
@@ -291,7 +336,7 @@
 							)
 						)}
 						{hypotheticalMode}
-						{hypotheticalAssignments}
+						hypotheticalCategoryOptions={gradeCategories?.map((category) => category._Type) ?? []}
 					/>
 				</TabItem>
 			{/each}
@@ -304,8 +349,11 @@
 				<span class="line-clamp-1 text-2xl">
 					{removeClassID(course._Title)}
 				</span>
-				<span class="shrink-0 text-2xl">
+				<span class="shrink-0 text-2xl flex items-center">
 					{#if hypotheticalMode}
+						{#if !gradeCategories && !rawGradeCalcMatches}
+							<ExclamationCircleOutline class="mr-2 focus:outline-none" />
+						{/if}
 						{Math.round(hypotheticalGrade * 100000) / 1000}%
 					{:else}
 						{course.Marks.Mark._CalculatedScoreString}

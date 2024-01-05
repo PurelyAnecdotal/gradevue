@@ -16,6 +16,7 @@ export const hypotheticalGradebook: Writable<{
 		pointsPossible: string;
 		notForGrade: boolean;
 		category?: string;
+		name?: string;
 	};
 }> = writable({});
 
