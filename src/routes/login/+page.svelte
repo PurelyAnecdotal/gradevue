@@ -2,8 +2,17 @@
 	import { goto } from '$app/navigation';
 	import { StudentAccount } from '$lib/synergy';
 	import { studentAccount } from '../../lib/stores';
-	import { Card, Input, Label, Helper, Button, Accordion, AccordionItem } from 'flowbite-svelte';
-	import { EyeSlashOutline } from 'flowbite-svelte-icons';
+	import {
+		Card,
+		Input,
+		Label,
+		Helper,
+		Button,
+		Accordion,
+		AccordionItem,
+		Modal
+	} from 'flowbite-svelte';
+	import { EyeSlashOutline, InfoCircleOutline } from 'flowbite-svelte-icons';
 
 	if (localStorage.getItem('token')) {
 		if (!$studentAccount) {
@@ -25,6 +34,12 @@
 
 		goto('/grades');
 	}
+
+	let modalShown = false;
+
+	function showModal() {
+		modalShown = true;
+	}
 </script>
 
 <div class="flex items-center justify-center min-h-screen">
@@ -44,17 +59,44 @@
 			<Label class="space-y-2 mb-4">
 				<span>Password</span>
 				<Input type="password" id="password" bind:value={password} class="mb-2" required />
-				<Helper class="text-xs flex">
-					<EyeSlashOutline class="m-2" />Your device connects directly to Synergy, so we won't see
-					your password.
+				<Helper class="text-xs flex items-center">
+					<EyeSlashOutline size="sm" class="mr-2" />
+					Your device connects directly to StudentVue. Unlike SynergyPlus, we can't see your password
+					or your grades.
 				</Helper>
+				<Helper class="text-xs flex items-center">
+					<InfoCircleOutline size="sm" class="mr-2" />
+					<span>
+						If you've never used Gradebook or SynergyPlus before, you will need to
+						<button on:click={showModal} class="inline text-primary-600 underline" form="">
+							create a password
+						</button>.
+					</span>
+				</Helper>
+				<Modal
+					bind:open={modalShown}
+					title="Create a password"
+					size="sm"
+					outsideclose
+					class="dark:text-gray-300 leading-relaxed"
+				>
+					<p>
+						If your district uses Sign in with Google to sign into StudentVue, you will need to
+						create a password for StudentVue that Gradebook can sign you in with instead. You'll
+						still be able to use Sign in with Google with StudentVue afterwards.
+					</p>
+					<Button href="https://{domain}/PXP2_Password_Help.aspx" target="_blank">
+						Set your StudentVue password
+					</Button>
+					<p>
+						You should receive an email in a few minutes that will contain a link to set your
+						password. Once you've created your password, you can use it to sign in to both
+						StudentVue and Gradebook.
+					</p>
+				</Modal>
 			</Label>
 			<Accordion flush class="mb-4">
-				<AccordionItem
-					paddingFlush="mb-2"
-					borderBottomClass=""
-					class="text-white"
-				>
+				<AccordionItem paddingFlush="mb-2" borderBottomClass="" class="text-white">
 					<span slot="header" class="text-sm dark:text-gray-300">Advanced</span>
 					<Label class="space-y-2">
 						<span>Domain</span>
