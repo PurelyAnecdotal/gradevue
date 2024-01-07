@@ -1,10 +1,15 @@
-import { XMLParser } from 'fast-xml-parser';
+import { XMLBuilder, XMLParser } from 'fast-xml-parser';
 import type { Gradebook } from '$lib/Gradebook';
 import type { Attendance } from './Attendance';
 
 const parser = new XMLParser({
 	ignoreAttributes: false,
 	ignoreDeclaration: true,
+	attributeNamePrefix: '_'
+});
+
+const builder = new XMLBuilder({
+	ignoreAttributes: false,
 	attributeNamePrefix: '_'
 });
 
@@ -19,7 +24,12 @@ export class StudentAccount {
 		this.password = password;
 	}
 
-	async request(methodName: string, paramStr = '&lt;Parms&gt;&lt;/Parms&gt;') {
+	async request(methodName: string, params: unknown = {}) {
+		const paramStr = builder
+			.build({ Params: params })
+			.replaceAll('<', '&lt;')
+			.replaceAll('>', '&gt;');
+
 		const res = await fetch(`https://${this.domain}/Service/PXPCommunication.asmx?WSDL`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/soap+xml; charset=utf-8' },
@@ -45,7 +55,10 @@ export class StudentAccount {
 		);
 	}
 
-	async grades(): Promise<Gradebook> {
+	async grades(reportPeriod?: number): Promise<Gradebook> {
+		if (reportPeriod)
+			return (await this.request('Gradebook', { ReportPeriod: reportPeriod })).Gradebook;
+
 		return (await this.request('Gradebook')).Gradebook;
 	}
 

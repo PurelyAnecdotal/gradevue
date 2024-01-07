@@ -10,9 +10,14 @@
 		Button,
 		Accordion,
 		AccordionItem,
-		Modal
+		Modal,
+		Alert
 	} from 'flowbite-svelte';
-	import { EyeSlashOutline, InfoCircleOutline } from 'flowbite-svelte-icons';
+	import {
+		ExclamationCircleSolid,
+		EyeSlashOutline,
+		InfoCircleOutline
+	} from 'flowbite-svelte-icons';
 
 	if (localStorage.getItem('token')) {
 		if (!$studentAccount) {
@@ -27,8 +32,21 @@
 	let password: string;
 	let domain: string = 'ca-pleas-psv.edupoint.com';
 
-	function login() {
-		$studentAccount = new StudentAccount(domain, username, password);
+	let loginErrorShown = false;
+	let loginError: string;
+
+	async function login() {
+		const loginAccount = new StudentAccount(domain, username, password);
+
+		const loginVerify = await loginAccount.request('StudentInfo');
+
+		if (loginVerify.RT_ERROR) {
+			loginErrorShown = true;
+			loginError = loginVerify.RT_ERROR._ERROR_MESSAGE;
+			return;
+		}
+
+		$studentAccount = loginAccount;
 
 		localStorage.setItem('token', JSON.stringify({ username, password, domain }));
 
@@ -41,6 +59,16 @@
 		modalShown = true;
 	}
 </script>
+
+{#if loginErrorShown}
+	<div class="fixed w-full p-4 top-0 left-0">
+		<Alert class="w-full" color="red">
+			<ExclamationCircleSolid slot="icon" />
+			<span class="font-bold">Couldn't log in</span>
+			{loginError}
+		</Alert>
+	</div>
+{/if}
 
 <div class="flex items-center justify-center min-h-screen">
 	<Card>

@@ -1,13 +1,43 @@
 <script lang="ts">
-	import { Card, Progressbar } from 'flowbite-svelte';
-	import { gradebook, gradebookLoaded } from '$lib/stores';
+	import { Card, Progressbar, Button, Dropdown, DropdownItem } from 'flowbite-svelte';
+	import { gradebook, gradebookLoaded, studentAccount } from '$lib/stores';
 	import { getColorForGrade, removeClassID } from '$lib/index';
+	import { ChevronDownSolid } from 'flowbite-svelte-icons';
+
+	let dropdownOpen = false;
+
+	const showDropdown = () => {
+		dropdownOpen = true;
+	};
+
+	const changeReportPeriod = async (period: number) => {
+		dropdownOpen = false;
+
+		$gradebookLoaded = false;
+		$gradebook = await $studentAccount?.grades(period);
+		$gradebookLoaded = true;
+	};
 </script>
 
 {#if $gradebook}
-	<ol>
+	<div class="m-4 flex justify-center">
+		<Button color="light" on:click={showDropdown}>
+			{$gradebook.ReportingPeriod._GradePeriod}
+			<ChevronDownSolid size="xs" class="ml-2 focus:outline-none" />
+		</Button>
+		
+		<Dropdown bind:open={dropdownOpen}>
+			{#each $gradebook.ReportingPeriods.ReportPeriod ?? [] as period, index}
+				<DropdownItem on:click={() => changeReportPeriod(index)}>
+					{period._GradePeriod}
+				</DropdownItem>
+			{/each}
+		</Dropdown>
+	</div>
+
+	<ol class="space-y-4 mx-4">
 		{#each $gradebook.Courses.Course ?? [] as course, index}
-			<li class="m-4">
+			<li>
 				<a href="/grades/{index.toString()}">
 					<Card
 						padding="md"
