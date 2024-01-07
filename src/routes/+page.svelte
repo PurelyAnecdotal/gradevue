@@ -20,6 +20,9 @@
 		<p class="font-normal text-gray-700 dark:text-gray-400 leading-tight">
 			An improved StudentVue experience.
 		</p>
-		<Button href="/login" class="mt-4">Log in</Button>
+		<div class="flex mt-4 space-x-4">
+			<Button href="/login" color="light" class="w-full">Log in</Button>
+			<Button href="/signup" class="w-full">Sign up</Button>
+		</div>
 	</Card>
 </div>

@@ -73,7 +73,7 @@
 <div class="flex items-center justify-center min-h-screen">
 	<Card>
 		<form on:submit|preventDefault={login}>
-			<h3 class="text-xl mb-4 dark:text-white">Sign in to Gradebook</h3>
+			<h1 class="text-xl mb-4 dark:text-white">Sign in to Gradebook</h1>
 			<Label class="space-y-2 mb-4">
 				<span>Username</span>
 				<Input
@@ -95,33 +95,10 @@
 				<Helper class="text-xs flex items-center">
 					<InfoCircleOutline size="sm" class="mr-2" />
 					<span>
-						If you've never used Gradebook or SynergyPlus before, you will need to
-						<button on:click={showModal} class="inline text-primary-600 underline" form="">
-							create a password
-						</button>.
+						If you've never used Gradebook or SynergyPlus before, you may need to
+						<a href="/signup" class="text-primary-600 underline">create a password</a>.
 					</span>
 				</Helper>
-				<Modal
-					bind:open={modalShown}
-					title="Create a password"
-					size="sm"
-					outsideclose
-					class="dark:text-gray-300 leading-relaxed"
-				>
-					<p>
-						If your district uses Sign in with Google to sign into StudentVue, you will need to
-						create a password for StudentVue that Gradebook can sign you in with instead. You'll
-						still be able to use Sign in with Google with StudentVue afterwards.
-					</p>
-					<Button href="https://{domain}/PXP2_Password_Help.aspx" target="_blank">
-						Set your StudentVue password
-					</Button>
-					<p>
-						You should receive an email in a few minutes that will contain a link to set your
-						password. Once you've created your password, you can use it to sign in to both
-						StudentVue and Gradebook.
-					</p>
-				</Modal>
 			</Label>
 			<Accordion flush class="mb-4">
 				<AccordionItem paddingFlush="mb-2" borderBottomClass="" class="text-white">
