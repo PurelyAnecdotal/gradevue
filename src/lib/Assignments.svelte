@@ -3,6 +3,7 @@
 	import Assignment from './Assignment.svelte';
 	import { extractPoints } from '$lib';
 	import { hypotheticalGradebook } from './stores';
+	import { fade } from 'svelte/transition';
 
 	export let assignments: AssignmentEntity[];
 	export let showCategories = true;
@@ -14,7 +15,7 @@
 <ol class="space-y-4">
 	{#if hypotheticalMode}
 		{#each Object.keys($hypotheticalGradebook).filter((x) => x.startsWith('hypothetical-')) as id}
-			<li>
+			<li transition:fade>
 				<Assignment
 					name={$hypotheticalGradebook[id].name ?? 'Hypothetical Assignment'}
 					pointsEarned={parseFloat($hypotheticalGradebook[id].pointsEarned)}

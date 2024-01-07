@@ -25,7 +25,7 @@
 			{$gradebook.ReportingPeriod._GradePeriod}
 			<ChevronDownSolid size="xs" class="ml-2 focus:outline-none" />
 		</Button>
-		
+
 		<Dropdown bind:open={dropdownOpen}>
 			{#each $gradebook.ReportingPeriods.ReportPeriod ?? [] as period, index}
 				<DropdownItem on:click={() => changeReportPeriod(index)}>
@@ -50,9 +50,7 @@
 						</span>
 
 						<Progressbar
-							color={!$gradebookLoaded
-								? 'gray'
-								: getColorForGrade(course.Marks.Mark._CalculatedScoreString)}
+							color={getColorForGrade(course.Marks.Mark._CalculatedScoreString)}
 							progress={course.Marks.Mark._CalculatedScoreRaw}
 							animate={true}
 							class="hidden sm:block w-1/3 shrink-0"

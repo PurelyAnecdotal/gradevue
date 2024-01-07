@@ -31,7 +31,7 @@
 	export let hypothetical = false;
 	export let hypotheticalCategoryOptions: string[] = [];
 
-	$: categoryDropdownOpen = !category;
+	let categoryDropdownOpen = false;
 
 	const getCategoryColor = (category: string) => {
 		if (category.match(/final/i)) return 'red';
@@ -63,6 +63,7 @@
 						<DropdownItem
 							on:click={() => {
 								$hypotheticalGradebook[id].category = category;
+								categoryDropdownOpen = false;
 							}}
 						>
 							{category}

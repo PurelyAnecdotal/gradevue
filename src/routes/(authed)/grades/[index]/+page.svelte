@@ -24,6 +24,7 @@
 		InfoCircleOutline,
 		InfoCircleSolid
 	} from 'flowbite-svelte-icons';
+	import { fade } from 'svelte/transition';
 
 	$: course = $gradebook?.Courses.Course?.[parseInt($page.params.index)];
 
@@ -305,10 +306,12 @@
 		</Popover>
 
 		{#if hypotheticalMode}
-			<Button color="light" class="mx-4" on:click={addHypotheticalAssignment}>
-				<GridPlusOutline size="sm" class="mr-2 focus:outline-none" />
-				Add Hypothetical Assignment
-			</Button>
+			<div transition:fade={{ duration: 200 }}>
+				<Button color="light" class="mx-4" on:click={addHypotheticalAssignment}>
+					<GridPlusOutline size="sm" class="mr-2 focus:outline-none" />
+					Add Hypothetical Assignment
+				</Button>
+			</div>
 		{/if}
 	</div>
 
@@ -318,32 +321,34 @@
 			toward your grade. Gradebook can reveal these assignments.
 		</Popover>
 
-		<Tabs class="m-4 mb-0" contentClass="m-4">
-			<TabItem open title="All">
-				<Assignments
-					{assignments}
-					{hiddenPointsByCategory}
-					{hypotheticalMode}
-					hypotheticalCategoryOptions={gradeCategories?.map((category) => category._Type) ?? []}
-				/>
-			</TabItem>
-
-			{#each assignmentCategories as category}
-				<TabItem title={category}>
+		<div transition:fade={{ duration: 200 }}>
+			<Tabs class="m-4 mb-0" contentClass="m-4">
+				<TabItem open title="All">
 					<Assignments
-						assignments={assignments.filter((assignment) => assignment._Type == category)}
-						showCategories={false}
-						hiddenPointsByCategory={Object.fromEntries(
-							Object.entries(hiddenPointsByCategory).filter(
-								([categoryName]) => categoryName == category
-							)
-						)}
+						{assignments}
+						{hiddenPointsByCategory}
 						{hypotheticalMode}
 						hypotheticalCategoryOptions={gradeCategories?.map((category) => category._Type) ?? []}
 					/>
 				</TabItem>
-			{/each}
-		</Tabs>
+
+				{#each assignmentCategories as category}
+					<TabItem title={category}>
+						<Assignments
+							assignments={assignments.filter((assignment) => assignment._Type == category)}
+							showCategories={false}
+							hiddenPointsByCategory={Object.fromEntries(
+								Object.entries(hiddenPointsByCategory).filter(
+									([categoryName]) => categoryName == category
+								)
+							)}
+							{hypotheticalMode}
+							hypotheticalCategoryOptions={gradeCategories?.map((category) => category._Type) ?? []}
+						/>
+					</TabItem>
+				{/each}
+			</Tabs>
+		</div>
 	{/if}
 
 	<div class="top-12 left-0 w-full fixed md:top-0">
