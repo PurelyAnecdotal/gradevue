@@ -2,7 +2,7 @@
 	import { Card, Progressbar, Button, Dropdown, DropdownItem } from 'flowbite-svelte';
 	import { gradebook, gradebookLoaded, studentAccount } from '$lib/stores';
 	import { getColorForGrade, removeClassID } from '$lib/index';
-	import { ChevronDownSolid } from 'flowbite-svelte-icons';
+	import { ChevronDownSolid, ChevronUpSolid, MapPinOutline } from 'flowbite-svelte-icons';
 
 	let dropdownOpen = false;
 
@@ -20,15 +20,25 @@
 </script>
 
 {#if $gradebook}
-	<div class="m-4 flex justify-center">
-		<Button color="light" on:click={showDropdown}>
-			{$gradebook.ReportingPeriod._GradePeriod}
-			<ChevronDownSolid size="xs" class="ml-2 focus:outline-none" />
-		</Button>
+	<div class="m-4 flex flex-col justify-center">
+		<div class="flex justify-center">
+			<Button color="light" on:click={showDropdown}>
+				{$gradebook.ReportingPeriod._GradePeriod}
+
+				{#if dropdownOpen}
+					<ChevronUpSolid size="xs" class="ml-2 focus:outline-none" />
+				{:else}
+					<ChevronDownSolid size="xs" class="ml-2 focus:outline-none" />
+				{/if}
+			</Button>
+		</div>
 
 		<Dropdown bind:open={dropdownOpen}>
 			{#each $gradebook.ReportingPeriods.ReportPeriod ?? [] as period, index}
-				<DropdownItem on:click={() => changeReportPeriod(index)}>
+				<DropdownItem on:click={() => changeReportPeriod(index)} class="flex items-center">
+					{#if period._GradePeriod == $gradebook.ReportingPeriod._GradePeriod}
+						<MapPinOutline size="sm" class="mr-2" />
+					{/if}
 					{period._GradePeriod}
 				</DropdownItem>
 			{/each}
