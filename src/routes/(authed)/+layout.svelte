@@ -45,6 +45,6 @@
 	<AppSidebar />
 </div>
 
-<main class="mt-16 md:mt-0 md:ml-64">
+<main class="pt-16 md:pt-0 md:pl-64 h-screen">
 	<slot />
 </main>

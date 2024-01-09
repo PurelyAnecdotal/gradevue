@@ -11,7 +11,8 @@
 		ArrowRightToBracketSolid,
 		BellOutline,
 		AdressBookOutline,
-		UserCircleOutline
+		UserCircleOutline,
+		FileLinesOutline
 	} from 'flowbite-svelte-icons';
 	import { studentInfo } from './stores';
 	import { loadStudentInfo } from './cache';
@@ -44,6 +45,12 @@
 			<SidebarItem label="Attendance" href="/attendance">
 				<svelte:fragment slot="icon">
 					<BellOutline class="focus:outline-none" />
+				</svelte:fragment>
+			</SidebarItem>
+
+			<SidebarItem label="Report Cards" href="/reportcards">
+				<svelte:fragment slot="icon">
+					<FileLinesOutline class="focus:outline-none" />
 				</svelte:fragment>
 			</SidebarItem>
 		</SidebarGroup>

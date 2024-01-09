@@ -1,5 +1,15 @@
 import { get } from 'svelte/store';
-import { gradebook, gradebookLoaded, studentAccount, attendance, attendanceLoaded, studentInfo } from './stores';
+import {
+	studentAccount,
+	gradebook,
+	gradebookLoaded,
+	attendance,
+	attendanceLoaded,
+	studentInfo,
+	studentInfoLoaded,
+	reportCardList,
+	reportCardListLoaded
+} from './stores';
 
 export const loadGradebook = async () => {
 	gradebookLoaded.set(false);
@@ -30,6 +40,8 @@ export const loadAttendance = async () => {
 };
 
 export const loadStudentInfo = async () => {
+	studentInfoLoaded.set(false);
+
 	const cache = localStorage.getItem('studentInfo');
 	if (cache) studentInfo.set(JSON.parse(cache));
 
@@ -37,4 +49,20 @@ export const loadStudentInfo = async () => {
 
 	studentInfo.set(studentInfoRecord);
 	localStorage.setItem('studentInfo', JSON.stringify(studentInfoRecord));
+
+	studentInfoLoaded.set(true);
+};
+
+export const loadReportCardList = async () => {
+	reportCardListLoaded.set(false);
+
+	const cache = localStorage.getItem('reportCardList');
+	if (cache) reportCardList.set(JSON.parse(cache));
+
+	const reportCardListRecord = await get(studentAccount)?.reportCardList();
+
+	reportCardList.set(reportCardListRecord);
+	localStorage.setItem('reportCardList', JSON.stringify(reportCardListRecord));
+
+	reportCardListLoaded.set(true);
 };

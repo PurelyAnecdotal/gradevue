@@ -1,7 +1,13 @@
 <script lang="ts">
-	import { studentInfo } from '$lib/stores';
+	import LoadingBanner from '$lib/LoadingBanner.svelte';
+	import { loadStudentInfo } from '$lib/cache';
+	import { studentInfo, studentInfoLoaded } from '$lib/stores';
 	import { Card } from 'flowbite-svelte';
+
+	if (!$studentInfo) loadStudentInfo();
 </script>
+
+<LoadingBanner show={!$studentInfoLoaded} loadingMsg="Loading student info..." />
 
 {#if $studentInfo}
 	<div class="p-4 flex justify-center">

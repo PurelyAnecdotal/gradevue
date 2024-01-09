@@ -5,19 +5,14 @@
 		Progressbar,
 		Input,
 		Checkbox,
-		Popover,
 		Dropdown,
 		DropdownItem,
 		Button
 	} from 'flowbite-svelte';
-	import {
-		fullDateFormatter,
-		getColorForGrade,
-		getRelativeTime,
-		shortDateFormatter
-	} from '$lib/index';
 	import { ChevronDownSolid, InfoCircleOutline } from 'flowbite-svelte-icons';
-	import { hypotheticalGradebook } from './stores';
+	import { getColorForGrade } from '$lib/index';
+	import { hypotheticalGradebook } from '$lib/stores';
+	import DateBadge from '$lib/DateBadge.svelte';
 
 	export let name: string;
 	export let pointsEarned: number;
@@ -105,11 +100,7 @@
 			<Badge border color="dark">Hypothetical Assignment</Badge>
 		{/if}
 		{#if date}
-			<Badge id="date-{id}" color="dark">{shortDateFormatter.format(date)}</Badge>
-			<Popover triggeredBy="#date-{id}">
-				{fullDateFormatter.format(date)}
-				({getRelativeTime(date)})
-			</Popover>
+			<DateBadge {date} />
 		{/if}
 	</div>
 

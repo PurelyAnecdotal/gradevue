@@ -48,25 +48,23 @@
 	<ol class="space-y-4 mx-4">
 		{#each $gradebook.Courses.Course ?? [] as course, index}
 			<li>
-				<a href="/grades/{index.toString()}">
-					<Card
-						padding="md"
-						class="dark:text-white text-xl max-w-none flex flex-row justify-between items-center"
-					>
-						<span class="line-clamp-1 mr-2">{removeClassID(course._Title)}</span>
-						<span class="shrink-0 ml-auto mr-2">
-							{course.Marks.Mark._CalculatedScoreString}
-							{course.Marks.Mark._CalculatedScoreRaw}%
-						</span>
+				<Card
+					class="dark:text-white text-xl max-w-none flex flex-row justify-between items-center"
+					href="/grades/{index.toString()}"
+				>
+					<span class="line-clamp-1 mr-2">{removeClassID(course._Title)}</span>
+					<span class="shrink-0 ml-auto mr-2">
+						{course.Marks.Mark._CalculatedScoreString}
+						{course.Marks.Mark._CalculatedScoreRaw}%
+					</span>
 
-						<Progressbar
-							color={getColorForGrade(course.Marks.Mark._CalculatedScoreString)}
-							progress={course.Marks.Mark._CalculatedScoreRaw}
-							animate={true}
-							class="hidden sm:block w-1/3 shrink-0"
-						/>
-					</Card>
-				</a>
+					<Progressbar
+						color={getColorForGrade(course.Marks.Mark._CalculatedScoreString)}
+						progress={course.Marks.Mark._CalculatedScoreRaw}
+						animate={true}
+						class="hidden sm:block w-1/3 shrink-0"
+					/>
+				</Card>
 			</li>
 		{/each}
 	</ol>

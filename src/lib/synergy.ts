@@ -1,7 +1,9 @@
 import { XMLBuilder, XMLParser } from 'fast-xml-parser';
 import type { Gradebook } from '$lib/Gradebook';
-import type { Attendance } from './Attendance';
-import type { StudentInfo } from './StudentInfo';
+import type { Attendance } from '$lib/Attendance';
+import type { StudentInfo } from '$lib/StudentInfo';
+import type { ReportCardListEntity } from '$lib/ReportCardListEntity';
+import type { ReportCardDocument } from '$lib/ReportCardDocument';
 
 const parser = new XMLParser({
 	ignoreAttributes: false,
@@ -69,5 +71,15 @@ export class StudentAccount {
 
 	async studentInfo(): Promise<StudentInfo> {
 		return (await this.request('StudentInfo')).StudentInfo;
+	}
+
+	async reportCardList(): Promise<ReportCardListEntity[]> {
+		return (await this.request('GetReportCardInitialData')).RCReportingPeriodData.RCReportingPeriods
+			.RCReportingPeriod;
+	}
+
+	async reportCard(documentGU: string): Promise<ReportCardDocument> {
+		return (await this.request('GetReportCardDocumentData', { DocumentGU: documentGU }))
+			.DocumentData;
 	}
 }
