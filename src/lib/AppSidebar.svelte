@@ -7,12 +7,21 @@
 		SidebarBrand,
 		SidebarItem
 	} from 'flowbite-svelte';
-	import { ArrowRightToBracketSolid, BellOutline, AdressBookOutline } from 'flowbite-svelte-icons';
+	import {
+		ArrowRightToBracketSolid,
+		BellOutline,
+		AdressBookOutline,
+		UserCircleOutline
+	} from 'flowbite-svelte-icons';
+	import { studentInfo } from './stores';
+	import { loadStudentInfo } from './cache';
 
 	function logOut() {
 		localStorage.clear();
 		location.assign('/login');
 	}
+
+	if (!$studentInfo) loadStudentInfo();
 </script>
 
 <Sidebar activeUrl={$page.url.pathname} class="h-screen">
@@ -25,21 +34,30 @@
 					img: '/favicon.ico'
 				}}
 			/>
+
 			<SidebarItem label="Grades" href="/grades">
 				<svelte:fragment slot="icon">
-					<AdressBookOutline />
+					<AdressBookOutline class="focus:outline-none" />
 				</svelte:fragment>
 			</SidebarItem>
+
 			<SidebarItem label="Attendance" href="/attendance">
 				<svelte:fragment slot="icon">
-					<BellOutline />
+					<BellOutline class="focus:outline-none" />
 				</svelte:fragment>
 			</SidebarItem>
 		</SidebarGroup>
+
 		<SidebarGroup>
+			<SidebarItem label={$studentInfo?.FormattedName ?? ''} href="/studentinfo">
+				<svelte:fragment slot="icon">
+					<UserCircleOutline class="focus:outline-none" />
+				</svelte:fragment>
+			</SidebarItem>
+
 			<SidebarItem on:click={logOut} label="Log Out" href="/login">
 				<svelte:fragment slot="icon">
-					<ArrowRightToBracketSolid />
+					<ArrowRightToBracketSolid class="focus:outline-none" />
 				</svelte:fragment>
 			</SidebarItem>
 		</SidebarGroup>

@@ -3,6 +3,7 @@ import type { Writable } from 'svelte/store';
 import type { StudentAccount } from '$lib/synergy';
 import type { Gradebook } from './Gradebook';
 import type { Attendance } from './Attendance';
+import type { StudentInfo } from './StudentInfo';
 
 export const studentAccount: Writable<StudentAccount | undefined> = writable();
 
@@ -23,3 +24,5 @@ export const hypotheticalGradebook: Writable<{
 export const attendance: Writable<Attendance | undefined> = writable();
 
 export const attendanceLoaded = writable(false);
+
+export const studentInfo: Writable<StudentInfo | undefined> = writable();

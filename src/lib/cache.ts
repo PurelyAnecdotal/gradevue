@@ -1,34 +1,40 @@
 import { get } from 'svelte/store';
-import { gradebook, gradebookLoaded, studentAccount, attendance, attendanceLoaded } from './stores';
+import { gradebook, gradebookLoaded, studentAccount, attendance, attendanceLoaded, studentInfo } from './stores';
 
-export function loadGradebook() {
+export const loadGradebook = async () => {
 	gradebookLoaded.set(false);
 
 	const cache = localStorage.getItem('gradebook');
 	if (cache) gradebook.set(JSON.parse(cache));
 
-	get(studentAccount)
-		?.grades()
-		.then((grades) => {
-			gradebook.set(grades);
-			localStorage.setItem('gradebook', JSON.stringify(grades));
+	const grades = await get(studentAccount)?.grades();
 
-			gradebookLoaded.set(true);
-		});
-}
+	gradebook.set(grades);
+	localStorage.setItem('gradebook', JSON.stringify(grades));
 
-export function loadAttendance() {
+	gradebookLoaded.set(true);
+};
+
+export const loadAttendance = async () => {
 	attendanceLoaded.set(false);
 
 	const cache = localStorage.getItem('attendance');
-	if (cache) attendance.set(JSON.parse(cache))
+	if (cache) attendance.set(JSON.parse(cache));
 
-	get(studentAccount)
-		?.attendance()
-		.then((attendanceRecord) => {
-			attendance.set(attendanceRecord);
-			localStorage.setItem('attendance', JSON.stringify(attendanceRecord));
+	const attendanceRecord = await get(studentAccount)?.attendance();
 
-			attendanceLoaded.set(true);
-		});
-}
+	attendance.set(attendanceRecord);
+	localStorage.setItem('attendance', JSON.stringify(attendanceRecord));
+
+	attendanceLoaded.set(true);
+};
+
+export const loadStudentInfo = async () => {
+	const cache = localStorage.getItem('studentInfo');
+	if (cache) studentInfo.set(JSON.parse(cache));
+
+	const studentInfoRecord = await get(studentAccount)?.studentInfo();
+
+	studentInfo.set(studentInfoRecord);
+	localStorage.setItem('studentInfo', JSON.stringify(studentInfoRecord));
+};

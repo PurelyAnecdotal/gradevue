@@ -1,6 +1,7 @@
 import { XMLBuilder, XMLParser } from 'fast-xml-parser';
 import type { Gradebook } from '$lib/Gradebook';
 import type { Attendance } from './Attendance';
+import type { StudentInfo } from './StudentInfo';
 
 const parser = new XMLParser({
 	ignoreAttributes: false,
@@ -64,5 +65,9 @@ export class StudentAccount {
 
 	async attendance(): Promise<Attendance> {
 		return (await this.request('Attendance')).Attendance;
+	}
+
+	async studentInfo(): Promise<StudentInfo> {
+		return (await this.request('StudentInfo')).StudentInfo;
 	}
 }
