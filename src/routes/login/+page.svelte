@@ -88,12 +88,12 @@
 				<span>Password</span>
 				<Input type="password" id="password" bind:value={password} class="mb-2" required />
 				<Helper class="text-xs flex items-center">
-					<EyeSlashOutline size="sm" class="mr-2" />
+					<EyeSlashOutline size="sm" class="mr-2 focus:outline-none" />
 					Your device connects directly to StudentVue. Unlike SynergyPlus, we can't see your password
 					or your grades.
 				</Helper>
 				<Helper class="text-xs flex items-center">
-					<InfoCircleOutline size="sm" class="mr-2" />
+					<InfoCircleOutline size="sm" class="mr-2 focus:outline-none" />
 					<span>
 						If you've never used Gradebook or SynergyPlus before, you may need to
 						<a href="/signup" class="text-primary-600 underline">create a password</a>.
