@@ -1,11 +1,12 @@
 <script lang="ts">
+	import { browser } from '$app/environment';
 	import DateBadge from '$lib/DateBadge.svelte';
 	import LoadingBanner from '$lib/LoadingBanner.svelte';
 	import { loadDocumentsList } from '$lib/cache';
 	import { documentsList, documentsListLoaded } from '$lib/stores';
 	import { Card, Badge } from 'flowbite-svelte';
 
-	if (!$documentsList) loadDocumentsList();
+	if (!$documentsList && browser) loadDocumentsList();
 
 	function getDocumentColor(documentType: string) {
 		switch (documentType) {

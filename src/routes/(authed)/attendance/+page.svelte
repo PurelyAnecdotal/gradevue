@@ -5,8 +5,9 @@
 	import LoadingBanner from '$lib/LoadingBanner.svelte';
 	import { Badge, Accordion, AccordionItem } from 'flowbite-svelte';
 	import { fullDateFormatter, removeClassID } from '$lib';
+	import { browser } from '$app/environment';
 
-	if (!$attendance) loadAttendance();
+	if (!$attendance && browser) loadAttendance();
 
 	function getAbsenceType(periods: PeriodEntity[]) {
 		const reasons = periods.map((period: PeriodEntity) => period._Name);

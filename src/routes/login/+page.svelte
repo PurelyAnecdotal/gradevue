@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { browser } from '$app/environment';
 	import { goto } from '$app/navigation';
 	import { StudentAccount } from '$lib/synergy';
 	import { studentAccount } from '../../lib/stores';
@@ -10,7 +11,6 @@
 		Button,
 		Accordion,
 		AccordionItem,
-		Modal,
 		Alert
 	} from 'flowbite-svelte';
 	import {
@@ -19,7 +19,7 @@
 		InfoCircleOutline
 	} from 'flowbite-svelte-icons';
 
-	if (localStorage.getItem('token')) {
+	if (browser && localStorage.getItem('token')) {
 		if (!$studentAccount) {
 			const { username, password, domain } = JSON.parse(localStorage.getItem('token') ?? '{}');
 			$studentAccount = new StudentAccount(domain, username, password);

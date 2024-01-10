@@ -17,13 +17,14 @@
 	} from 'flowbite-svelte-icons';
 	import { studentInfo } from './stores';
 	import { loadStudentInfo } from './cache';
+	import { browser } from '$app/environment';
 
 	function logOut() {
 		localStorage.clear();
 		location.assign('/login');
 	}
 
-	if (!$studentInfo) loadStudentInfo();
+	if (!$studentInfo && browser) loadStudentInfo();
 </script>
 
 <Sidebar activeUrl={$page.url.pathname} class="h-screen">

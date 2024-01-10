@@ -1,11 +1,12 @@
 <script lang="ts">
+	import { browser } from '$app/environment';
 	import DateBadge from '$lib/DateBadge.svelte';
 	import LoadingBanner from '$lib/LoadingBanner.svelte';
 	import { loadReportCardList } from '$lib/cache';
 	import { reportCardList, reportCardListLoaded } from '$lib/stores';
 	import { Badge, Card } from 'flowbite-svelte';
 
-	if (!$reportCardList) loadReportCardList();
+	if (!$reportCardList && browser) loadReportCardList();
 </script>
 
 <LoadingBanner show={!$reportCardListLoaded} loadingMsg="Loading report cards..." />

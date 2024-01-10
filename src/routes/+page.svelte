@@ -10,8 +10,9 @@
 		GithubSolid,
 		GridPlusOutline
 	} from 'flowbite-svelte-icons';
+	import { browser } from '$app/environment';
 
-	if (localStorage.getItem('token')) {
+	if (browser && localStorage.getItem('token')) {
 		if (!$studentAccount) {
 			const { username, password, domain } = JSON.parse(localStorage.getItem('token') ?? '{}');
 			$studentAccount = new StudentAccount(domain, username, password);

@@ -1,10 +1,11 @@
 <script lang="ts">
+	import { browser } from '$app/environment';
 	import LoadingBanner from '$lib/LoadingBanner.svelte';
 	import { loadStudentInfo } from '$lib/cache';
 	import { studentInfo, studentInfoLoaded } from '$lib/stores';
 	import { Card } from 'flowbite-svelte';
 
-	if (!$studentInfo) loadStudentInfo();
+	if (!$studentInfo && browser) loadStudentInfo();
 </script>
 
 <LoadingBanner show={!$studentInfoLoaded} loadingMsg="Loading student info..." />

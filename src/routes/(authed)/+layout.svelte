@@ -6,10 +6,11 @@
 	import { Drawer, Navbar, NavBrand, NavHamburger } from 'flowbite-svelte';
 	import AppSidebar from '$lib/AppSidebar.svelte';
 	import { navigating } from '$app/stores';
+	import { browser } from '$app/environment';
 
 	let drawerHidden = true;
 
-	if (!$studentAccount) {
+	if (browser && !$studentAccount) {
 		if (localStorage.getItem('token')) {
 			const { username, password, domain } = JSON.parse(localStorage.getItem('token') ?? '{}');
 			$studentAccount = new StudentAccount(domain, username, password);
