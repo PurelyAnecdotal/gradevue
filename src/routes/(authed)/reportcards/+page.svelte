@@ -16,7 +16,7 @@
 			<li>
 				{#if reportCard._DocumentGU}
 					<Card
-						href="/reportcards/{reportCard._DocumentGU}"
+						href="/documents/{reportCard._DocumentGU}"
 						class="dark:text-white max-w-none flex-row items-center gap-2"
 					>
 						<h2 class="text-xl">{reportCard._ReportingPeriodName}</h2>

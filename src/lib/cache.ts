@@ -8,7 +8,9 @@ import {
 	studentInfo,
 	studentInfoLoaded,
 	reportCardList,
-	reportCardListLoaded
+	reportCardListLoaded,
+	documentsList,
+	documentsListLoaded
 } from './stores';
 
 export const loadGradebook = async () => {
@@ -66,3 +68,17 @@ export const loadReportCardList = async () => {
 
 	reportCardListLoaded.set(true);
 };
+
+export const loadDocumentsList = async () => {
+	documentsListLoaded.set(false);
+
+	const cache = localStorage.getItem('documentsList');
+	if (cache) documentsList.set(JSON.parse(cache));
+
+	const documentsListRecord = await get(studentAccount)?.documentsList();
+
+	documentsList.set(documentsListRecord);
+	localStorage.setItem('documentsList', JSON.stringify(documentsListRecord));
+
+	documentsListLoaded.set(true);
+}

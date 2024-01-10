@@ -4,6 +4,7 @@ import type { Attendance } from '$lib/Attendance';
 import type { StudentInfo } from '$lib/StudentInfo';
 import type { ReportCardListEntity } from '$lib/ReportCardListEntity';
 import type { ReportCardDocument } from '$lib/ReportCardDocument';
+import type { DocumentsList } from './DocumentsList';
 
 const parser = new XMLParser({
 	ignoreAttributes: false,
@@ -81,5 +82,9 @@ export class StudentAccount {
 	async reportCard(documentGU: string): Promise<ReportCardDocument> {
 		return (await this.request('GetReportCardDocumentData', { DocumentGU: documentGU }))
 			.DocumentData;
+	}
+
+	async documentsList(): Promise<DocumentsList> {
+		return (await this.request('GetStudentDocumentInitialData')).StudentDocuments
 	}
 }

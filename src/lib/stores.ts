@@ -6,6 +6,7 @@ import type { Gradebook } from '$lib/Gradebook';
 import type { Attendance } from '$lib/Attendance';
 import type { StudentInfo } from '$lib/StudentInfo';
 import type { ReportCardListEntity } from '$lib/ReportCardListEntity';
+import type { DocumentsList } from './DocumentsList';
 
 export const studentAccount: Writable<StudentAccount | undefined> = writable();
 
@@ -34,3 +35,7 @@ export const studentInfoLoaded = writable(false);
 export const reportCardList: Writable<ReportCardListEntity[] | undefined> = writable();
 
 export const reportCardListLoaded = writable(false);
+
+export const documentsList: Writable<DocumentsList | undefined> = writable();
+
+export const documentsListLoaded = writable(false);
