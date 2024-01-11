@@ -82,7 +82,7 @@
 		</Card>
 	</div>
 	<p>and more!</p>
-	<Button href="https://github.com/Nonexistent-Name/gradebook" target="_blank" color="light" class="gap-2">
+	<Button href="https://github.com/Nonexistent-Name/gradevue" target="_blank" color="light" class="gap-2">
 		<GithubSolid class="inline focus:outline-none" />
 		Open Source
 	</Button>
