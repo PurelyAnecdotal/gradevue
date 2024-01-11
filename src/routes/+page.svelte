@@ -24,7 +24,7 @@
 
 <div class="p-4 flex flex-col gap-4 items-center justify-center min-h-screen">
 	<Card class="w-full sm:w-auto">
-		<h1 class="text-2xl font-bold tracking-tight text-gray-900 dark:text-white">Gradebook</h1>
+		<h1 class="text-2xl font-bold tracking-tight text-gray-900 dark:text-white">GradeVue</h1>
 		<span class="mt-2 font-normal text-gray-700 dark:text-gray-400 leading-tight">
 			An improved StudentVue experience.
 		</span>
@@ -41,8 +41,8 @@
 				Private Login
 			</h2>
 			<p>
-				Unlike SynergyPlus, Gradebook does not have access to your login information. When you use
-				Gradebook, your device connects directly to StudentVue. We never see your password or your
+				Unlike SynergyPlus, GradeVue does not have access to your login information. When you use
+				GradeVue, your device connects directly to StudentVue. We never see your password or your
 				grades!
 			</p>
 		</Card>
@@ -53,7 +53,7 @@
 				Hidden Assignments
 			</h2>
 			<p>
-				Unlike SynergyPlus, Gradebook is able to reveal hidden assignments and will factor them into
+				Unlike SynergyPlus, GradeVue is able to reveal hidden assignments and will factor them into
 				your grade calculations. You never have to worry about your grade calculations being
 				inaccurate!
 			</p>
@@ -65,7 +65,7 @@
 				Grade Calculator
 			</h2>
 			<p>
-				Gradebook's powerful Hypothetical Mode allows you to calculate what your grade would be if
+				GradeVue's powerful Hypothetical Mode allows you to calculate what your grade would be if
 				you got a score on an assignment.
 			</p>
 		</Card>
@@ -76,7 +76,7 @@
 				Fast Loading
 			</h2>
 			<p>
-				Gradebook features a modern, responsive design, and is able to load your gradebook in under
+				GradeVue features a modern, responsive design, and is able to load your GradeVue in under
 				3 seconds. SynergyPlus takes over 8 seconds to load.
 			</p>
 		</Card>

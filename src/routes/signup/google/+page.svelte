@@ -4,8 +4,8 @@
 </script>
 
 <p>
-	Gradebook isn't able to use Sign in with Google to sign you in. You'll need to create a password
-	for StudentVue that Gradebook can sign you in with instead.
+	GradeVue isn't able to use Sign in with Google to sign you in. You'll need to create a password
+	for StudentVue that GradeVue can sign you in with instead.
 	<span class="font-bold">
 		You'll still be able to use Sign in with Google with StudentVue afterwards.
 	</span>
@@ -18,7 +18,7 @@
 <Alert color="dark" class="p-0">
 	<InfoCircleOutline slot="icon" size="sm" class="focus:outline-none" />
 	If you've used SynergyPlus before, you can use the same password to
-	<a href="/login" class="text-primary-600 underline">log in to Gradebook</a>.
+	<a href="/login" class="text-primary-600 underline">log in to GradeVue</a>.
 </Alert>
 
 <p>

@@ -73,7 +73,7 @@
 <div class="flex items-center justify-center min-h-screen">
 	<Card>
 		<form on:submit|preventDefault={login}>
-			<h1 class="text-xl mb-4 dark:text-white">Sign in to Gradebook</h1>
+			<h1 class="text-xl mb-4 dark:text-white">Sign in to GradeVue</h1>
 			<Label class="space-y-2 mb-4">
 				<span>Username</span>
 				<Input
@@ -95,7 +95,7 @@
 				<Helper class="text-xs flex items-center">
 					<InfoCircleOutline size="sm" class="mr-2 focus:outline-none" />
 					<span>
-						If you've never used Gradebook or SynergyPlus before, you may need to
+						If you've never used GradeVue or SynergyPlus before, you may need to
 						<a href="/signup" class="text-primary-600 underline">create a password</a>.
 					</span>
 				</Helper>

@@ -32,7 +32,7 @@
 		<SidebarGroup>
 			<SidebarBrand
 				site={{
-					name: 'Gradebook',
+					name: 'GradeVue',
 					href: '/grades',
 					img: '/favicon.ico'
 				}}

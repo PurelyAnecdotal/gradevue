@@ -280,7 +280,7 @@
 		{#if rawGradeCalcMatches}
 			<Alert class="m-4" color="dark">
 				<InfoCircleSolid slot="icon" size="sm" class="focus:outline-none" />
-				Gradebook cannot show hidden assignments for this class. If there are any, they have not significantly
+				GradeVue cannot show hidden assignments for this class. If there are any, they have not significantly
 				affected the grade percentage.
 			</Alert>
 		{:else}
@@ -318,7 +318,7 @@
 	{#if assignments.length > 0 || hypotheticalMode}
 		<Popover triggeredBy=".hidden-badge" class="max-w-md">
 			Teachers can choose to have assignments hidden from the assignment list but still calculated
-			toward your grade. Gradebook can reveal these assignments.
+			toward your grade. GradeVue can reveal these assignments.
 		</Popover>
 
 		<div transition:fade={{ duration: 200 }}>
