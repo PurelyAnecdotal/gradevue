@@ -233,8 +233,6 @@
 			name: 'Hypothetical Assignment'
 		};
 	}
-
-	hypotheticalGradebook.subscribe(console.log)
 </script>
 
 {#if course}
