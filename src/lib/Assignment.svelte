@@ -13,6 +13,7 @@
 	import { getColorForGrade } from '$lib/index';
 	import { hypotheticalGradebook } from '$lib/stores';
 	import DateBadge from '$lib/DateBadge.svelte';
+	import { writable } from 'svelte/store';
 
 	export let name: string;
 	export let pointsEarned: number;
@@ -36,10 +37,27 @@
 	};
 
 	$: percentage = hypotheticalMode
-		? (parseFloat($hypotheticalGradebook[id].pointsEarned) /
-				parseFloat($hypotheticalGradebook[id].pointsPossible)) *
-			100
+		? ($hypotheticalGradebook[id].pointsEarned / $hypotheticalGradebook[id].pointsPossible) * 100
 		: (pointsEarned / pointsPossible) * 100;
+
+	let pointsEarnedInput = writable($hypotheticalGradebook[id].pointsEarned.toString());
+	let pointsPossibleInput = writable($hypotheticalGradebook[id].pointsPossible.toString());
+
+	pointsEarnedInput.subscribe((pointsEarned) => {
+		$hypotheticalGradebook[id].pointsEarned = parseFloat(pointsEarned);
+	});
+
+	pointsPossibleInput.subscribe((pointsPossible) => {
+		$hypotheticalGradebook[id].pointsPossible = parseFloat(pointsPossible);
+	});
+
+	hypotheticalGradebook.subscribe((gradebook) => {
+		if (gradebook[id].pointsEarned !== parseFloat($pointsEarnedInput))
+			$pointsEarnedInput = gradebook[id].pointsEarned.toString();
+
+		if (gradebook[id].pointsPossible !== parseFloat($pointsPossibleInput))
+			$pointsPossibleInput = gradebook[id].pointsPossible.toString();
+	});
 </script>
 
 <Card class="dark:text-white max-w-none flex flex-row items-center sm:p-4">
@@ -77,7 +95,7 @@
 		{#if percentage == Infinity}
 			<Badge border color="indigo">Extra Credit</Badge>
 		{/if}
-		{#if hypotheticalMode ? isNaN(parseFloat($hypotheticalGradebook[id].pointsEarned)) : isNaN(pointsEarned)}
+		{#if hypotheticalMode ? isNaN($hypotheticalGradebook[id].pointsEarned) : isNaN(pointsEarned)}
 			<Badge border color="purple">Not Graded</Badge>
 		{/if}
 		{#if notForGrade}
@@ -107,9 +125,9 @@
 	<div class="ml-auto mr-2 shrink-0">
 		{#if hypotheticalMode}
 			<div class="w-32 flex items-center">
-				<Input type="number" size="sm" bind:value={$hypotheticalGradebook[id].pointsEarned} />
+				<Input type="number" size="sm" bind:value={$pointsEarnedInput} />
 				<span class="mx-1"> / </span>
-				<Input type="number" size="sm" bind:value={$hypotheticalGradebook[id].pointsPossible} />
+				<Input type="number" size="sm" bind:value={$pointsPossibleInput} />
 			</div>
 		{:else if isNaN(pointsEarned)}
 			{pointsPossible}

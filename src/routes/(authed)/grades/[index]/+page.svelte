@@ -110,8 +110,8 @@
 				([id, { pointsEarned, pointsPossible, notForGrade }]) => [
 					id,
 					{
-						pointsEarned: pointsEarned.toString(),
-						pointsPossible: pointsPossible.toString(),
+						pointsEarned: pointsEarned,
+						pointsPossible: pointsPossible,
 						notForGrade
 					}
 				]
@@ -129,8 +129,8 @@
 
 			const points = pointsByCategory[assignment._Type] ?? [0, 0];
 			const hypotheticalPoints = [
-				parseFloat($hypotheticalGradebook[assignment._GradebookID].pointsEarned),
-				parseFloat($hypotheticalGradebook[assignment._GradebookID].pointsPossible)
+				$hypotheticalGradebook[assignment._GradebookID].pointsEarned,
+				$hypotheticalGradebook[assignment._GradebookID].pointsPossible
 			];
 
 			if (isNaN(hypotheticalPoints[0])) return;
@@ -166,8 +166,8 @@
 		Object.keys(hiddenPointsByCategory).forEach((categoryName) => {
 			const points = pointsByCategory[categoryName] ?? [0, 0];
 			const hypotheticalPoints = [
-				parseFloat($hypotheticalGradebook[`hidden-${categoryName}`].pointsEarned),
-				parseFloat($hypotheticalGradebook[`hidden-${categoryName}`].pointsPossible)
+				$hypotheticalGradebook[`hidden-${categoryName}`].pointsEarned,
+				$hypotheticalGradebook[`hidden-${categoryName}`].pointsPossible
 			];
 
 			if (isNaN(hypotheticalPoints[0])) return;
@@ -185,10 +185,7 @@
 				if (assignment.notForGrade == true || (gradeCategories && !assignment.category)) return;
 
 				const points = pointsByCategory[assignment.category ?? 'hypothetical'] ?? [0, 0];
-				const hypotheticalPoints = [
-					parseFloat(assignment.pointsEarned),
-					parseFloat(assignment.pointsPossible)
-				];
+				const hypotheticalPoints = [assignment.pointsEarned, assignment.pointsPossible];
 
 				if (isNaN(hypotheticalPoints[0])) return;
 
@@ -230,12 +227,14 @@
 
 	function addHypotheticalAssignment() {
 		$hypotheticalGradebook[`hypothetical-${Math.random().toString(36).substring(2, 15)}`] = {
-			pointsEarned: '0',
-			pointsPossible: '0',
+			pointsEarned: 0,
+			pointsPossible: 0,
 			notForGrade: false,
 			name: 'Hypothetical Assignment'
 		};
 	}
+
+	hypotheticalGradebook.subscribe(console.log)
 </script>
 
 {#if course}

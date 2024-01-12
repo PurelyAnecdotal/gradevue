@@ -18,8 +18,8 @@
 			<li transition:fade>
 				<Assignment
 					name={$hypotheticalGradebook[id].name ?? 'Hypothetical Assignment'}
-					pointsEarned={parseFloat($hypotheticalGradebook[id].pointsEarned)}
-					pointsPossible={parseFloat($hypotheticalGradebook[id].pointsPossible)}
+					pointsEarned={$hypotheticalGradebook[id].pointsEarned}
+					pointsPossible={$hypotheticalGradebook[id].pointsPossible}
 					{id}
 					category={$hypotheticalGradebook[id].category}
 					{hypotheticalMode}

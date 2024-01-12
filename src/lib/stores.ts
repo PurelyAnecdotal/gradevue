@@ -16,8 +16,8 @@ export const gradebookLoaded = writable(false);
 
 export const hypotheticalGradebook: Writable<{
 	[id: string]: {
-		pointsEarned: string;
-		pointsPossible: string;
+		pointsEarned: number;
+		pointsPossible: number;
 		notForGrade: boolean;
 		category?: string;
 		name?: string;
