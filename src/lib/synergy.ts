@@ -59,6 +59,12 @@ export class StudentAccount {
 		);
 	}
 
+	async checkLogin() {
+		const res = await this.request('StudentInfo');
+
+		if (res.RT_ERROR) throw new Error(res.RT_ERROR._ERROR_MESSAGE);
+	}
+
 	async grades(reportPeriod?: number): Promise<Gradebook> {
 		if (reportPeriod)
 			return (await this.request('Gradebook', { ReportPeriod: reportPeriod })).Gradebook;
@@ -85,6 +91,6 @@ export class StudentAccount {
 	}
 
 	async documentsList(): Promise<DocumentsList> {
-		return (await this.request('GetStudentDocumentInitialData')).StudentDocuments
+		return (await this.request('GetStudentDocumentInitialData')).StudentDocuments;
 	}
 }

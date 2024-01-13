@@ -38,11 +38,11 @@
 	async function login() {
 		const loginAccount = new StudentAccount(domain, username, password);
 
-		const loginVerify = await loginAccount.request('StudentInfo');
-
-		if (loginVerify.RT_ERROR) {
+		try {
+			await loginAccount.checkLogin();
+		} catch (e) {
 			loginErrorShown = true;
-			loginError = loginVerify.RT_ERROR._ERROR_MESSAGE;
+			loginError = e instanceof Error ? e.message : 'An unknown error occurred';
 			return;
 		}
 
@@ -51,12 +51,6 @@
 		localStorage.setItem('token', JSON.stringify({ username, password, domain }));
 
 		goto('/grades');
-	}
-
-	let modalShown = false;
-
-	function showModal() {
-		modalShown = true;
 	}
 </script>
 
