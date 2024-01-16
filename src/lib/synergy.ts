@@ -6,10 +6,17 @@ import type { ReportCardListEntity } from '$lib/ReportCardListEntity';
 import type { ReportCardDocument } from '$lib/ReportCardDocument';
 import type { DocumentsList } from './DocumentsList';
 
+const alwaysArray = [
+	'Gradebook.Courses.Course',
+	'Gradebook.Courses.Course.Marks.Mark.Assignments.Assignment',
+	'Gradebook.ReportingPeriods.ReportPeriod'
+];
+
 const parser = new XMLParser({
 	ignoreAttributes: false,
 	ignoreDeclaration: true,
-	attributeNamePrefix: '_'
+	attributeNamePrefix: '_',
+	isArray: (_name, jpath) => alwaysArray.includes(jpath)
 });
 
 const builder = new XMLBuilder({
