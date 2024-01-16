@@ -37,11 +37,9 @@
 
 	$: totalCategory = categories?.find((grade) => grade._Type == 'TOTAL');
 
-	$: assignmentCategories = new Set(
-		course?.Marks.Mark.Assignments.Assignment?.map((assignment) => assignment._Type).toSorted()
-	);
-
 	$: assignments = course?.Marks.Mark.Assignments.Assignment ?? [];
+
+	$: assignmentCategories = new Set(assignments.map((assignment) => assignment._Type).toSorted());
 
 	let hiddenPointsByCategory: { [categoryName: string]: [number, number] } = {};
 
