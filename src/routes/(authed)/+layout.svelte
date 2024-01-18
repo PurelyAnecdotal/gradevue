@@ -1,25 +1,15 @@
 <script lang="ts">
+	import { browser } from '$app/environment';
 	import { goto } from '$app/navigation';
+	import { navigating } from '$app/stores';
+	import AppSidebar from '$lib/AppSidebar.svelte';
 	import { studentAccount } from '$lib/stores';
 	import { StudentAccount } from '$lib/synergy';
-	import { sineIn } from 'svelte/easing';
 	import { Drawer, Navbar, NavBrand, NavHamburger } from 'flowbite-svelte';
-	import AppSidebar from '$lib/AppSidebar.svelte';
-	import { navigating } from '$app/stores';
-	import { browser } from '$app/environment';
+	import { onDestroy } from 'svelte';
+	import { sineIn } from 'svelte/easing';
 
 	let drawerHidden = true;
-
-	if (browser && !$studentAccount) {
-		if (localStorage.getItem('token')) {
-			const { username, password, domain } = JSON.parse(localStorage.getItem('token') ?? '{}');
-			$studentAccount = new StudentAccount(domain, username, password);
-		} else goto('/login');
-	}
-
-	function showSidebar() {
-		drawerHidden = false;
-	}
 
 	let transitionParams = {
 		x: -320,
@@ -27,9 +17,22 @@
 		easing: sineIn
 	};
 
-	navigating.subscribe((navigating) => {
+	const showSidebar = () => {
+		drawerHidden = false;
+	};
+
+	const navigationUnsubscribe = navigating.subscribe((navigating) => {
 		if (navigating) drawerHidden = true;
 	});
+
+	onDestroy(navigationUnsubscribe);
+
+	if (browser && !$studentAccount) {
+		if (localStorage.getItem('token')) {
+			const { username, password, domain } = JSON.parse(localStorage.getItem('token') ?? '{}');
+			$studentAccount = new StudentAccount(domain, username, password);
+		} else goto('/login');
+	}
 </script>
 
 <div class="fixed top-0 w-full z-10 md:hidden">
