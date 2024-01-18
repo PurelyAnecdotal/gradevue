@@ -1,7 +1,7 @@
 <script lang="ts">
-	import { Card, Progressbar, Button, Dropdown, DropdownItem } from 'flowbite-svelte';
-	import { gradebook, gradebookLoaded, studentAccount } from '$lib/stores';
 	import { getColorForGrade, removeClassID } from '$lib/index';
+	import { gradebook, gradebookLoaded, studentAccount } from '$lib/stores';
+	import { Button, Card, Dropdown, DropdownItem, Progressbar } from 'flowbite-svelte';
 	import { ChevronDownSolid, ChevronUpSolid, MapPinOutline } from 'flowbite-svelte-icons';
 
 	let dropdownOpen = false;

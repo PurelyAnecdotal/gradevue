@@ -1,20 +1,20 @@
 <script lang="ts">
+	import DateBadge from '$lib/DateBadge.svelte';
+	import { getColorForGrade } from '$lib/index';
+	import { hypotheticalGradebook } from '$lib/stores';
 	import {
-		Card,
 		Badge,
-		Progressbar,
-		Input,
+		Button,
+		Card,
 		Checkbox,
 		Dropdown,
 		DropdownItem,
-		Button
+		Input,
+		Progressbar
 	} from 'flowbite-svelte';
 	import { ChevronDownSolid, InfoCircleOutline } from 'flowbite-svelte-icons';
-	import { getColorForGrade } from '$lib/index';
-	import { hypotheticalGradebook } from '$lib/stores';
-	import DateBadge from '$lib/DateBadge.svelte';
-	import { writable } from 'svelte/store';
 	import { onDestroy } from 'svelte';
+	import { writable } from 'svelte/store';
 
 	export let name: string;
 	export let pointsEarned: number;

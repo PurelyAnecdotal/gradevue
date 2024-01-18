@@ -1,8 +1,8 @@
 <script lang="ts">
-	import { gradebook, gradebookLoaded } from '$lib/stores';
+	import { browser } from '$app/environment';
 	import LoadingBanner from '$lib/LoadingBanner.svelte';
 	import { loadGradebook } from '$lib/cache';
-	import { browser } from '$app/environment';
+	import { gradebook, gradebookLoaded } from '$lib/stores';
 
 	if (!$gradebook && browser) loadGradebook();
 </script>

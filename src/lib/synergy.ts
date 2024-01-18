@@ -1,9 +1,9 @@
-import { XMLBuilder, XMLParser } from 'fast-xml-parser';
-import type { Gradebook } from '$lib/Gradebook';
 import type { Attendance } from '$lib/Attendance';
-import type { StudentInfo } from '$lib/StudentInfo';
-import type { ReportCardListEntity } from '$lib/ReportCardListEntity';
+import type { Gradebook } from '$lib/Gradebook';
 import type { ReportCardDocument } from '$lib/ReportCardDocument';
+import type { ReportCardListEntity } from '$lib/ReportCardListEntity';
+import type { StudentInfo } from '$lib/StudentInfo';
+import { XMLBuilder, XMLParser } from 'fast-xml-parser';
 import type { DocumentsList } from './DocumentsList';
 
 const alwaysArray = [

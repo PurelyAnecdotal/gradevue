@@ -1,16 +1,16 @@
 import { get } from 'svelte/store';
 import {
-	studentAccount,
-	gradebook,
-	gradebookLoaded,
 	attendance,
 	attendanceLoaded,
-	studentInfo,
-	studentInfoLoaded,
+	documentsList,
+	documentsListLoaded,
+	gradebook,
+	gradebookLoaded,
 	reportCardList,
 	reportCardListLoaded,
-	documentsList,
-	documentsListLoaded
+	studentAccount,
+	studentInfo,
+	studentInfoLoaded
 } from './stores';
 
 export const loadGradebook = async () => {

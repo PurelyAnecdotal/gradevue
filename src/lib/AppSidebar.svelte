@@ -1,23 +1,23 @@
 <script>
+	import { browser } from '$app/environment';
 	import { page } from '$app/stores';
 	import {
 		Sidebar,
-		SidebarWrapper,
-		SidebarGroup,
 		SidebarBrand,
-		SidebarItem
+		SidebarGroup,
+		SidebarItem,
+		SidebarWrapper
 	} from 'flowbite-svelte';
 	import {
+		AdressBookOutline,
 		ArrowRightToBracketSolid,
 		BellOutline,
-		AdressBookOutline,
-		UserCircleOutline,
 		FileLinesOutline,
-		FolderOpenOutline
+		FolderOpenOutline,
+		UserCircleOutline
 	} from 'flowbite-svelte-icons';
-	import { studentInfo } from './stores';
 	import { loadStudentInfo } from './cache';
-	import { browser } from '$app/environment';
+	import { studentInfo } from './stores';
 
 	function logOut() {
 		localStorage.clear();

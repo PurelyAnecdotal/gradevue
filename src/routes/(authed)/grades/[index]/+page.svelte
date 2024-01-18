@@ -1,21 +1,21 @@
 <script lang="ts">
-	import Assignments from '$lib/Assignments.svelte';
-	import { gradebook, hypotheticalGradebook } from '$lib/stores';
 	import { page } from '$app/stores';
-	import { removeClassID, extractPoints } from '$lib/index';
+	import Assignments from '$lib/Assignments.svelte';
+	import { extractPoints, removeClassID } from '$lib/index';
+	import { gradebook, hypotheticalGradebook } from '$lib/stores';
 	import {
+		Alert,
+		Button,
+		Checkbox,
+		Popover,
+		TabItem,
 		Table,
 		TableBody,
 		TableBodyCell,
 		TableBodyRow,
 		TableHead,
 		TableHeadCell,
-		Tabs,
-		TabItem,
-		Checkbox,
-		Alert,
-		Popover,
-		Button
+		Tabs
 	} from 'flowbite-svelte';
 	import {
 		ExclamationCircleOutline,

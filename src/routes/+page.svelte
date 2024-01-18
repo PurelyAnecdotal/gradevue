@@ -1,8 +1,9 @@
 <script lang="ts">
+	import { browser } from '$app/environment';
 	import { goto } from '$app/navigation';
-	import { StudentAccount } from '$lib/synergy';
 	import { studentAccount } from '$lib/stores';
-	import { Card, Button } from 'flowbite-svelte';
+	import { StudentAccount } from '$lib/synergy';
+	import { Button, Card } from 'flowbite-svelte';
 	import {
 		ChartOutline,
 		ClockOutline,
@@ -10,7 +11,6 @@
 		GithubSolid,
 		GridPlusOutline
 	} from 'flowbite-svelte-icons';
-	import { browser } from '$app/environment';
 
 	if (browser && localStorage.getItem('token')) {
 		if (!$studentAccount) {

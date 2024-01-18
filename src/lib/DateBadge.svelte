@@ -1,6 +1,6 @@
 <script lang="ts">
+	import { fullDateFormatter, getRelativeTime, shortDateFormatter } from '$lib/index';
 	import { Badge, Popover } from 'flowbite-svelte';
-	import { shortDateFormatter, fullDateFormatter, getRelativeTime } from '$lib/index';
 
 	export let date: Date;
 </script>

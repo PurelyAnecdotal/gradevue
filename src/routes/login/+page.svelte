@@ -2,22 +2,22 @@
 	import { browser } from '$app/environment';
 	import { goto } from '$app/navigation';
 	import { StudentAccount } from '$lib/synergy';
-	import { studentAccount } from '../../lib/stores';
 	import {
-		Card,
-		Input,
-		Label,
-		Helper,
-		Button,
 		Accordion,
 		AccordionItem,
-		Alert
+		Alert,
+		Button,
+		Card,
+		Helper,
+		Input,
+		Label
 	} from 'flowbite-svelte';
 	import {
 		ExclamationCircleSolid,
 		EyeSlashOutline,
 		InfoCircleOutline
 	} from 'flowbite-svelte-icons';
+	import { studentAccount } from '../../lib/stores';
 
 	if (browser && localStorage.getItem('token')) {
 		if (!$studentAccount) {

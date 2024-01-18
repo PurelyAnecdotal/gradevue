@@ -4,7 +4,7 @@
 	import LoadingBanner from '$lib/LoadingBanner.svelte';
 	import { loadDocumentsList } from '$lib/cache';
 	import { documentsList, documentsListLoaded } from '$lib/stores';
-	import { Card, Badge } from 'flowbite-svelte';
+	import { Badge, Card } from 'flowbite-svelte';
 
 	if (!$documentsList && browser) loadDocumentsList();
 

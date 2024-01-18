@@ -1,9 +1,9 @@
 <script lang="ts">
-	import type { AssignmentEntity } from './Gradebook';
-	import Assignment from './Assignment.svelte';
 	import { extractPoints } from '$lib';
-	import { hypotheticalGradebook } from './stores';
 	import { fade } from 'svelte/transition';
+	import Assignment from './Assignment.svelte';
+	import type { AssignmentEntity } from './Gradebook';
+	import { hypotheticalGradebook } from './stores';
 
 	export let assignments: AssignmentEntity[];
 	export let showCategories = true;

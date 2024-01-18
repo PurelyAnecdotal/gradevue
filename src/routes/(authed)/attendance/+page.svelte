@@ -1,11 +1,11 @@
 <script lang="ts">
-	import type { PeriodEntity } from '$lib/Attendance';
-	import { attendance, attendanceLoaded } from '$lib/stores';
-	import { loadAttendance } from '$lib/cache';
-	import LoadingBanner from '$lib/LoadingBanner.svelte';
-	import { Badge, Accordion, AccordionItem } from 'flowbite-svelte';
-	import { fullDateFormatter, removeClassID } from '$lib';
 	import { browser } from '$app/environment';
+	import { fullDateFormatter, removeClassID } from '$lib';
+	import type { PeriodEntity } from '$lib/Attendance';
+	import LoadingBanner from '$lib/LoadingBanner.svelte';
+	import { loadAttendance } from '$lib/cache';
+	import { attendance, attendanceLoaded } from '$lib/stores';
+	import { Accordion, AccordionItem, Badge } from 'flowbite-svelte';
 
 	if (!$attendance && browser) loadAttendance();
 
