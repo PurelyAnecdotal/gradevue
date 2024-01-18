@@ -14,6 +14,7 @@
 	import { hypotheticalGradebook } from '$lib/stores';
 	import DateBadge from '$lib/DateBadge.svelte';
 	import { writable } from 'svelte/store';
+	import { onDestroy } from 'svelte';
 
 	export let name: string;
 	export let pointsEarned: number;
@@ -43,20 +44,31 @@
 	let pointsEarnedInput = writable($hypotheticalGradebook[id].pointsEarned.toString());
 	let pointsPossibleInput = writable($hypotheticalGradebook[id].pointsPossible.toString());
 
-	pointsEarnedInput.subscribe((pointsEarned) => {
+	const earnedUnsubscribe = pointsEarnedInput.subscribe((pointsEarned) => {
 		$hypotheticalGradebook[id].pointsEarned = parseFloat(pointsEarned);
 	});
 
-	pointsPossibleInput.subscribe((pointsPossible) => {
+	const possibleUnsubscribe = pointsPossibleInput.subscribe((pointsPossible) => {
 		$hypotheticalGradebook[id].pointsPossible = parseFloat(pointsPossible);
 	});
 
-	hypotheticalGradebook.subscribe((gradebook) => {
+	const hypotheticalUnsubscribe = hypotheticalGradebook.subscribe((gradebook) => {
+		if (!gradebook[id]) {
+			console.error(`Missing expected hypothetical assignment ${id} with name ${name}`);
+			return;
+		}
+
 		if (gradebook[id].pointsEarned !== parseFloat($pointsEarnedInput))
 			$pointsEarnedInput = gradebook[id].pointsEarned.toString();
 
 		if (gradebook[id].pointsPossible !== parseFloat($pointsPossibleInput))
 			$pointsPossibleInput = gradebook[id].pointsPossible.toString();
+	});
+
+	onDestroy(() => {
+		earnedUnsubscribe();
+		possibleUnsubscribe();
+		hypotheticalUnsubscribe();
 	});
 </script>
 
