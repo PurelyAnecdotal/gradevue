@@ -121,9 +121,14 @@
 	let rawGradeCalcMatches = true;
 	$: {
 		let pointsByCategory: { [categoryName: string]: [number, number] } = {};
+		let totalPointsEarned = 0;
+		let totalPointsPossible = 0;
 
 		assignments?.forEach((assignment) => {
 			if ($hypotheticalGradebook[assignment._GradebookID].notForGrade == true) return;
+
+			totalPointsEarned += extractPoints(assignment._Points)[0];
+			totalPointsPossible += extractPoints(assignment._Points)[1];
 
 			const points = pointsByCategory[assignment._Type] ?? [0, 0];
 			const hypotheticalPoints = [
@@ -140,16 +145,6 @@
 		});
 
 		if (!gradeCategories && course) {
-			let totalPointsEarned = 0;
-			let totalPointsPossible = 0;
-
-			Object.entries(pointsByCategory).forEach(
-				([_categoryName, [pointsEarned, pointsPossible]]) => {
-					totalPointsEarned += pointsEarned;
-					totalPointsPossible += pointsPossible;
-				}
-			);
-
 			let rawGrade = (totalPointsEarned / totalPointsPossible) * 100;
 			if (isNaN(rawGrade)) rawGrade = 0;
 			let synergyGrade = parseFloat(course.Marks.Mark._CalculatedScoreRaw);
