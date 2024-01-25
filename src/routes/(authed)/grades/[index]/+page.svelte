@@ -39,7 +39,9 @@
 
 	$: assignments = course?.Marks.Mark.Assignments.Assignment ?? [];
 
-	$: assignmentCategories = new Set(assignments.map((assignment) => assignment._Type).toSorted());
+	$: assignmentCategories = new Set(
+		assignments.length > 0 ? assignments.map((assignment) => assignment._Type).toSorted() : []
+	);
 
 	let hiddenPointsByCategory: { [categoryName: string]: [number, number] } = {};
 
