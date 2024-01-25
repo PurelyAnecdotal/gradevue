@@ -4,7 +4,7 @@
 	import LoadingBanner from '$lib/LoadingBanner.svelte';
 	import { loadDocumentsList } from '$lib/cache';
 	import { documentsList, documentsListLoaded } from '$lib/stores';
-	import { Badge, Card } from 'flowbite-svelte';
+	import { Badge, Card, TabItem, Tabs } from 'flowbite-svelte';
 
 	if (!$documentsList && browser) loadDocumentsList();
 
@@ -20,23 +20,63 @@
 				return 'primary';
 		}
 	}
+
+	$: documents = $documentsList?.StudentDocumentDatas?.StudentDocumentData ?? [];
+
+	const sortPriority = ['Transcript', 'Report Card'];
+
+	$: documentCategories = new Set(
+		documents
+			.map((document) => document._DocumentType)
+			.toSorted((a, b) => {
+				const aPriority = sortPriority.indexOf(a);
+				const bPriority = sortPriority.indexOf(b);
+				if (aPriority == -1 && bPriority == -1) return a.localeCompare(b);
+				if (aPriority == -1) return 1;
+				if (bPriority == -1) return -1;
+				return aPriority - bPriority;
+			})
+	);
 </script>
 
 <LoadingBanner show={!$documentsListLoaded} loadingMsg="Loading documents..." />
 
 {#if $documentsList}
-	<ol class="m-4 space-y-4">
-		{#each $documentsList.StudentDocumentDatas?.StudentDocumentData ?? [] as document}
-			<li>
-				<Card
-					href="/documents/{document._DocumentGU}"
-					class="dark:text-white max-w-none flex flex-row items-center gap-2 flex-wrap"
-				>
-					<h2 class="text-md">{document._DocumentComment}</h2>
-					<DateBadge date={new Date(document._DocumentDate)} />
-					<Badge color={getDocumentColor(document._DocumentType)}>{document._DocumentType}</Badge>
-				</Card>
-			</li>
+	<Tabs class="m-4 mb-0" contentClass="p-4">
+		<TabItem title="All" open>
+			<ol class="space-y-4">
+				{#each documents as document}
+					<li>
+						<Card
+							href="/documents/{document._DocumentGU}"
+							class="dark:text-white max-w-none flex flex-row items-center gap-2 flex-wrap"
+						>
+							<h2 class="text-md">{document._DocumentComment}</h2>
+							<DateBadge date={new Date(document._DocumentDate)} />
+							<Badge color={getDocumentColor(document._DocumentType)}>
+								{document._DocumentType}
+							</Badge>
+						</Card>
+					</li>
+				{/each}
+			</ol>
+		</TabItem>
+		{#each documentCategories as category}
+			<TabItem title={category}>
+				<ol class="space-y-4">
+					{#each documents.filter((document) => document._DocumentType == category) as document}
+						<li>
+							<Card
+								href="/documents/{document._DocumentGU}"
+								class="dark:text-white max-w-none flex flex-row items-center gap-2 flex-wrap"
+							>
+								<h2 class="text-md">{document._DocumentComment}</h2>
+								<DateBadge date={new Date(document._DocumentDate)} />
+							</Card>
+						</li>
+					{/each}
+				</ol>
+			</TabItem>
 		{/each}
-	</ol>
+	</Tabs>
 {/if}
