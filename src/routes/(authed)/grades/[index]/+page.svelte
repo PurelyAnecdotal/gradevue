@@ -40,6 +40,7 @@
 	$: assignments = course?.Marks.Mark.Assignments.Assignment ?? [];
 
 	$: assignmentCategories = new Set(
+		// fix required for Vercel, cannot reproduce locally
 		assignments.length > 0 ? assignments.map((assignment) => assignment._Type).toSorted() : []
 	);
 
