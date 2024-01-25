@@ -1,10 +1,11 @@
 import type { Attendance } from '$lib/Attendance';
+import type { DocumentsList } from '$lib/DocumentsList';
 import type { Gradebook } from '$lib/Gradebook';
+import type { Message } from '$lib/Message';
 import type { ReportCardDocument } from '$lib/ReportCardDocument';
 import type { ReportCardListEntity } from '$lib/ReportCardListEntity';
 import type { StudentInfo } from '$lib/StudentInfo';
 import { XMLBuilder, XMLParser } from 'fast-xml-parser';
-import type { DocumentsList } from './DocumentsList';
 
 const alwaysArray = [
 	'Gradebook.Courses.Course',
@@ -99,5 +100,9 @@ export class StudentAccount {
 
 	async documentsList(): Promise<DocumentsList> {
 		return (await this.request('GetStudentDocumentInitialData')).StudentDocuments;
+	}
+
+	async messages(): Promise<Message[]> {
+		return (await this.request('GetPXPMessages')).PXPMessagesData.MessageListings.MessageListing
 	}
 }

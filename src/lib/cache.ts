@@ -6,6 +6,8 @@ import {
 	documentsListLoaded,
 	gradebook,
 	gradebookLoaded,
+	messages,
+	messagesLoaded,
 	reportCardList,
 	reportCardListLoaded,
 	studentAccount,
@@ -81,4 +83,18 @@ export const loadDocumentsList = async () => {
 	localStorage.setItem('documentsList', JSON.stringify(documentsListRecord));
 
 	documentsListLoaded.set(true);
-}
+};
+
+export const loadMessages = async () => {
+	messagesLoaded.set(false);
+
+	const cache = localStorage.getItem('messages');
+	if (cache) messages.set(JSON.parse(cache));
+
+	const messagesRecord = await get(studentAccount)?.messages();
+
+	messages.set(messagesRecord);
+	localStorage.setItem('messages', JSON.stringify(messagesRecord));
+
+	messagesLoaded.set(true);
+};
