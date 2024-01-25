@@ -14,6 +14,7 @@
 		BellOutline,
 		FileLinesOutline,
 		FolderOpenOutline,
+		MailBoxOutline,
 		UserCircleOutline
 	} from 'flowbite-svelte-icons';
 	import { loadStudentInfo } from './cache';
@@ -59,6 +60,12 @@
 			<SidebarItem label="Documents" href="/documents">
 				<svelte:fragment slot="icon">
 					<FolderOpenOutline class="focus:outline-none" />
+				</svelte:fragment>
+			</SidebarItem>
+
+			<SidebarItem label="Messages" href="/messages">
+				<svelte:fragment slot="icon">
+					<MailBoxOutline class="focus:outline-none" />
 				</svelte:fragment>
 			</SidebarItem>
 		</SidebarGroup>

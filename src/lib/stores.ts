@@ -7,6 +7,7 @@ import type { Attendance } from '$lib/Attendance';
 import type { StudentInfo } from '$lib/StudentInfo';
 import type { ReportCardListEntity } from '$lib/ReportCardListEntity';
 import type { DocumentsList } from './DocumentsList';
+import type { Message } from './Message';
 
 export const studentAccount: Writable<StudentAccount | undefined> = writable();
 
@@ -39,3 +40,7 @@ export const reportCardListLoaded = writable(false);
 export const documentsList: Writable<DocumentsList | undefined> = writable();
 
 export const documentsListLoaded = writable(false);
+
+export const messages: Writable<Message[] | undefined> = writable();
+
+export const messagesLoaded = writable(false);
