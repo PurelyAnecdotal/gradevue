@@ -45,7 +45,7 @@
 		</Dropdown>
 	</div>
 
-	<ol class="space-y-4 mx-4">
+	<ol class="space-y-4 p-4 pt-0">
 		{#each $gradebook.Courses.Course ?? [] as course, index}
 			<li>
 				<Card

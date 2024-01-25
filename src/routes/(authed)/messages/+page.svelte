@@ -15,7 +15,7 @@
 <LoadingBanner show={!$messagesLoaded} loadingMsg="Loading messages..." />
 
 {#if $messages}
-	<ol class="m-4 space-y-4">
+	<ol class="p-4 space-y-4">
 		{#each $messages as message}
 			<li>
 				<Card class="dark:text-white max-w-none flex flex-row items-center gap-2 flex-wrap">

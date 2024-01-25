@@ -39,7 +39,7 @@
 <LoadingBanner show={!$attendanceLoaded} loadingMsg="Loading attendance..." />
 
 {#if $attendance}
-	<Accordion class="m-4">
+	<Accordion class="p-4">
 		{#each $attendance.Absences.Absence ?? [] as absence}
 			<AccordionItem class="dark:">
 				<div slot="header">

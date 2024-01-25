@@ -12,7 +12,7 @@
 <LoadingBanner show={!$reportCardListLoaded} loadingMsg="Loading report cards..." />
 
 {#if $reportCardList}
-	<ol class="m-4 space-y-4">
+	<ol class="p-4 space-y-4">
 		{#each $reportCardList as reportCard}
 			<li>
 				{#if reportCard._DocumentGU}

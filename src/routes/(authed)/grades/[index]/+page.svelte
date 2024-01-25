@@ -315,7 +315,7 @@
 		</Popover>
 
 		<div transition:fade={{ duration: 200 }}>
-			<Tabs class="m-4 mb-0" contentClass="m-4">
+			<Tabs class="m-4 mb-0" contentClass="p-4">
 				<TabItem open title="All">
 					<Assignments
 						{assignments}
