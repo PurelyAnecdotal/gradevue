@@ -9,7 +9,8 @@
 		ClockOutline,
 		EyeSlashOutline,
 		GithubSolid,
-		GridPlusOutline
+		GridPlusOutline,
+		BuildingOutline
 	} from 'flowbite-svelte-icons';
 
 	if (browser && localStorage.getItem('token')) {
@@ -76,13 +77,23 @@
 				Fast Loading
 			</h2>
 			<p>
-				GradeVue features a modern, responsive design, and is able to load your GradeVue in under
-				3 seconds. SynergyPlus takes over 8 seconds to load.
+				GradeVue features a modern, responsive design, and is able to load your GradeVue in under 3
+				seconds. SynergyPlus takes over 8 seconds to load.
 			</p>
 		</Card>
 	</div>
-	<p>and more!</p>
-	<Button href="https://github.com/Nonexistent-Name/gradevue" target="_blank" color="light" class="gap-2">
+
+	<Button href="/admin-info" color="light" class="gap-2">
+		<BuildingOutline class="inline focus:outline-none" size="sm" />
+		Message to school administrators
+	</Button>
+
+	<Button
+		href="https://github.com/Nonexistent-Name/gradevue"
+		target="_blank"
+		color="light"
+		class="gap-2"
+	>
 		<GithubSolid class="inline focus:outline-none" />
 		Open Source
 	</Button>
