@@ -3,6 +3,7 @@
 	import { gradebook, gradebookLoaded, studentAccount } from '$lib/stores';
 	import { Button, Card, Dropdown, DropdownItem, Progressbar } from 'flowbite-svelte';
 	import { ChevronDownSolid, ChevronUpSolid, MapPinOutline } from 'flowbite-svelte-icons';
+	import { onMount } from 'svelte';
 
 	let dropdownOpen = false;
 
@@ -17,6 +18,20 @@
 		$gradebook = await $studentAccount?.grades(period);
 		$gradebookLoaded = true;
 	};
+
+	let greeting = '';
+
+	onMount(() => {
+		const currentTime = new Date().getHours();
+
+		if (currentTime >= 5 && currentTime < 12) {
+		greeting = 'Good morning';
+		} else if (currentTime >= 12 && currentTime < 18) {
+		greeting = 'Good afternoon';
+		} else {
+		greeting = 'Good evening';
+		}
+	});
 </script>
 
 {#if $gradebook}
@@ -45,25 +60,44 @@
 		</Dropdown>
 	</div>
 
-	<ol class="space-y-4 p-4 pt-0">
+	<ol class="space-y-4 px-8 pb-4 pt-0">
 		{#each $gradebook.Courses.Course ?? [] as course, index}
+		
 			<li>
 				<Card
 					class="dark:text-white text-xl max-w-none flex flex-row justify-between items-center"
 					href="/grades/{index.toString()}"
 				>
-					<span class="line-clamp-1 mr-2">{removeClassID(course._Title)}</span>
-					<span class="shrink-0 ml-auto mr-2">
-						{course.Marks.Mark._CalculatedScoreString}
-						{course.Marks.Mark._CalculatedScoreRaw}%
-					</span>
+				
 
+				<div class="w-12 h-12 flex items-center justify-center bg-primary-600 rounded-full mr-4">
+					<span class="text-3xl tracking-tight font-extrabold lg:text-3xl text-gray-100 dark:text-gray-100 whitespace-nowrap">{course._Period}</span>
+				</div>
+				<div class="flex flex-col">
+					<span class="line-clamp-1 mb-1">{removeClassID(course._Title)}</span>
+					<span class="line-clamp-1 text-sm">{removeClassID(course._Staff)}</span>
+				</div>
+
+				<div class="flex flex-col shrink-0 ml-auto mr-4 w-1/3">
+					<span class="shrink-0 ml-auto mr-2 pb-2">
+						{course.Marks.Mark._CalculatedScoreRaw}%
+						({course.Marks.Mark._CalculatedScoreString})
+					</span>
 					<Progressbar
 						color={getColorForGrade(course.Marks.Mark._CalculatedScoreString)}
 						progress={course.Marks.Mark._CalculatedScoreRaw}
 						animate={true}
-						class="hidden sm:block w-1/3 shrink-0"
+						class="hidden sm:block w-full shrink-0"
 					/>
+				</div>
+
+
+
+					
+				
+
+					
+					
 				</Card>
 			</li>
 		{/each}

@@ -12,7 +12,7 @@ export function getColorForGrade(grade: string | number) {
 	return 'gray';
 }
 
-export const removeClassID = (name: string) => name.replace(/ \([A-Z]+\)( \([0-9]+\))?$/, '');
+export const removeClassID = (name: string) => name.replace(/\([^)]*\)/g, '');
 
 export function extractPoints(score: string): [number, number] {
 	if (score.endsWith(' Points Possible'))
