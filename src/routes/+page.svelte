@@ -42,7 +42,7 @@
 				Private Login
 			</h2>
 			<p>
-				Unlike SynergyPlus, GradeVue does not have access to your login information. When you use
+				GradeVue does not have access to your login information. When you use
 				GradeVue, your device connects directly to StudentVue. We never see your password or your
 				grades!
 			</p>
@@ -51,10 +51,10 @@
 		<Card>
 			<h2 class="text-xl dark:text-white mb-2 flex items-center gap-2">
 				<GridPlusOutline class="inline focus:outline-none" />
-				Hidden Assignments
+				Shows Hidden Assignments
 			</h2>
 			<p>
-				Unlike SynergyPlus, GradeVue is able to reveal hidden assignments and will factor them into
+				GradeVue is able to reveal hidden assignments and will factor them into
 				your grade calculations. You never have to worry about your grade calculations being
 				inaccurate!
 			</p>
@@ -77,8 +77,8 @@
 				Fast Loading
 			</h2>
 			<p>
-				GradeVue features a modern, responsive design, and is able to load your GradeVue in under 3
-				seconds. SynergyPlus takes over 8 seconds to load.
+				GradeVue features a modern, responsive design, and is able to load your gradebook in under 3
+				seconds.
 			</p>
 		</Card>
 	</div>
