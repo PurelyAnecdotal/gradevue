@@ -1,4 +1,4 @@
-import { get } from 'svelte/store';
+import { get, type Writable } from 'svelte/store';
 import {
 	attendance,
 	attendanceLoaded,
@@ -15,18 +15,23 @@ import {
 	studentInfoLoaded
 } from './stores';
 
+const writeCacheToStore = (key: string, store: Writable<unknown>) => {
+	const cache = localStorage.getItem(key);
+	if (cache) {
+		try {
+			store.set(JSON.parse(cache));
+		} catch (e) {
+			console.error(e);
+			localStorage.removeItem(key);
+		}
+	}
+}
+
 export const loadGradebook = async () => {
 	gradebookLoaded.set(false);
 
-	const cache = localStorage.getItem('gradebook');
-	if (cache) {
-		try {
-			gradebook.set(JSON.parse(cache));
-		} catch (e) {
-			console.error(e);
-			localStorage.removeItem('gradebook');
-		}
-	}
+	writeCacheToStore('gradebook', gradebook);
+
 	const grades = await get(studentAccount)?.grades();
 
 	gradebook.set(grades);
@@ -38,15 +43,7 @@ export const loadGradebook = async () => {
 export const loadAttendance = async () => {
 	attendanceLoaded.set(false);
 
-	const cache = localStorage.getItem('attendance');
-	if (cache) {
-		try {
-			attendance.set(JSON.parse(cache));
-		} catch (e) {
-			console.error(e);
-			localStorage.removeItem('attendance');
-		}
-	}
+	writeCacheToStore('attendance', attendance);
 
 	const attendanceRecord = await get(studentAccount)?.attendance();
 
@@ -59,15 +56,7 @@ export const loadAttendance = async () => {
 export const loadStudentInfo = async () => {
 	studentInfoLoaded.set(false);
 
-	const cache = localStorage.getItem('studentInfo');
-	if (cache) {
-		try {
-			studentInfo.set(JSON.parse(cache));
-		} catch (e) {
-			console.error(e);
-			localStorage.removeItem('studentInfo');
-		}
-	}
+	writeCacheToStore('studentInfo', studentInfo);
 
 	const studentInfoRecord = await get(studentAccount)?.studentInfo();
 
@@ -80,15 +69,7 @@ export const loadStudentInfo = async () => {
 export const loadReportCardList = async () => {
 	reportCardListLoaded.set(false);
 
-	const cache = localStorage.getItem('reportCardList');
-	if (cache) {
-		try {
-			reportCardList.set(JSON.parse(cache));
-		} catch (e) {
-			console.error(e);
-			localStorage.removeItem('reportCardList');
-		}
-	}
+	writeCacheToStore('reportCardList', reportCardList);
 
 	const reportCardListRecord = await get(studentAccount)?.reportCardList();
 
@@ -101,15 +82,7 @@ export const loadReportCardList = async () => {
 export const loadDocumentsList = async () => {
 	documentsListLoaded.set(false);
 
-	const cache = localStorage.getItem('documentsList');
-	if (cache) {
-		try {
-			documentsList.set(JSON.parse(cache));
-		} catch (e) {
-			console.error(e);
-			localStorage.removeItem('documentsList');
-		}
-	}
+	writeCacheToStore('documentsList', documentsList);
 
 	const documentsListRecord = await get(studentAccount)?.documentsList();
 
@@ -122,15 +95,7 @@ export const loadDocumentsList = async () => {
 export const loadMessages = async () => {
 	messagesLoaded.set(false);
 
-	const cache = localStorage.getItem('messages');
-	if (cache) {
-		try {
-			messages.set(JSON.parse(cache));
-		} catch (e) {
-			console.error(e);
-			localStorage.removeItem('messages');
-		}
-	}
+	writeCacheToStore('messages', messages);
 
 	const messagesRecord = await get(studentAccount)?.messages();
 
