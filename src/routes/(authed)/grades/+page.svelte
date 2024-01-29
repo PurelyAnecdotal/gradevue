@@ -1,7 +1,8 @@
 <script lang="ts">
-	import { getColorForGrade, removeClassID } from '$lib/index';
+	import { removeClassID } from '$lib';
+	import Course from '$lib/Course.svelte';
 	import { gradebook, gradebookLoaded, studentAccount } from '$lib/stores';
-	import { Button, Card, Dropdown, DropdownItem, Progressbar } from 'flowbite-svelte';
+	import { Button, Dropdown, DropdownItem } from 'flowbite-svelte';
 	import { ChevronDownSolid, ChevronUpSolid, MapPinOutline } from 'flowbite-svelte-icons';
 
 	let dropdownOpen = false;
@@ -48,23 +49,12 @@
 	<ol class="space-y-4 p-4 pt-0">
 		{#each $gradebook.Courses.Course ?? [] as course, index}
 			<li>
-				<Card
-					class="dark:text-white text-xl max-w-none flex flex-row justify-between items-center"
+				<Course
 					href="/grades/{index.toString()}"
-				>
-					<span class="line-clamp-1 mr-2">{removeClassID(course._Title)}</span>
-					<span class="shrink-0 ml-auto mr-2">
-						{course.Marks.Mark._CalculatedScoreString}
-						{course.Marks.Mark._CalculatedScoreRaw}%
-					</span>
-
-					<Progressbar
-						color={getColorForGrade(course.Marks.Mark._CalculatedScoreString)}
-						progress={course.Marks.Mark._CalculatedScoreRaw}
-						animate={true}
-						class="hidden sm:block w-1/3 shrink-0"
-					/>
-				</Card>
+					courseName={removeClassID(course._Title)}
+					scoreGrade={course.Marks.Mark._CalculatedScoreString}
+					scorePercent={parseFloat(course.Marks.Mark._CalculatedScoreRaw)}
+				/>
 			</li>
 		{/each}
 	</ol>
