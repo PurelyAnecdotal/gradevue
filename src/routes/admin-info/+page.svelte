@@ -20,9 +20,13 @@
 		<p>
 			When a student logs in to GradeVue, their username and password are sent directly to the
 			offical website, using the built-in
-			<a href="https://ca-pleas-psv.edupoint.com/Service/PXPCommunication.asmx" class="text-primary-600 underline">Synergy API</a>.
-			This is different from SynergyPlus, which sends the login information through their servers
-			without ever informing the user.
+			<a
+				href="https://ca-pleas-psv.edupoint.com/Service/PXPCommunication.asmx"
+				class="text-primary-600 underline"
+			>
+				Synergy API
+			</a>. This is different from SynergyPlus, which sends the login information through their
+			servers without ever informing the user.
 		</p>
 
 		<span>

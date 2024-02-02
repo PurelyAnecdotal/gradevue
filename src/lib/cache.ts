@@ -25,7 +25,7 @@ const writeCacheToStore = (key: string, store: Writable<unknown>) => {
 			localStorage.removeItem(key);
 		}
 	}
-}
+};
 
 export const loadGradebook = async () => {
 	gradebookLoaded.set(false);
