@@ -103,6 +103,6 @@ export class StudentAccount {
 	}
 
 	async messages(): Promise<Message[]> {
-		return (await this.request('GetPXPMessages')).PXPMessagesData.MessageListings.MessageListing
+		return (await this.request('GetPXPMessages')).PXPMessagesData.MessageListings.MessageListing;
 	}
 }

@@ -8,8 +8,6 @@
 	import { UserOutline } from 'flowbite-svelte-icons';
 
 	if (!$messages && browser) loadMessages();
-
-	console.log($messages);
 </script>
 
 <LoadingBanner show={!$messagesLoaded} loadingMsg="Loading messages..." />
