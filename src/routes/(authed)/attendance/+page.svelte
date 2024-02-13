@@ -12,12 +12,18 @@
 	function getAbsenceType(periods: PeriodEntity[]) {
 		const reasons = periods.map((period: PeriodEntity) => period._Name);
 
-		if (reasons.some((reason) => reason == 'Absent')) return 'Absent';
+		if (reasons.some((reason) => reason === 'Absent')) return 'Absent';
 
 		if (reasons.some((reason) => reason.match(/Tardy/))) return 'Tardy';
 
-		if (reasons.some((reason) => reason.match(/Field Trip|School Pass|Excused|Medical\/Dent/)))
+		if (
+			reasons.some((reason) =>
+				reason.match(/Field Trip|School Pass|Excused|Medical\/Dent|Comp Ed\/Court-Religi/)
+			)
+		)
 			return 'Excused';
+
+		if (reasons.some((reason) => reason === 'Present')) return 'Present';
 
 		return 'Unknown';
 	}
@@ -29,6 +35,7 @@
 			case 'Tardy':
 				return 'yellow';
 			case 'Excused':
+			case 'Present':
 				return 'green';
 			default:
 				return 'primary';
