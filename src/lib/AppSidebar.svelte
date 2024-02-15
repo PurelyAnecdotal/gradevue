@@ -35,7 +35,7 @@
 				site={{
 					name: 'GradeVue',
 					href: '/grades',
-					img: '/favicon.ico'
+					img: '/favicon.svg'
 				}}
 			/>
 
