@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
 	import { pwaInfo } from 'virtual:pwa-info';
 	import '../app.css';
 </script>
