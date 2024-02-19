@@ -1,4 +1,4 @@
-<script lang="ts">
+<script>
 	import { Alert, Button } from 'flowbite-svelte';
 	import { InfoCircleOutline } from 'flowbite-svelte-icons';
 </script>
