@@ -94,8 +94,11 @@ export class StudentAccount {
 	}
 
 	async reportCard(documentGU: string): Promise<ReportCardDocument> {
-		return (await this.request('GetReportCardDocumentData', { DocumentGU: documentGU }))
-			.DocumentData;
+		return (
+			await this.request('GetReportCardDocumentData', {
+				DocumentGU: documentGU
+			})
+		).DocumentData;
 	}
 
 	async documentsList(): Promise<DocumentsList> {
