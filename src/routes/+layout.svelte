@@ -3,12 +3,12 @@
 	import '../app.css';
 </script>
 
-{#await import('$lib/ReloadPrompt.svelte') then { default: ReloadPrompt }}
-	<div class="fixed w-full h-full"><ReloadPrompt /></div>
-{/await}
-
 <svelte:head>
 	{@html pwaInfo?.webManifest.linkTag ?? ''}
 </svelte:head>
 
 <slot />
+
+{#await import('$lib/ReloadPrompt.svelte') then { default: ReloadPrompt }}
+	<ReloadPrompt />
+{/await}

@@ -18,23 +18,24 @@
 </script>
 
 {#if $offlineReady || $needRefresh}
-	<Toast
-		color="green"
-		position="bottom-right"
-		contentClass="w-full text-sm font-normal flex items-center justify-between"
-	>
-		<DownloadOutline slot="icon" class="focus:outline-none" />
+	<div class="fixed bottom-4 right-4">
+		<Toast
+			color="green"
+			contentClass="w-full text-sm font-normal flex items-center justify-between"
+		>
+			<DownloadOutline slot="icon" class="focus:outline-none" />
 
-		<span class="text-gray-300">
-			{#if $offlineReady}
-				App ready to work offline
-			{:else if $needRefresh}
-				Update available
+			<span class="text-gray-300">
+				{#if $offlineReady}
+					App ready to work offline
+				{:else if $needRefresh}
+					Update available
+				{/if}
+			</span>
+
+			{#if $needRefresh}
+				<Button on:click={reload} size="xs">Reload</Button>
 			{/if}
-		</span>
-
-		{#if $needRefresh}
-			<Button on:click={reload} size="xs">Reload</Button>
-		{/if}
-	</Toast>
+		</Toast>
+	</div>
 {/if}
