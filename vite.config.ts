@@ -6,10 +6,6 @@ export default defineConfig({
 	plugins: [
 		sveltekit(),
 		SvelteKitPWA({
-			registerType: 'autoUpdate',
-			devOptions: {
-				enabled: true
-			},
 			manifest: {
 				name: 'GradeVue: StudentVue Grade Calculator',
 				short_name: 'GradeVue',
