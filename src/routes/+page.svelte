@@ -42,8 +42,9 @@
 				Private Login
 			</h2>
 			<p>
-				GradeVue does not have access to your login information. When you use GradeVue, your device
-				connects directly to StudentVue. We never see your password or your grades!
+				GradeVue does not have access to your login information. When you use
+				GradeVue, your device connects directly to StudentVue. We never see your password or your
+				grades!
 			</p>
 		</Card>
 
@@ -53,8 +54,9 @@
 				Shows Hidden Assignments
 			</h2>
 			<p>
-				GradeVue is able to reveal hidden assignments and will factor them into your grade
-				calculations. You never have to worry about your grade calculations being inaccurate!
+				GradeVue is able to reveal hidden assignments and will factor them into
+				your grade calculations. You never have to worry about your grade calculations being
+				inaccurate!
 			</p>
 		</Card>
 

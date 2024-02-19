@@ -1,14 +1,5 @@
-<script lang="ts">
-	import { pwaInfo } from 'virtual:pwa-info';
+<script>
 	import '../app.css';
 </script>
 
-<svelte:head>
-	{@html pwaInfo?.webManifest.linkTag ?? ''}
-</svelte:head>
-
 <slot />
-
-{#await import('$lib/ReloadPrompt.svelte') then { default: ReloadPrompt }}
-	<ReloadPrompt />
-{/await}
