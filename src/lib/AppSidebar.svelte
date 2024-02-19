@@ -1,4 +1,4 @@
-<script lang="ts">
+<script>
 	import { browser } from '$app/environment';
 	import { page } from '$app/stores';
 	import {
@@ -9,7 +9,7 @@
 		SidebarWrapper
 	} from 'flowbite-svelte';
 	import {
-		AddressBookOutline,
+		AdressBookOutline,
 		ArrowRightToBracketSolid,
 		BellOutline,
 		FileLinesOutline,
@@ -41,7 +41,7 @@
 
 			<SidebarItem label="Grades" href="/grades">
 				<svelte:fragment slot="icon">
-					<AddressBookOutline class="focus:outline-none" />
+					<AdressBookOutline class="focus:outline-none" />
 				</svelte:fragment>
 			</SidebarItem>
 
