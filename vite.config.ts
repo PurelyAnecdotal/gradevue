@@ -13,6 +13,8 @@ export default defineConfig({
 			manifest: {
 				name: 'GradeVue: StudentVue Grade Calculator',
 				short_name: 'GradeVue',
+				description:
+					'An improved StudentVue experience, with calculators and tools to help you understand your grade.',
 				icons: [
 					{
 						src: 'pwa-192x192.png',
