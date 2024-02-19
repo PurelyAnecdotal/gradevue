@@ -7,7 +7,9 @@
 
 	export let assignments: AssignmentEntity[];
 	export let showCategories = true;
-	export let hiddenPointsByCategory: { [categoryName: string]: [number, number] } = {};
+	export let hiddenPointsByCategory: {
+		[categoryName: string]: [number, number];
+	} = {};
 	export let hypotheticalMode = false;
 	export let hypotheticalCategoryOptions: string[] = [];
 </script>
