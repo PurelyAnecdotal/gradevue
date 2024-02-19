@@ -85,11 +85,7 @@
 
 	$: {
 		let hypotheticalGradebookInit: {
-			[gradebookID: string]: {
-				pointsEarned: number;
-				pointsPossible: number;
-				notForGrade: boolean;
-			};
+			[gradebookID: string]: { pointsEarned: number; pointsPossible: number; notForGrade: boolean };
 		} = {};
 
 		assignments?.forEach((assignment) => {
