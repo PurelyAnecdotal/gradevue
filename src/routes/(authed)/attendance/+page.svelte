@@ -18,7 +18,9 @@
 
 		if (
 			reasons.some((reason) =>
-				reason.match(/Field Trip|School Pass|Excused|Medical\/Dent|Comp Ed\/Court-Religi/)
+				reason.match(
+					/Field Trip|School Pass|Excused|Medical\/Dent|Comp Ed\/Court-Religi|Illness or Sickness/
+				)
 			)
 		)
 			return 'Excused';
