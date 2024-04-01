@@ -9,8 +9,7 @@
 		ClockOutline,
 		EyeSlashOutline,
 		GithubSolid,
-		GridPlusOutline,
-		BuildingOutline
+		GridPlusOutline
 	} from 'flowbite-svelte-icons';
 
 	if (browser && localStorage.getItem('token')) {
@@ -44,6 +43,7 @@
 			<p>
 				GradeVue does not have access to your login information. When you use GradeVue, your device
 				connects directly to StudentVue. We never see your password or your grades!
+				<a href="/privacy" class="text-primary-600 underline">Learn more</a>
 			</p>
 		</Card>
 
@@ -80,11 +80,6 @@
 			</p>
 		</Card>
 	</div>
-
-	<Button href="/admin-info" color="light" class="gap-2">
-		<BuildingOutline class="inline focus:outline-none" size="sm" />
-		Message to school administrators
-	</Button>
 
 	<Button
 		href="https://github.com/Nonexistent-Name/gradevue"
