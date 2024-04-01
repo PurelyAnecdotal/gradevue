@@ -10,6 +10,7 @@
 	} from 'flowbite-svelte';
 	import {
 		AddressBookOutline,
+		AnnotationOutline,
 		ArrowRightToBracketOutline,
 		BellOutline,
 		FileLinesOutline,
@@ -71,6 +72,12 @@
 		</SidebarGroup>
 
 		<SidebarGroup>
+			<SidebarItem label="Feedback" href="/feedback">
+				<svelte:fragment slot="icon">
+					<AnnotationOutline class="focus:outline-none" />
+				</svelte:fragment>
+			</SidebarItem>
+
 			<SidebarItem label={$studentInfo?.FormattedName ?? ''} href="/studentinfo">
 				<svelte:fragment slot="icon">
 					<UserCircleOutline class="focus:outline-none" />
