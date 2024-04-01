@@ -10,7 +10,7 @@
 	} from 'flowbite-svelte';
 	import {
 		AddressBookOutline,
-		ArrowRightToBracketSolid,
+		ArrowRightToBracketOutline,
 		BellOutline,
 		FileLinesOutline,
 		FolderOpenOutline,
@@ -79,7 +79,7 @@
 
 			<SidebarItem on:click={logOut} label="Log Out" href="/login">
 				<svelte:fragment slot="icon">
-					<ArrowRightToBracketSolid class="focus:outline-none" />
+					<ArrowRightToBracketOutline class="focus:outline-none" />
 				</svelte:fragment>
 			</SidebarItem>
 		</SidebarGroup>

@@ -3,7 +3,7 @@
 	import Course from '$lib/Course.svelte';
 	import { gradebook, gradebookLoaded, studentAccount } from '$lib/stores';
 	import { Button, Dropdown, DropdownItem } from 'flowbite-svelte';
-	import { ChevronDownSolid, ChevronUpSolid, MapPinOutline } from 'flowbite-svelte-icons';
+	import { ChevronDownOutline, ChevronUpOutline, MapPinOutline } from 'flowbite-svelte-icons';
 
 	let dropdownOpen = false;
 
@@ -27,9 +27,9 @@
 				{$gradebook.ReportingPeriod._GradePeriod}
 
 				{#if dropdownOpen}
-					<ChevronUpSolid size="xs" class="ml-2 focus:outline-none" />
+					<ChevronUpOutline size="xs" class="ml-2 focus:outline-none" />
 				{:else}
-					<ChevronDownSolid size="xs" class="ml-2 focus:outline-none" />
+					<ChevronDownOutline size="xs" class="ml-2 focus:outline-none" />
 				{/if}
 			</Button>
 		</div>

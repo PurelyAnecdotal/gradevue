@@ -12,7 +12,7 @@
 		Input,
 		Progressbar
 	} from 'flowbite-svelte';
-	import { ChevronDownSolid, InfoCircleOutline } from 'flowbite-svelte-icons';
+	import { ChevronDownOutline, InfoCircleOutline } from 'flowbite-svelte-icons';
 	import { onDestroy } from 'svelte';
 	import { writable } from 'svelte/store';
 
@@ -80,7 +80,7 @@
 			{#if hypotheticalCategoryOptions.length > 0}
 				<Button color="light">
 					{category ?? 'Category'}
-					<ChevronDownSolid size="xs" class="ml-2 focus:outline-none" />
+					<ChevronDownOutline size="xs" class="ml-2 focus:outline-none" />
 				</Button>
 
 				<Dropdown bind:open={categoryDropdownOpen}>
