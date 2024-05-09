@@ -19,7 +19,7 @@
 		if (
 			reasons.some((reason) =>
 				reason.match(
-					/Field Trip|School Pass|Excused|Medical\/Dent|Comp Ed\/Court-Religi|Illness or Sickness/
+					/Field Trip|School Pass|Excused|Medical\/Dent|Comp Ed\/Court-Religi|Illness or Sickness|SB14 Wellness/Illnes/
 				)
 			)
 		)
