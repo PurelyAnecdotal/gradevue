@@ -33,7 +33,8 @@
 	const getCategoryColor = (category: string) => {
 		if (category.match(/final/i)) return 'red';
 		if (category.match(/test|quiz|assessment|performance/i)) return 'purple';
-		if (category.match(/homework|classwork|activity|activities|assignment|project/i)) return 'green';
+		if (category.match(/homework|classwork|activity|activities|assignment|project/i))
+			return 'green';
 		return 'primary';
 	};
 
