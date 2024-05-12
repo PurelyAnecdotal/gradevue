@@ -1,6 +1,8 @@
 <script lang="ts">
 	import { page } from '$app/stores';
 	import Assignments from '$lib/Assignments.svelte';
+	import type { AssignmentEntity } from '$lib/Gradebook';
+	import type { HypotheticalGradebook } from '$lib/HypotheticalGradebook';
 	import { extractPoints, removeClassID } from '$lib/index';
 	import { gradebook, hypotheticalGradebook } from '$lib/stores';
 	import {
@@ -44,8 +46,11 @@
 		assignments.length > 0 ? assignments.map((assignment) => assignment._Type).toSorted() : []
 	);
 
-	let hiddenPointsByCategory: { [categoryName: string]: [number, number] } = {};
+	let hiddenPointsByCategory: {
+		[categoryName: string]: { pointsEarned: number; pointsPossible: number };
+	} = {};
 
+	// Sum points for each category to detect hidden assignments
 	$: {
 		if (categories) {
 			let pointsByCategory: { [categoryName: string]: [number, number] } = {};
@@ -76,159 +81,321 @@
 				const hiddenPointsPossible = parseFloat(category._PointsPossible) - pointsPossible;
 
 				if (hiddenPointsEarned && hiddenPointsPossible)
-					hiddenPointsByCategory[category._Type] = [hiddenPointsEarned, hiddenPointsPossible];
+					hiddenPointsByCategory[category._Type] = {
+						pointsEarned: hiddenPointsEarned,
+						pointsPossible: hiddenPointsPossible
+					};
 			});
 		}
 	}
 
 	let hypotheticalMode = false;
 
-	$: {
-		let hypotheticalGradebookInit: {
-			[gradebookID: string]: { pointsEarned: number; pointsPossible: number; notForGrade: boolean };
-		} = {};
+	let gradePercentageChangesByAssignment: { [id: string]: number } = {};
 
-		assignments?.forEach((assignment) => {
-			hypotheticalGradebookInit[assignment._GradebookID] = {
-				pointsEarned: extractPoints(assignment._Points)[0],
-				pointsPossible: extractPoints(assignment._Points)[1],
-				notForGrade: assignment._Notes == '(Not For Grading)'
+	// Calculate the grade percentage changes and initialize the hypothetical gradebook
+	$: {
+		let hypotheticalGradebookInit: HypotheticalGradebook = {};
+
+		let pointsByCategory: {
+			[categoryName: string]: { pointsEarned: number; pointsPossible: number };
+		} = {};
+		let totalPointsEarned = 0;
+		let totalPointsPossible = 0;
+
+		function calculateGradePercentage() {
+			let gradePercentage = 0;
+
+			if (!gradeCategories) {
+				gradePercentage = (totalPointsEarned / totalPointsPossible) * 100;
+
+				if (isNaN(gradePercentage)) gradePercentage = 0;
+
+				return gradePercentage;
+			}
+
+			let totalWeight = 0;
+
+			Object.entries(pointsByCategory).forEach(([categoryName, categoryPoints]) => {
+				const category = gradeCategories.find((category) => category._Type == categoryName);
+				if (!category) return;
+
+				const weight = parseFloat(category._Weight);
+
+				gradePercentage += (categoryPoints.pointsEarned / categoryPoints.pointsPossible) * weight;
+				totalWeight += weight;
+			});
+
+			gradePercentage = (gradePercentage / totalWeight) * 100;
+
+			if (isNaN(gradePercentage)) gradePercentage = 0;
+
+			return gradePercentage;
+		}
+
+		// Calculate for regular assignments
+		assignments.toReversed().forEach((assignment) => {
+			const id = assignment._GradebookID;
+			const category = assignment._Type;
+			const notForGrade = assignment._Notes === '(Not For Grading)';
+			const [pointsEarned, pointsPossible] = extractPoints(assignment._Points);
+
+			if (notForGrade || isNaN(pointsEarned)) {
+				gradePercentageChangesByAssignment[id] = 0;
+
+				hypotheticalGradebookInit[id] = {
+					pointsEarned,
+					pointsPossible,
+					gradePercentageChange: 0,
+					notForGrade
+				};
+
+				return;
+			}
+
+			// Calculate grade prior to the assignment
+			const priorGrade = calculateGradePercentage();
+
+			// Add assignment points to the grade
+			totalPointsEarned += pointsEarned;
+			totalPointsPossible += pointsPossible;
+
+			const categoryPoints = pointsByCategory[category] ?? { pointsEarned: 0, pointsPossible: 0 };
+			pointsByCategory[category] = {
+				pointsEarned: categoryPoints.pointsEarned + pointsEarned,
+				pointsPossible: categoryPoints.pointsPossible + pointsPossible
+			};
+
+			// Calculate grade after the assignment
+			const afterGrade = calculateGradePercentage();
+
+			// Calculate grade percentage change and initalize hypothetical gradebook
+			const gradePercentageChange = afterGrade - priorGrade;
+
+			gradePercentageChangesByAssignment[id] = gradePercentageChange;
+			hypotheticalGradebookInit[id] = {
+				pointsEarned,
+				pointsPossible,
+				gradePercentageChange,
+				notForGrade
 			};
 		});
 
+		// Calculate for hidden assignments
 		Object.entries(hiddenPointsByCategory).forEach(
-			([categoryName, [pointsEarned, pointsPossible]]) => {
-				hypotheticalGradebookInit[`hidden-${categoryName}`] = {
+			([categoryName, { pointsEarned, pointsPossible }]) => {
+				const id = `hidden-${categoryName}`;
+
+				// Calculate grade prior to the assignment
+				const priorGrade = calculateGradePercentage();
+
+				// Add assignment points to the grade
+				totalPointsEarned += pointsEarned;
+				totalPointsPossible += pointsPossible;
+
+				const categoryPoints = pointsByCategory[categoryName] ?? {
+					pointsEarned: 0,
+					pointsPossible: 0
+				};
+				pointsByCategory[categoryName] = {
+					pointsEarned: categoryPoints.pointsEarned + pointsEarned,
+					pointsPossible: categoryPoints.pointsPossible + pointsPossible
+				};
+
+				// Calculate grade after the assignment
+				const afterGrade = calculateGradePercentage();
+
+				// Calculate grade percentage change and initalize hypothetical gradebook
+				const gradePercentageChange = afterGrade - priorGrade;
+
+				gradePercentageChangesByAssignment[id] = gradePercentageChange;
+
+				hypotheticalGradebookInit[id] = {
 					pointsEarned,
 					pointsPossible,
+					gradePercentageChange,
 					notForGrade: false
 				};
 			}
 		);
 
-		$hypotheticalGradebook = Object.fromEntries(
-			Object.entries(hypotheticalGradebookInit).map(
-				([id, { pointsEarned, pointsPossible, notForGrade }]) => [
-					id,
-					{
-						pointsEarned: pointsEarned,
-						pointsPossible: pointsPossible,
-						notForGrade
-					}
-				]
-			)
-		);
+		$hypotheticalGradebook = hypotheticalGradebookInit;
 	}
 
 	let hypotheticalGrade = 0;
 	let rawGradeCalcMatches = true;
-	$: {
-		let pointsByCategory: { [categoryName: string]: [number, number] } = {};
+
+	// Calculate hypothetical grade and hypothetical grade percentage changes
+	function calculateHypotheticalGrade(assignments: AssignmentEntity[]) {
+		let pointsByCategory: {
+			[categoryName: string]: { pointsEarned: number; pointsPossible: number };
+		} = {};
 		let totalPointsEarned = 0;
 		let totalPointsPossible = 0;
 
-		assignments?.forEach((assignment) => {
-			if ($hypotheticalGradebook[assignment._GradebookID].notForGrade == true) return;
+		function calculateGradePercentage() {
+			let gradePercentage = 0;
 
-			totalPointsEarned += extractPoints(assignment._Points)[0];
-			totalPointsPossible += extractPoints(assignment._Points)[1];
+			if (!gradeCategories) {
+				gradePercentage = (totalPointsEarned / totalPointsPossible) * 100;
 
-			const points = pointsByCategory[assignment._Type] ?? [0, 0];
-			const hypotheticalPoints = [
-				$hypotheticalGradebook[assignment._GradebookID].pointsEarned,
-				$hypotheticalGradebook[assignment._GradebookID].pointsPossible
-			];
+				if (isNaN(gradePercentage)) gradePercentage = 0;
 
-			if (isNaN(hypotheticalPoints[0])) return;
+				return gradePercentage;
+			}
 
-			pointsByCategory[assignment._Type] = [
-				points[0] + hypotheticalPoints[0],
-				points[1] + hypotheticalPoints[1]
-			];
-		});
+			let totalWeight = 0;
 
-		if (!gradeCategories && course) {
-			let rawGrade = (totalPointsEarned / totalPointsPossible) * 100;
-			if (isNaN(rawGrade)) rawGrade = 0;
-			let synergyGrade = parseFloat(course.Marks.Mark._CalculatedScoreRaw);
-
-			let decimalPlaces = 0;
-			if (synergyGrade % 1 != 0) decimalPlaces = synergyGrade.toString().split('.')[1].length;
-
-			if (Math.floor(rawGrade * 10 ** decimalPlaces) / 10 ** decimalPlaces != synergyGrade)
-				rawGradeCalcMatches = false;
-		}
-
-		Object.keys(hiddenPointsByCategory).forEach((categoryName) => {
-			const points = pointsByCategory[categoryName] ?? [0, 0];
-			const hypotheticalPoints = [
-				$hypotheticalGradebook[`hidden-${categoryName}`].pointsEarned,
-				$hypotheticalGradebook[`hidden-${categoryName}`].pointsPossible
-			];
-
-			if (isNaN(hypotheticalPoints[0])) return;
-
-			pointsByCategory[categoryName] = [
-				points[0] + hypotheticalPoints[0],
-				points[1] + hypotheticalPoints[1]
-			];
-		});
-
-		Object.keys($hypotheticalGradebook)
-			.filter((id) => id.startsWith('hypothetical-'))
-			.map((id) => $hypotheticalGradebook[id])
-			.forEach((assignment) => {
-				if (assignment.notForGrade == true || (gradeCategories && !assignment.category)) return;
-
-				const points = pointsByCategory[assignment.category ?? 'hypothetical'] ?? [0, 0];
-				const hypotheticalPoints = [assignment.pointsEarned, assignment.pointsPossible];
-
-				if (isNaN(hypotheticalPoints[0])) return;
-
-				pointsByCategory[assignment.category ?? 'hypothetical'] = [
-					points[0] + hypotheticalPoints[0],
-					points[1] + hypotheticalPoints[1]
-				];
-			});
-
-		hypotheticalGrade = 0;
-
-		if (gradeCategories) {
-			let weight = 0;
-
-			Object.entries(pointsByCategory).forEach(([categoryName, [pointsEarned, pointsPossible]]) => {
-				const category = gradeCategories?.find((category) => category._Type == categoryName);
+			Object.entries(pointsByCategory).forEach(([categoryName, categoryPoints]) => {
+				const category = gradeCategories.find((category) => category._Type == categoryName);
 				if (!category) return;
 
-				hypotheticalGrade += (pointsEarned / pointsPossible) * parseFloat(category._Weight);
-				weight += parseFloat(category._Weight);
+				const weight = parseFloat(category._Weight);
+
+				gradePercentage += (categoryPoints.pointsEarned / categoryPoints.pointsPossible) * weight;
+				totalWeight += weight;
 			});
 
-			hypotheticalGrade = hypotheticalGrade / weight;
-		} else {
-			let totalPoints = 0;
-
-			Object.entries(pointsByCategory).forEach(
-				([_categoryName, [pointsEarned, pointsPossible]]) => {
-					hypotheticalGrade += pointsEarned;
-					totalPoints += pointsPossible;
-				}
-			);
-
-			hypotheticalGrade = hypotheticalGrade / totalPoints;
+			return (gradePercentage / totalWeight) * 100;
 		}
 
-		if (isNaN(hypotheticalGrade)) hypotheticalGrade = 0;
+		// Calculate hypothetical grade for regular assignments
+		assignments.toReversed().forEach((assignment) => {
+			const id = assignment._GradebookID;
+			const category = assignment._Type;
+			const { pointsEarned, pointsPossible, notForGrade } = $hypotheticalGradebook[id];
+
+			if (notForGrade || isNaN(pointsEarned)) {
+				$hypotheticalGradebook[id].gradePercentageChange = 0;
+				return;
+			}
+
+			// Calculate grade prior to the assignment
+			const priorGrade = calculateGradePercentage();
+
+			// Add assignment points to the grade
+			totalPointsEarned += pointsEarned;
+			totalPointsPossible += pointsPossible;
+
+			const categoryPoints = pointsByCategory[category] ?? { pointsEarned: 0, pointsPossible: 0 };
+			pointsByCategory[category] = {
+				pointsEarned: categoryPoints.pointsEarned + pointsEarned,
+				pointsPossible: categoryPoints.pointsPossible + pointsPossible
+			};
+
+			// Calculate grade after the assignment
+			const afterGrade = calculateGradePercentage();
+
+			// Calculate grade percentage change
+			$hypotheticalGradebook[id].gradePercentageChange = afterGrade - priorGrade;
+		});
+
+		// Check if the calculated grade matches the raw grade
+		// if (!gradeCategories && course) {
+		// 	let rawGrade = (totalPointsEarned / totalPointsPossible) * 100;
+		// 	if (isNaN(rawGrade)) rawGrade = 0;
+		// 	let synergyGrade = parseFloat(course.Marks.Mark._CalculatedScoreRaw);
+
+		// 	let decimalPlaces = 0;
+		// 	if (synergyGrade % 1 != 0) decimalPlaces = synergyGrade.toString().split('.')[1].length;
+
+		// 	if (Math.floor(rawGrade * 10 ** decimalPlaces) / 10 ** decimalPlaces != synergyGrade)
+		// 		rawGradeCalcMatches = false;
+		// }
+
+		// Calculate hypothetical grade for hidden assignments
+		Object.keys(hiddenPointsByCategory).forEach((categoryName) => {
+			const id = `hidden-${categoryName}`;
+			const { pointsEarned, pointsPossible, notForGrade } = $hypotheticalGradebook[id];
+
+			if (notForGrade || isNaN(pointsEarned)) {
+				$hypotheticalGradebook[id].gradePercentageChange = 0;
+				return;
+			}
+
+			// Calculate grade prior to the assignment
+			const priorGrade = calculateGradePercentage();
+
+			// Add assignment points to the grade
+			totalPointsEarned += pointsEarned;
+			totalPointsPossible += pointsPossible;
+
+			const categoryPoints = pointsByCategory[categoryName] ?? {
+				pointsEarned: 0,
+				pointsPossible: 0
+			};
+			pointsByCategory[categoryName] = {
+				pointsEarned: categoryPoints.pointsEarned + pointsEarned,
+				pointsPossible: categoryPoints.pointsPossible + pointsPossible
+			};
+
+			// Calculate grade after the assignment
+			const afterGrade = calculateGradePercentage();
+
+			// Calculate grade percentage change
+			$hypotheticalGradebook[id].gradePercentageChange = afterGrade - priorGrade;
+		});
+
+		// Calculate grade for hypothetical assignments
+		Object.keys($hypotheticalGradebook)
+			.filter((id) => id.startsWith('hypothetical-'))
+			.forEach((id) => {
+				const { pointsEarned, pointsPossible, notForGrade, category } = $hypotheticalGradebook[id];
+
+				if (notForGrade || isNaN(pointsEarned) || (gradeCategories && !category)) {
+					$hypotheticalGradebook[id].gradePercentageChange = 0;
+					return;
+				}
+
+				// Calculate grade prior to the assignment
+				const priorGrade = calculateGradePercentage();
+
+				// Add assignment points to the grade
+				totalPointsEarned += pointsEarned;
+				totalPointsPossible += pointsPossible;
+
+				const categoryPoints = pointsByCategory[category ?? 'hypothetical'] ?? {
+					pointsEarned: 0,
+					pointsPossible: 0
+				};
+				pointsByCategory[category ?? 'hypothetical'] = {
+					pointsEarned: categoryPoints.pointsEarned + pointsEarned,
+					pointsPossible: categoryPoints.pointsPossible + pointsPossible
+				};
+
+				// Calculate grade after the assignment
+				const afterGrade = calculateGradePercentage();
+
+				// Calculate grade percentage change
+				$hypotheticalGradebook[id].gradePercentageChange = afterGrade - priorGrade;
+			});
+
+		let hypotheticalGrade = calculateGradePercentage();
+
+		// if (isNaN(hypotheticalGrade)) hypotheticalGrade = 0;
+
+		return hypotheticalGrade;
+	}
+
+	$: {
+		hypotheticalGrade = calculateHypotheticalGrade(assignments);
+	}
+
+	function recalculateGradePercentages() {
+		hypotheticalGrade = calculateHypotheticalGrade(assignments);
 	}
 
 	function addHypotheticalAssignment() {
 		$hypotheticalGradebook[`hypothetical-${Math.random().toString(36).substring(2, 15)}`] = {
 			pointsEarned: 0,
 			pointsPossible: 0,
+			gradePercentageChange: 0,
 			notForGrade: false,
 			name: 'Hypothetical Assignment'
 		};
 	}
+
+	$: console.log($hypotheticalGradebook);
 </script>
 
 {#if course}
@@ -322,6 +489,8 @@
 						{hiddenPointsByCategory}
 						{hypotheticalMode}
 						hypotheticalCategoryOptions={gradeCategories?.map((category) => category._Type) ?? []}
+						{gradePercentageChangesByAssignment}
+						{recalculateGradePercentages}
 					/>
 				</TabItem>
 
@@ -337,6 +506,8 @@
 							)}
 							{hypotheticalMode}
 							hypotheticalCategoryOptions={gradeCategories?.map((category) => category._Type) ?? []}
+							{gradePercentageChangesByAssignment}
+							{recalculateGradePercentages}
 						/>
 					</TabItem>
 				{/each}
@@ -355,7 +526,7 @@
 						{#if !gradeCategories && !rawGradeCalcMatches}
 							<ExclamationCircleOutline class="mr-2 focus:outline-none" />
 						{/if}
-						{Math.round(hypotheticalGrade * 100000) / 1000}%
+						{Math.round(hypotheticalGrade * 1000) / 1000}%
 					{:else}
 						{course.Marks.Mark._CalculatedScoreString}
 						{course.Marks.Mark._CalculatedScoreRaw}%

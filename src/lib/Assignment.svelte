@@ -19,6 +19,7 @@
 	export let name: string;
 	export let pointsEarned: number;
 	export let pointsPossible: number;
+	export let gradePercentageChange: number;
 	export let id: string;
 	export let category: string | undefined = undefined;
 	export let date: Date | undefined = undefined;
@@ -27,6 +28,7 @@
 	export let notForGrade = false;
 	export let hypothetical = false;
 	export let hypotheticalCategoryOptions: string[] = [];
+	export let recalculateGradePercentage: () => void;
 
 	let categoryDropdownOpen = false;
 
@@ -42,15 +44,39 @@
 		? ($hypotheticalGradebook[id].pointsEarned / $hypotheticalGradebook[id].pointsPossible) * 100
 		: (pointsEarned / pointsPossible) * 100;
 
+	$: rawPercentageChange = hypotheticalMode
+		? $hypotheticalGradebook[id].gradePercentageChange
+		: gradePercentageChange;
+
+	$: percentageChangeDisplay = Math.round(rawPercentageChange * 100) / 100;
+
 	let pointsEarnedInput = writable($hypotheticalGradebook[id].pointsEarned.toString());
 	let pointsPossibleInput = writable($hypotheticalGradebook[id].pointsPossible.toString());
+	let notForGradeInput = writable($hypotheticalGradebook[id].notForGrade);
 
-	const earnedUnsubscribe = pointsEarnedInput.subscribe((pointsEarned) => {
-		$hypotheticalGradebook[id].pointsEarned = parseFloat(pointsEarned);
+	const earnedUnsubscribe = pointsEarnedInput.subscribe((input) => {
+		const pointsEarned = parseFloat(input);
+
+		if ($hypotheticalGradebook[id].pointsEarned == pointsEarned) return;
+
+		$hypotheticalGradebook[id].pointsEarned = pointsEarned;
+		recalculateGradePercentage();
 	});
 
-	const possibleUnsubscribe = pointsPossibleInput.subscribe((pointsPossible) => {
-		$hypotheticalGradebook[id].pointsPossible = parseFloat(pointsPossible);
+	const possibleUnsubscribe = pointsPossibleInput.subscribe((input) => {
+		const pointsPossible = parseFloat(input);
+
+		if ($hypotheticalGradebook[id].pointsPossible == pointsPossible) return;
+
+		$hypotheticalGradebook[id].pointsPossible = pointsPossible;
+		recalculateGradePercentage();
+	});
+
+	const notForGradeUnsubscribe = notForGradeInput.subscribe((notForGrade) => {
+		if ($hypotheticalGradebook[id].notForGrade == notForGrade) return;
+
+		$hypotheticalGradebook[id].notForGrade = notForGrade;
+		recalculateGradePercentage();
 	});
 
 	const hypotheticalUnsubscribe = hypotheticalGradebook.subscribe((gradebook) => {
@@ -64,11 +90,18 @@
 
 		if (gradebook[id].pointsPossible !== parseFloat($pointsPossibleInput))
 			$pointsPossibleInput = gradebook[id].pointsPossible.toString();
+
+		if (gradebook[id].gradePercentageChange !== rawPercentageChange)
+			rawPercentageChange = gradebook[id].gradePercentageChange;
+
+		if (gradebook[id].notForGrade !== $notForGradeInput)
+			$notForGradeInput = gradebook[id].notForGrade;
 	});
 
 	onDestroy(() => {
 		earnedUnsubscribe();
 		possibleUnsubscribe();
+		notForGradeUnsubscribe();
 		hypotheticalUnsubscribe();
 	});
 </script>
@@ -90,6 +123,7 @@
 							on:click={() => {
 								$hypotheticalGradebook[id].category = category;
 								categoryDropdownOpen = false;
+								recalculateGradePercentage();
 							}}
 						>
 							{category}
@@ -114,7 +148,7 @@
 		{#if notForGrade}
 			<Badge border color="pink">
 				{#if hypotheticalMode}
-					<Checkbox bind:checked={$hypotheticalGradebook[id].notForGrade}>
+					<Checkbox bind:checked={$notForGradeInput}>
 						<span class="text-xs">Not For Grade</span>
 					</Checkbox>
 				{:else}
@@ -135,7 +169,19 @@
 		{/if}
 	</div>
 
-	<div class="ml-auto mr-2 shrink-0">
+	<div class="ml-auto mr-2 shrink-0 flex items-center gap-2">
+		{#if percentageChangeDisplay < 0}
+			<span class="text-red-500">
+				{percentageChangeDisplay}%
+			</span>
+		{:else if percentageChangeDisplay > 0}
+			<span class="text-green-500">
+				+{percentageChangeDisplay}%
+			</span>
+		{:else if !notForGrade && !isNaN(pointsEarned)}
+			<span class="text-gray-500">+0%</span>
+		{/if}
+
 		{#if hypotheticalMode}
 			<div class="w-32 flex items-center">
 				<Input type="number" size="sm" bind:value={$pointsEarnedInput} />
@@ -151,6 +197,7 @@
 			{/if}
 		{/if}
 	</div>
+
 	<Progressbar
 		color={getColorForGrade(percentage)}
 		progress={Math.min(isNaN(percentage) ? 0 : percentage, 100)}
