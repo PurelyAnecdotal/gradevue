@@ -227,6 +227,8 @@
 
 	// Calculate hypothetical grade and hypothetical grade percentage changes
 	function calculateHypotheticalGrade(assignments: AssignmentEntity[]) {
+		let hypotheticalGradebookCache = $hypotheticalGradebook;
+
 		let pointsByCategory: {
 			[categoryName: string]: { pointsEarned: number; pointsPossible: number };
 		} = {};
@@ -263,10 +265,10 @@
 		assignments.toReversed().forEach((assignment) => {
 			const id = assignment._GradebookID;
 			const category = assignment._Type;
-			const { pointsEarned, pointsPossible, notForGrade } = $hypotheticalGradebook[id];
+			const { pointsEarned, pointsPossible, notForGrade } = hypotheticalGradebookCache[id];
 
 			if (notForGrade || isNaN(pointsEarned)) {
-				$hypotheticalGradebook[id].gradePercentageChange = 0;
+				hypotheticalGradebookCache[id].gradePercentageChange = 0;
 				return;
 			}
 
@@ -287,7 +289,7 @@
 			const afterGrade = calculateGradePercentage();
 
 			// Calculate grade percentage change
-			$hypotheticalGradebook[id].gradePercentageChange = afterGrade - priorGrade;
+			hypotheticalGradebookCache[id].gradePercentageChange = afterGrade - priorGrade;
 		});
 
 		// Check if the calculated grade matches the raw grade
@@ -306,10 +308,10 @@
 		// Calculate hypothetical grade for hidden assignments
 		Object.keys(hiddenPointsByCategory).forEach((categoryName) => {
 			const id = `hidden-${categoryName}`;
-			const { pointsEarned, pointsPossible, notForGrade } = $hypotheticalGradebook[id];
+			const { pointsEarned, pointsPossible, notForGrade } = hypotheticalGradebookCache[id];
 
 			if (notForGrade || isNaN(pointsEarned)) {
-				$hypotheticalGradebook[id].gradePercentageChange = 0;
+				hypotheticalGradebookCache[id].gradePercentageChange = 0;
 				return;
 			}
 
@@ -333,17 +335,18 @@
 			const afterGrade = calculateGradePercentage();
 
 			// Calculate grade percentage change
-			$hypotheticalGradebook[id].gradePercentageChange = afterGrade - priorGrade;
+			hypotheticalGradebookCache[id].gradePercentageChange = afterGrade - priorGrade;
 		});
 
 		// Calculate grade for hypothetical assignments
-		Object.keys($hypotheticalGradebook)
+		Object.keys(hypotheticalGradebookCache)
 			.filter((id) => id.startsWith('hypothetical-'))
 			.forEach((id) => {
-				const { pointsEarned, pointsPossible, notForGrade, category } = $hypotheticalGradebook[id];
+				const { pointsEarned, pointsPossible, notForGrade, category } =
+					hypotheticalGradebookCache[id];
 
 				if (notForGrade || isNaN(pointsEarned) || (gradeCategories && !category)) {
-					$hypotheticalGradebook[id].gradePercentageChange = 0;
+					hypotheticalGradebookCache[id].gradePercentageChange = 0;
 					return;
 				}
 
@@ -367,22 +370,18 @@
 				const afterGrade = calculateGradePercentage();
 
 				// Calculate grade percentage change
-				$hypotheticalGradebook[id].gradePercentageChange = afterGrade - priorGrade;
+				hypotheticalGradebookCache[id].gradePercentageChange = afterGrade - priorGrade;
 			});
 
-		let hypotheticalGrade = calculateGradePercentage();
+		hypotheticalGrade = calculateGradePercentage();
 
-		// if (isNaN(hypotheticalGrade)) hypotheticalGrade = 0;
-
-		return hypotheticalGrade;
+		$hypotheticalGradebook = hypotheticalGradebookCache;
 	}
 
-	$: {
-		hypotheticalGrade = calculateHypotheticalGrade(assignments);
-	}
+	$: calculateHypotheticalGrade(assignments);
 
 	function recalculateGradePercentages() {
-		hypotheticalGrade = calculateHypotheticalGrade(assignments);
+		calculateHypotheticalGrade(assignments);
 	}
 
 	function addHypotheticalAssignment() {
@@ -394,8 +393,6 @@
 			name: 'Hypothetical Assignment'
 		};
 	}
-
-	$: console.log($hypotheticalGradebook);
 </script>
 
 {#if course}
