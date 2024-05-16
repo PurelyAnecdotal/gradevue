@@ -61,6 +61,47 @@
 
 	let hypotheticalAssignments: DisplayAssignment[] = [];
 
+	function calculateGradePercentage(
+		totalPointsEarned: number,
+		totalPointsPossible: number,
+		pointsByCategory: {
+			[categoryName: string]: { pointsEarned: number; pointsPossible: number };
+		}
+	) {
+		let gradePercentage = 0;
+
+		if (!gradeCategories) {
+			gradePercentage = (totalPointsEarned / totalPointsPossible) * 100;
+
+			if (isNaN(gradePercentage)) gradePercentage = 0;
+
+			return gradePercentage;
+		}
+
+		if (Object.entries(pointsByCategory).length == 0) return 0;
+
+		let totalWeight = 0;
+
+		Object.entries(pointsByCategory).forEach(([categoryName, categoryPoints]) => {
+			const category = gradeCategories.find((category) => category._Type == categoryName);
+			if (!category) return;
+
+			const weight = parseFloat(category._Weight);
+
+			gradePercentage += (categoryPoints.pointsEarned / categoryPoints.pointsPossible) * weight;
+			totalWeight += weight;
+		});
+
+		gradePercentage = (gradePercentage / totalWeight) * 100;
+
+		if (isNaN(gradePercentage)) {
+			console.error('Grade percentage is NaN');
+			return 0;
+		}
+
+		return gradePercentage;
+	}
+
 	// Initialize the gradebook
 	$: {
 		console.log('Initalizing gradebook');
@@ -70,36 +111,6 @@
 		} = {};
 		let totalPointsEarned = 0;
 		let totalPointsPossible = 0;
-
-		function calculateGradePercentage() {
-			let gradePercentage = 0;
-
-			if (!gradeCategories) {
-				gradePercentage = (totalPointsEarned / totalPointsPossible) * 100;
-
-				if (isNaN(gradePercentage)) gradePercentage = 0;
-
-				return gradePercentage;
-			}
-
-			let totalWeight = 0;
-
-			Object.entries(pointsByCategory).forEach(([categoryName, categoryPoints]) => {
-				const category = gradeCategories.find((category) => category._Type == categoryName);
-				if (!category) return;
-
-				const weight = parseFloat(category._Weight);
-
-				gradePercentage += (categoryPoints.pointsEarned / categoryPoints.pointsPossible) * weight;
-				totalWeight += weight;
-			});
-
-			gradePercentage = (gradePercentage / totalWeight) * 100;
-
-			if (isNaN(gradePercentage)) gradePercentage = 0;
-
-			return gradePercentage;
-		}
 
 		// Initialize regular assignments
 		let regularAssignmentsInit = assignments.map((assignment) => {
@@ -127,7 +138,11 @@
 				if (notForGrade || isNaN(pointsEarned)) return assignment;
 
 				// Calculate grade prior to the assignment
-				const priorGrade = calculateGradePercentage();
+				const priorGrade = calculateGradePercentage(
+					totalPointsEarned,
+					totalPointsPossible,
+					pointsByCategory
+				);
 
 				// Add assignment points to the grade
 				totalPointsEarned += pointsEarned;
@@ -140,7 +155,11 @@
 				};
 
 				// Calculate grade after the assignment
-				const afterGrade = calculateGradePercentage();
+				const afterGrade = calculateGradePercentage(
+					totalPointsEarned,
+					totalPointsPossible,
+					pointsByCategory
+				);
 
 				// Calculate grade percentage change and initalize hypothetical gradebook
 				const gradePercentageChange = afterGrade - priorGrade;
@@ -182,7 +201,11 @@
 				const { pointsEarned, pointsPossible, category } = assignment;
 
 				// Calculate grade prior to the assignment
-				const priorGrade = calculateGradePercentage();
+				const priorGrade = calculateGradePercentage(
+					totalPointsEarned,
+					totalPointsPossible,
+					pointsByCategory
+				);
 
 				// Add assignment points to the grade
 				totalPointsEarned += pointsEarned;
@@ -199,7 +222,11 @@
 				};
 
 				// Calculate grade after the assignment
-				const afterGrade = calculateGradePercentage();
+				const afterGrade = calculateGradePercentage(
+					totalPointsEarned,
+					totalPointsPossible,
+					pointsByCategory
+				);
 
 				// Calculate grade percentage change and initalize hypothetical gradebook
 				const gradePercentageChange = afterGrade - priorGrade;
@@ -210,6 +237,11 @@
 
 		displayAssignments = [...hiddenAssignmentsInit, ...regularAssignmentsInit];
 		hypotheticalAssignments = displayAssignments;
+		hypotheticalGrade = calculateGradePercentage(
+			totalPointsEarned,
+			totalPointsPossible,
+			pointsByCategory
+		);
 	}
 
 	let hypotheticalMode = false;
@@ -225,32 +257,6 @@
 		let totalPointsEarned = 0;
 		let totalPointsPossible = 0;
 
-		function calculateGradePercentage() {
-			let gradePercentage = 0;
-
-			if (!gradeCategories) {
-				gradePercentage = (totalPointsEarned / totalPointsPossible) * 100;
-
-				if (isNaN(gradePercentage)) gradePercentage = 0;
-
-				return gradePercentage;
-			}
-
-			let totalWeight = 0;
-
-			Object.entries(pointsByCategory).forEach(([categoryName, categoryPoints]) => {
-				const category = gradeCategories.find((category) => category._Type == categoryName);
-				if (!category) return;
-
-				const weight = parseFloat(category._Weight);
-
-				gradePercentage += (categoryPoints.pointsEarned / categoryPoints.pointsPossible) * weight;
-				totalWeight += weight;
-			});
-
-			return (gradePercentage / totalWeight) * 100;
-		}
-
 		// Calculate hypothetical grade for regular assignments
 		assignments = assignments
 			.toReversed()
@@ -260,7 +266,11 @@
 				if (notForGrade || isNaN(pointsEarned)) return assignment;
 
 				// Calculate grade prior to the assignment
-				const priorGrade = calculateGradePercentage();
+				const priorGrade = calculateGradePercentage(
+					totalPointsEarned,
+					totalPointsPossible,
+					pointsByCategory
+				);
 
 				// Add assignment points to the grade
 				totalPointsEarned += pointsEarned;
@@ -273,7 +283,11 @@
 				};
 
 				// Calculate grade after the assignment
-				const afterGrade = calculateGradePercentage();
+				const afterGrade = calculateGradePercentage(
+					totalPointsEarned,
+					totalPointsPossible,
+					pointsByCategory
+				);
 
 				// Calculate grade percentage change and initalize hypothetical gradebook
 				const gradePercentageChange = afterGrade - priorGrade;
@@ -295,12 +309,17 @@
 				rawGradeCalcMatches = false;
 		}
 
-		return { grade: calculateGradePercentage(), assignments };
+		hypotheticalAssignments = assignments;
+		hypotheticalGrade = calculateGradePercentage(
+			totalPointsEarned,
+			totalPointsPossible,
+			pointsByCategory
+		);
 	}
 
 	function recalculateGradePercentages() {
 		console.log('Hypothetical recalculation triggered');
-		hypotheticalAssignments = calculateHypotheticalGrade(hypotheticalAssignments).assignments;
+		calculateHypotheticalGrade(hypotheticalAssignments);
 	}
 
 	function addHypotheticalAssignment() {
