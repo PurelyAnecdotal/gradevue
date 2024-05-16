@@ -7,7 +7,6 @@ import type { ReportCardListEntity } from '$lib/ReportCardListEntity';
 import type { StudentInfo } from '$lib/StudentInfo';
 import type { StudentAccount } from '$lib/synergy';
 import type { DocumentsList } from './DocumentsList';
-import type { HypotheticalGradebook } from './HypotheticalGradebook';
 import type { Message } from './Message';
 
 export const studentAccount: Writable<StudentAccount | undefined> = writable();
@@ -15,8 +14,6 @@ export const studentAccount: Writable<StudentAccount | undefined> = writable();
 export const gradebook: Writable<Gradebook | undefined> = writable();
 
 export const gradebookLoaded = writable(false);
-
-export const hypotheticalGradebook: Writable<HypotheticalGradebook> = writable({});
 
 export const attendance: Writable<Attendance | undefined> = writable();
 

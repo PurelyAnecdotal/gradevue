@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { page } from '$app/stores';
-	import Assignments from '$lib/Assignments.svelte';
+	import Assignment from '$lib/Assignment.svelte';
 	import { extractPoints, removeClassID } from '$lib/index';
 	import { gradebook } from '$lib/stores';
 	import {
@@ -44,9 +44,10 @@
 		assignments.length > 0 ? assignments.map((assignment) => assignment._Type).toSorted() : []
 	);
 
+	$: categoryDropdownOptions = gradeCategories?.map((category) => category._Type) ?? [];
+
 	interface DisplayAssignment {
 		name: string;
-		id: string;
 		pointsEarned: number;
 		pointsPossible: number;
 		gradePercentageChange: number;
@@ -104,8 +105,6 @@
 
 	// Initialize the gradebook
 	$: {
-		console.log('Initalizing gradebook');
-
 		let pointsByCategory: {
 			[categoryName: string]: { pointsEarned: number; pointsPossible: number };
 		} = {};
@@ -113,11 +112,10 @@
 		let totalPointsPossible = 0;
 
 		// Initialize regular assignments
-		let regularAssignmentsInit = assignments.map((assignment) => {
+		let regularAssignmentsInit: DisplayAssignment[] = assignments.map((assignment) => {
 			const points = extractPoints(assignment._Points);
 			return {
 				name: assignment._Measure,
-				id: assignment._GradebookID,
 				pointsEarned: points[0],
 				pointsPossible: points[1],
 				gradePercentageChange: 0,
@@ -133,7 +131,7 @@
 		regularAssignmentsInit = regularAssignmentsInit
 			.toReversed()
 			.map((assignment) => {
-				const { id, category, notForGrade, pointsEarned, pointsPossible } = assignment;
+				const { category, notForGrade, pointsEarned, pointsPossible } = assignment;
 
 				if (notForGrade || isNaN(pointsEarned)) return assignment;
 
@@ -185,7 +183,6 @@
 
 				hiddenAssignmentsInit.push({
 					name: `Hidden ${category._Type} Assignments`,
-					id: `hidden-${category._Type}`,
 					pointsEarned: hiddenPointsEarned,
 					pointsPossible: hiddenPointsPossible,
 					gradePercentageChange: 0,
@@ -317,8 +314,7 @@
 		);
 	}
 
-	function recalculateGradePercentages() {
-		console.log('Hypothetical recalculation triggered');
+	function recalculateGradePercentage() {
 		calculateHypotheticalGrade(hypotheticalAssignments);
 	}
 
@@ -326,7 +322,6 @@
 		hypotheticalAssignments = [
 			{
 				name: 'Hypothetical Assignment',
-				id: `hypothetical-${Math.random().toString(36).substring(2, 15)}`,
 				pointsEarned: 0,
 				pointsPossible: 0,
 				gradePercentageChange: 0,
@@ -426,27 +421,55 @@
 		<div transition:fade={{ duration: 200 }}>
 			<Tabs class="m-4 mb-0" contentClass="p-4">
 				<TabItem open title="All">
-					<Assignments
-						assignments={hypotheticalMode ? hypotheticalAssignments : displayAssignments}
-						editable={hypotheticalMode}
-						categoryDropdownOptions={gradeCategories?.map((category) => category._Type) ?? []}
-						{recalculateGradePercentages}
-					/>
+					<ol class="space-y-4">
+						{#each hypotheticalMode ? hypotheticalAssignments : displayAssignments as { name, pointsEarned, pointsPossible, gradePercentageChange, notForGrade, hidden, hypothetical, category, date }}
+							<li>
+								<Assignment
+									bind:name
+									bind:pointsEarned
+									bind:pointsPossible
+									{gradePercentageChange}
+									bind:notForGrade
+									{hidden}
+									{hypothetical}
+									bind:category
+									{categoryDropdownOptions}
+									{date}
+									editable={hypotheticalMode}
+									{recalculateGradePercentage}
+								/>
+							</li>
+						{/each}
+					</ol>
 				</TabItem>
 
 				{#each assignmentCategories as category}
 					<TabItem title={category}>
-						<Assignments
-							assignments={(hypotheticalMode ? hypotheticalAssignments : displayAssignments)
+						<ol class="space-y-4">
+							{#each (hypotheticalMode ? hypotheticalAssignments : displayAssignments)
 								.filter((assignment) => assignment.category === category)
 								.map((assignment) => {
 									const { category, ...rest } = assignment;
 									return rest;
-								})}
-							editable={hypotheticalMode}
-							categoryDropdownOptions={gradeCategories?.map((category) => category._Type) ?? []}
-							{recalculateGradePercentages}
-						/>
+								}) as { name, pointsEarned, pointsPossible, gradePercentageChange, notForGrade, hidden, hypothetical, date }}
+								<li>
+									<Assignment
+										bind:name
+										bind:pointsEarned
+										bind:pointsPossible
+										{gradePercentageChange}
+										bind:notForGrade
+										{hidden}
+										{hypothetical}
+										bind:category
+										{categoryDropdownOptions}
+										{date}
+										editable={hypotheticalMode}
+										{recalculateGradePercentage}
+									/>
+								</li>
+							{/each}
+						</ol>
 					</TabItem>
 				{/each}
 			</Tabs>
