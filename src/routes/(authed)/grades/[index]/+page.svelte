@@ -230,6 +230,23 @@
 
 				return { ...assignment, gradePercentageChange };
 			});
+		} else if (course) {
+			// Since hidden assignments can't be directly detected, check if the calculated grade matches what Synergy says
+
+			let rawGrade = calculateGradePercentage(
+				totalPointsEarned,
+				totalPointsPossible,
+				pointsByCategory
+			);
+			if (isNaN(rawGrade)) rawGrade = 0;
+
+			const synergyGrade = parseFloat(course.Marks.Mark._CalculatedScoreRaw);
+
+			const decimalPlaces =
+				synergyGrade % 1 !== 0 ? synergyGrade.toString().split('.')[1].length : 0;
+
+			if (Math.floor(rawGrade * 10 ** decimalPlaces) / 10 ** decimalPlaces !== synergyGrade)
+				rawGradeCalcMatches = false;
 		}
 
 		displayAssignments = [...hiddenAssignmentsInit, ...regularAssignmentsInit];
@@ -292,19 +309,6 @@
 				return { ...assignment, gradePercentageChange };
 			})
 			.toReversed();
-
-		// Check if the calculated grade matches the raw grade
-		if (!gradeCategories && course) {
-			let rawGrade = (totalPointsEarned / totalPointsPossible) * 100;
-			if (isNaN(rawGrade)) rawGrade = 0;
-			let synergyGrade = parseFloat(course.Marks.Mark._CalculatedScoreRaw);
-
-			let decimalPlaces = 0;
-			if (synergyGrade % 1 != 0) decimalPlaces = synergyGrade.toString().split('.')[1].length;
-
-			if (Math.floor(rawGrade * 10 ** decimalPlaces) / 10 ** decimalPlaces != synergyGrade)
-				rawGradeCalcMatches = false;
-		}
 
 		hypotheticalAssignments = assignments;
 		hypotheticalGrade = calculateGradePercentage(
