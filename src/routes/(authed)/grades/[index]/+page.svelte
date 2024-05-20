@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { page } from '$app/stores';
-	import Assignment from '$lib/Assignment.svelte';
-	import { extractPoints, removeClassID } from '$lib/index';
+	import { extractPoints, removeClassID } from '$lib';
+	import Assignment from '$lib/components/Assignment.svelte';
 	import { gradebook } from '$lib/stores';
 	import {
 		Alert,

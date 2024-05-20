@@ -18,8 +18,8 @@
 		MailBoxOutline,
 		UserCircleOutline
 	} from 'flowbite-svelte-icons';
-	import { loadStudentInfo } from './cache';
-	import { studentInfo } from './stores';
+	import { loadStudentInfo } from '../cache';
+	import { studentInfo } from '../stores';
 
 	function logOut() {
 		localStorage.clear();

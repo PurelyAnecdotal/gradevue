@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { browser } from '$app/environment';
-	import LoadingBanner from '$lib/LoadingBanner.svelte';
 	import { loadStudentInfo } from '$lib/cache';
+	import LoadingBanner from '$lib/components/LoadingBanner.svelte';
 	import { studentInfo, studentInfoLoaded } from '$lib/stores';
 	import { Card } from 'flowbite-svelte';
 

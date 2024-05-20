@@ -1,6 +1,6 @@
 <script lang="ts">
-	import DateBadge from '$lib/DateBadge.svelte';
-	import { getColorForGrade } from '$lib/index';
+	import DateBadge from '$lib/components/DateBadge.svelte';
+	import { getColorForGrade } from '$lib';
 	import {
 		Badge,
 		Button,

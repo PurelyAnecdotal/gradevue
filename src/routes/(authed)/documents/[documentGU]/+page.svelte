@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { page } from '$app/stores';
-	import LoadingBanner from '$lib/LoadingBanner.svelte';
+	import LoadingBanner from '$lib/components/LoadingBanner.svelte';
 	import { studentAccount } from '$lib/stores';
 
 	const reportCardPromise = $studentAccount?.reportCard($page.params.documentGU);

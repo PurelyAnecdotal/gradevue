@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { getColorForGrade } from '$lib/index';
+	import { getColorForGrade } from '$lib';
 	import { Card, Progressbar } from 'flowbite-svelte';
 
 	export let href: string;
