@@ -1,8 +1,7 @@
 <script lang="ts">
-	import { removeClassID } from '$lib';
-	import Course from '$lib/Course.svelte';
+	import { getColorForGrade, removeClassID } from '$lib';
 	import { gradebook, gradebookLoaded, studentAccount } from '$lib/stores';
-	import { Button, Dropdown, DropdownItem } from 'flowbite-svelte';
+	import { Button, Card, Dropdown, DropdownItem, Progressbar } from 'flowbite-svelte';
 	import { ChevronDownOutline, ChevronUpOutline, MapPinOutline } from 'flowbite-svelte-icons';
 
 	let dropdownOpen = false;
@@ -47,14 +46,25 @@
 	</div>
 
 	<ol class="space-y-4 p-4 pt-0">
-		{#each $gradebook.Courses.Course ?? [] as course, index}
+		{#each $gradebook.Courses.Course ?? [] as {_Title: title, Marks: { Mark: {_CalculatedScoreString: grade, _CalculatedScoreRaw: percent}}}, index}
 			<li>
-				<Course
+				<Card
+					class="dark:text-white text-xl max-w-none flex flex-row justify-between items-center"
 					href="/grades/{index.toString()}"
-					courseName={removeClassID(course._Title)}
-					scoreGrade={course.Marks.Mark._CalculatedScoreString}
-					scorePercent={parseFloat(course.Marks.Mark._CalculatedScoreRaw)}
-				/>
+				>
+					<span class="line-clamp-1 mr-2">{removeClassID(title)}</span>
+					<span class="shrink-0 ml-auto mr-2">
+						{grade}
+						{parseFloat(percent)}%
+					</span>
+
+					<Progressbar
+						color={getColorForGrade(grade)}
+						progress={Math.min(isNaN(parseFloat(percent)) ? 0 : parseFloat(percent), 100)}
+						animate={true}
+						class="hidden sm:block w-1/3 shrink-0"
+					/>
+				</Card>
 			</li>
 		{/each}
 	</ol>

@@ -1,10 +1,10 @@
 <script lang="ts">
 	import { browser } from '$app/environment';
 	import { fullDateFormatter, removeClassID } from '$lib';
-	import type { PeriodEntity } from '$lib/Attendance';
-	import LoadingBanner from '$lib/LoadingBanner.svelte';
 	import { loadAttendance } from '$lib/cache';
+	import LoadingBanner from '$lib/components/LoadingBanner.svelte';
 	import { attendance, attendanceLoaded } from '$lib/stores';
+	import type { PeriodEntity } from '$lib/types/Attendance';
 	import { Accordion, AccordionItem, Badge } from 'flowbite-svelte';
 
 	if (!$attendance && browser) loadAttendance();
@@ -12,7 +12,7 @@
 	function getAbsenceType(periods: PeriodEntity[]) {
 		const reasons = periods.map((period: PeriodEntity) => period._Name);
 
-		if (reasons.some((reason) => reason === 'Absent')) return 'Absent';
+		if (reasons.some((reason) => reason === 'Absent' || reason === 'Non ADA')) return 'Absent';
 
 		if (reasons.some((reason) => reason.match(/Tardy/))) return 'Tardy';
 

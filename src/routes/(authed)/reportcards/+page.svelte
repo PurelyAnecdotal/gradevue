@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { browser } from '$app/environment';
-	import DateBadge from '$lib/DateBadge.svelte';
-	import LoadingBanner from '$lib/LoadingBanner.svelte';
 	import { loadReportCardList } from '$lib/cache';
+	import DateBadge from '$lib/components/DateBadge.svelte';
+	import LoadingBanner from '$lib/components/LoadingBanner.svelte';
 	import { reportCardList, reportCardListLoaded } from '$lib/stores';
 	import { Badge, Card } from 'flowbite-svelte';
 

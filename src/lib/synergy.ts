@@ -1,10 +1,10 @@
-import type { Attendance } from '$lib/Attendance';
-import type { DocumentsList } from '$lib/DocumentsList';
-import type { Gradebook } from '$lib/Gradebook';
-import type { Message } from '$lib/Message';
-import type { ReportCardDocument } from '$lib/ReportCardDocument';
-import type { ReportCardListEntity } from '$lib/ReportCardListEntity';
-import type { StudentInfo } from '$lib/StudentInfo';
+import type { Attendance } from '$lib/types/Attendance';
+import type { DocumentsList } from '$lib/types/DocumentsList';
+import type { Gradebook } from '$lib/types/Gradebook';
+import type { Message } from '$lib/types/Message';
+import type { ReportCardDocument } from '$lib/types/ReportCardDocument';
+import type { ReportCardListEntity } from '$lib/types/ReportCardListEntity';
+import type { StudentInfo } from '$lib/types/StudentInfo';
 import { XMLBuilder, XMLParser } from 'fast-xml-parser';
 
 const alwaysArray = [

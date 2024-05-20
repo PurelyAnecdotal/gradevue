@@ -1,7 +1,6 @@
 <script lang="ts">
-	import DateBadge from '$lib/DateBadge.svelte';
-	import { getColorForGrade } from '$lib/index';
-	import { hypotheticalGradebook } from '$lib/stores';
+	import { getColorForGrade } from '$lib';
+	import DateBadge from '$lib/components/DateBadge.svelte';
 	import {
 		Badge,
 		Button,
@@ -10,23 +9,23 @@
 		Dropdown,
 		DropdownItem,
 		Input,
+		NumberInput,
 		Progressbar
 	} from 'flowbite-svelte';
 	import { ChevronDownOutline, InfoCircleOutline } from 'flowbite-svelte-icons';
-	import { onDestroy } from 'svelte';
-	import { writable } from 'svelte/store';
 
 	export let name: string;
 	export let pointsEarned: number;
 	export let pointsPossible: number;
-	export let id: string;
-	export let category: string | undefined = undefined;
-	export let date: Date | undefined = undefined;
-	export let hypotheticalMode = false;
-	export let hidden = false;
+	export let gradePercentageChange: number;
 	export let notForGrade = false;
+	export let hidden = false;
 	export let hypothetical = false;
-	export let hypotheticalCategoryOptions: string[] = [];
+	export let category: string | undefined = undefined;
+	export let categoryDropdownOptions: string[] = [];
+	export let date: Date | undefined = undefined;
+	export let editable = false;
+	export let recalculateGradePercentage: () => void;
 
 	let categoryDropdownOpen = false;
 
@@ -38,61 +37,32 @@
 		return 'primary';
 	};
 
-	$: percentage = hypotheticalMode
-		? ($hypotheticalGradebook[id].pointsEarned / $hypotheticalGradebook[id].pointsPossible) * 100
-		: (pointsEarned / pointsPossible) * 100;
+	$: percentage = (pointsEarned / pointsPossible) * 100;
 
-	let pointsEarnedInput = writable($hypotheticalGradebook[id].pointsEarned.toString());
-	let pointsPossibleInput = writable($hypotheticalGradebook[id].pointsPossible.toString());
-
-	const earnedUnsubscribe = pointsEarnedInput.subscribe((pointsEarned) => {
-		$hypotheticalGradebook[id].pointsEarned = parseFloat(pointsEarned);
-	});
-
-	const possibleUnsubscribe = pointsPossibleInput.subscribe((pointsPossible) => {
-		$hypotheticalGradebook[id].pointsPossible = parseFloat(pointsPossible);
-	});
-
-	const hypotheticalUnsubscribe = hypotheticalGradebook.subscribe((gradebook) => {
-		if (!gradebook[id]) {
-			console.error(`Missing expected hypothetical assignment ${id} with name ${name}`);
-			return;
-		}
-
-		if (gradebook[id].pointsEarned !== parseFloat($pointsEarnedInput))
-			$pointsEarnedInput = gradebook[id].pointsEarned.toString();
-
-		if (gradebook[id].pointsPossible !== parseFloat($pointsPossibleInput))
-			$pointsPossibleInput = gradebook[id].pointsPossible.toString();
-	});
-
-	onDestroy(() => {
-		earnedUnsubscribe();
-		possibleUnsubscribe();
-		hypotheticalUnsubscribe();
-	});
+	$: percentageChange = Math.round(gradePercentageChange * 100) / 100;
 </script>
 
 <Card class="dark:text-white max-w-none flex flex-row items-center sm:p-4">
 	<div class="mr-2">
-		{#if hypotheticalMode && hypothetical}
+		{#if editable && hypothetical}
 			<Input bind:value={name} class="w-48 inline" />
 
-			{#if hypotheticalCategoryOptions.length > 0}
+			{#if categoryDropdownOptions.length > 0}
 				<Button color="light">
 					{category ?? 'Category'}
 					<ChevronDownOutline size="xs" class="ml-2 focus:outline-none" />
 				</Button>
 
 				<Dropdown bind:open={categoryDropdownOpen}>
-					{#each hypotheticalCategoryOptions as category}
+					{#each categoryDropdownOptions as categoryOption}
 						<DropdownItem
 							on:click={() => {
-								$hypotheticalGradebook[id].category = category;
+								category = categoryOption;
 								categoryDropdownOpen = false;
+								recalculateGradePercentage();
 							}}
 						>
-							{category}
+							{categoryOption}
 						</DropdownItem>
 					{/each}
 				</Dropdown>
@@ -108,13 +78,13 @@
 		{#if percentage == Infinity}
 			<Badge border color="indigo">Extra Credit</Badge>
 		{/if}
-		{#if hypotheticalMode ? isNaN($hypotheticalGradebook[id].pointsEarned) : isNaN(pointsEarned)}
+		{#if isNaN(pointsEarned)}
 			<Badge border color="purple">Not Graded</Badge>
 		{/if}
 		{#if notForGrade}
 			<Badge border color="pink">
-				{#if hypotheticalMode}
-					<Checkbox bind:checked={$hypotheticalGradebook[id].notForGrade}>
+				{#if editable}
+					<Checkbox bind:checked={notForGrade} on:change={recalculateGradePercentage}>
 						<span class="text-xs">Not For Grade</span>
 					</Checkbox>
 				{:else}
@@ -135,12 +105,24 @@
 		{/if}
 	</div>
 
-	<div class="ml-auto mr-2 shrink-0">
-		{#if hypotheticalMode}
+	<div class="ml-auto mr-2 shrink-0 flex items-center gap-2">
+		{#if percentageChange < 0}
+			<span class="text-red-500">
+				{percentageChange}%
+			</span>
+		{:else if percentageChange > 0}
+			<span class="text-green-500">
+				+{percentageChange}%
+			</span>
+		{:else if !notForGrade && !isNaN(pointsEarned)}
+			<span class="text-gray-500">+0%</span>
+		{/if}
+
+		{#if editable}
 			<div class="w-32 flex items-center">
-				<Input type="number" size="sm" bind:value={$pointsEarnedInput} />
+				<NumberInput type="number" size="sm" bind:value={pointsEarned} on:input={recalculateGradePercentage}/>
 				<span class="mx-1"> / </span>
-				<Input type="number" size="sm" bind:value={$pointsPossibleInput} />
+				<NumberInput type="number" size="sm" bind:value={pointsPossible} on:input={recalculateGradePercentage} />
 			</div>
 		{:else if isNaN(pointsEarned)}
 			{pointsPossible}
@@ -151,6 +133,7 @@
 			{/if}
 		{/if}
 	</div>
+
 	<Progressbar
 		color={getColorForGrade(percentage)}
 		progress={Math.min(isNaN(percentage) ? 0 : percentage, 100)}
