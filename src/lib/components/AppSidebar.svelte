@@ -1,6 +1,8 @@
 <script lang="ts">
 	import { browser } from '$app/environment';
 	import { page } from '$app/stores';
+	import { loadStudentInfo } from '$lib/cache';
+	import { studentInfo } from '$lib/stores';
 	import {
 		Sidebar,
 		SidebarBrand,
@@ -18,8 +20,6 @@
 		MailBoxOutline,
 		UserCircleOutline
 	} from 'flowbite-svelte-icons';
-	import { loadStudentInfo } from '../cache';
-	import { studentInfo } from '../stores';
 
 	function logOut() {
 		localStorage.clear();
