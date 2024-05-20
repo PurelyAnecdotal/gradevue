@@ -12,7 +12,7 @@
 	function getAbsenceType(periods: PeriodEntity[]) {
 		const reasons = periods.map((period: PeriodEntity) => period._Name);
 
-		if (reasons.some((reason) => reason === 'Absent')) return 'Absent';
+		if (reasons.some((reason) => reason === 'Absent' || reason === 'Non ADA')) return 'Absent';
 
 		if (reasons.some((reason) => reason.match(/Tardy/))) return 'Tardy';
 
