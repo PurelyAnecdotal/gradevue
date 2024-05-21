@@ -319,6 +319,14 @@
 	}
 
 	function recalculateGradePercentage() {
+		// Fix Svelte treating empty numeric inputs as "null"
+		hypotheticalAssignments = hypotheticalAssignments.map((assignment) => {
+			if (assignment.pointsEarned === null) assignment.pointsEarned = NaN;
+			if (assignment.pointsPossible === null) assignment.pointsPossible = NaN;
+
+			return assignment;
+		});
+
 		calculateHypotheticalGrade(hypotheticalAssignments);
 	}
 
