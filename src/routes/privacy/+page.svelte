@@ -6,6 +6,10 @@
 	if (browser) email = 'hello@gradevue.org';
 </script>
 
+<svelte:head>
+	<title>Privacy - GradeVue</title>
+</svelte:head>
+
 <div class="flex items-center justify-center min-h-screen">
 	<Card size="lg" class="gap-4">
 		<h1 class="text-2xl text-white">About the privacy of GradeVue</h1>

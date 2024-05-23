@@ -39,6 +39,10 @@
 	);
 </script>
 
+<svelte:head>
+	<title>Documents - GradeVue</title>
+</svelte:head>
+
 <LoadingBanner show={!$documentsListLoaded} loadingMsg="Loading documents..." />
 
 {#if $documentsList}

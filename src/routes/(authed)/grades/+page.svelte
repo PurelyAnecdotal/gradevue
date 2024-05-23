@@ -19,6 +19,10 @@
 	};
 </script>
 
+<svelte:head>
+	<title>Grades - GradeVue</title>
+</svelte:head>
+
 {#if $gradebook}
 	<div class="m-4 flex flex-col justify-center">
 		<div class="flex justify-center">

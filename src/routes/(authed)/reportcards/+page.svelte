@@ -9,6 +9,10 @@
 	if (!$reportCardList && browser) loadReportCardList();
 </script>
 
+<svelte:head>
+	<title>Report Cards - GradeVue</title>
+</svelte:head>
+
 <LoadingBanner show={!$reportCardListLoaded} loadingMsg="Loading report cards..." />
 
 {#if $reportCardList}
