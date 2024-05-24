@@ -20,7 +20,7 @@
 	<ol class="p-4 space-y-4">
 		{#each $messages as message}
 			<li>
-				<Card class="dark:text-white max-w-none flex flex-col md:flex-row md:items-center  gap-2">
+				<Card class="dark:text-white max-w-none flex flex-row items-center gap-2 flex-wrap">
 					<h2 class="text-md">{message._SubjectNoHTML}</h2>
 					<Badge color="blue">
 						<UserOutline size="xs" class="focus:outline-none mr-1" />
