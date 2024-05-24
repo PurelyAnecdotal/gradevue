@@ -10,6 +10,10 @@
 	if (!$messages && browser) loadMessages();
 </script>
 
+<svelte:head>
+	<title>Messages - GradeVue</title>
+</svelte:head>
+
 <LoadingBanner show={!$messagesLoaded} loadingMsg="Loading messages..." />
 
 {#if $messages}

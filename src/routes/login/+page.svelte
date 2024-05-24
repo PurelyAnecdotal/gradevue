@@ -54,6 +54,10 @@
 	}
 </script>
 
+<svelte:head>
+	<title>Log In - Gradevue</title>
+</svelte:head>
+
 {#if loginErrorShown}
 	<div class="fixed w-full p-4 top-0 left-0">
 		<Alert class="w-full" color="red">

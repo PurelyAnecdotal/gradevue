@@ -8,6 +8,10 @@
 	if (!$studentInfo && browser) loadStudentInfo();
 </script>
 
+<svelte:head>
+	<title>Student Info - GradeVue</title>
+</svelte:head>
+
 <LoadingBanner show={!$studentInfoLoaded} loadingMsg="Loading student info..." />
 
 {#if $studentInfo}
