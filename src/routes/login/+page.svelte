@@ -1,6 +1,8 @@
 <script lang="ts">
 	import { browser } from '$app/environment';
 	import { goto } from '$app/navigation';
+	import LoadingBanner from '$lib/components/LoadingBanner.svelte';
+	import { studentAccount } from '$lib/stores';
 	import { StudentAccount } from '$lib/synergy';
 	import {
 		Accordion,
@@ -17,7 +19,7 @@
 		EyeSlashOutline,
 		InfoCircleOutline
 	} from 'flowbite-svelte-icons';
-	import { studentAccount } from '../../lib/stores';
+	import { fly } from 'svelte/transition';
 
 	if (browser && localStorage.getItem('token')) {
 		if (!$studentAccount) {
@@ -35,12 +37,19 @@
 	let loginErrorShown = false;
 	let loginError: string;
 
+	let loggingIn = false;
+
 	async function login() {
+		if (loggingIn) return;
+		loggingIn = true;
+
 		const loginAccount = new StudentAccount(domain, username, password);
 
 		try {
 			await loginAccount.checkLogin();
 		} catch (e) {
+			loggingIn = false;
+
 			loginErrorShown = true;
 			loginError = e instanceof Error ? e.message : 'An unknown error occurred';
 			return;
@@ -50,16 +59,20 @@
 
 		localStorage.setItem('token', JSON.stringify({ username, password, domain }));
 
+		loggingIn = false;
+
 		goto('/grades');
 	}
 </script>
 
+<LoadingBanner show={loggingIn} loadingMsg="Logging you in..." />
+
 {#if loginErrorShown}
-	<div class="fixed w-full p-4 top-0 left-0">
-		<Alert class="w-full" color="red">
+	<div in:fly={{ y: -50, duration: 200 }} class="fixed w-full p-4 top-0 left-0 flex justify-center">
+		<Alert color="red">
 			<ExclamationCircleSolid slot="icon" />
 			<span class="font-bold">Couldn't log in</span>
-			{loginError}
+			<p>{loginError}</p>
 		</Alert>
 	</div>
 {/if}
