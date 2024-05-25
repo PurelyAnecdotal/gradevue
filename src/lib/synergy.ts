@@ -1,4 +1,5 @@
 import type { Attendance } from '$lib/types/Attendance';
+import type { AuthToken } from '$lib/types/AuthToken';
 import type { DocumentsList } from '$lib/types/DocumentsList';
 import type { Gradebook } from '$lib/types/Gradebook';
 import type { Message } from '$lib/types/Message';
@@ -36,7 +37,7 @@ export class StudentAccount {
 		this.password = password;
 	}
 
-	async request(methodName: string, params: unknown = {}) {
+	async soapRequest(operation: string, methodName: string, params: unknown = {}) {
 		const paramStr = builder
 			.build({ Params: params })
 			.replaceAll('<', '&lt;')
@@ -48,7 +49,7 @@ export class StudentAccount {
 			body: `<?xml version="1.0" encoding="utf-8"?>
             <soap12:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap12="http://www.w3.org/2003/05/soap-envelope">
                 <soap12:Body>
-                    <ProcessWebServiceRequest xmlns="http://edupoint.com/webservices/">
+                    <${operation} xmlns="http://edupoint.com/webservices/">
                         <userID>${this.userID}</userID>
                         <password>${this.password}</password>
                         <skipLoginLog>true</skipLoginLog>
@@ -56,21 +57,46 @@ export class StudentAccount {
                         <webServiceHandleName>PXPWebServices</webServiceHandleName>
                         <methodName>${methodName}</methodName>
                         <paramStr>${paramStr}</paramStr>
-                    </ProcessWebServiceRequest>
+                    </${operation}>
                 </soap12:Body>
             </soap12:Envelope>`
 		});
 
-		return parser.parse(
-			parser.parse(await res.text())['soap:Envelope']['soap:Body'].ProcessWebServiceRequestResponse
-				.ProcessWebServiceRequestResult
+		const result = parser.parse(
+			parser.parse(await res.text())['soap:Envelope']['soap:Body'][operation + 'Response'][
+				operation + 'Result'
+			]
 		);
+
+		if (result.RT_ERROR) throw new Error(result.RT_ERROR._ERROR_MESSAGE);
+
+		return result;
+	}
+
+	async request(methodName: string, params: unknown = {}) {
+		return this.soapRequest('ProcessWebServiceRequest', methodName, params);
+	}
+
+	async requestMultiWeb(methodName: string, params: unknown = {}) {
+		return this.soapRequest('ProcessWebServiceRequestMultiWeb', methodName, params);
 	}
 
 	async checkLogin() {
-		const res = await this.request('StudentInfo');
+		await this.request('StudentInfo');
+	}
 
-		if (res.RT_ERROR) throw new Error(res.RT_ERROR._ERROR_MESSAGE);
+	async getAuthToken(): Promise<AuthToken> {
+		return (
+			await this.requestMultiWeb('GenerateAuthToken', {
+				Username: this.userID,
+				TokenForClassWebSite: true,
+				Usertype: 0,
+				IsParentStudent: 0,
+				DataString: '',
+				DocumentID: 1,
+				AssignmentID: 1
+			})
+		).AuthToken;
 	}
 
 	async grades(reportPeriod?: number): Promise<Gradebook> {
