@@ -45,6 +45,10 @@
 	}
 </script>
 
+<svelte:head>
+	<title>Attendance - GradeVue</title>
+</svelte:head>
+
 <LoadingBanner show={!$attendanceLoaded} loadingMsg="Loading attendance..." />
 
 {#if $attendance}

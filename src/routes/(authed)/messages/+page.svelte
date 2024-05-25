@@ -32,6 +32,10 @@
 	}
 </script>
 
+<svelte:head>
+	<title>Messages - GradeVue</title>
+</svelte:head>
+
 <LoadingBanner show={!$messagesLoaded} loadingMsg="Loading messages..." />
 <LoadingBanner show={authenticating} loadingMsg="Authenticating..." />
 

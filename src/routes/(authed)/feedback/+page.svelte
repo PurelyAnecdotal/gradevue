@@ -3,6 +3,10 @@
 	import { GithubSolid } from 'flowbite-svelte-icons';
 </script>
 
+<svelte:head>
+	<title>Feedback - GradeVue</title>
+</svelte:head>
+
 <div class="p-4 flex flex-col items-center justify-center min-h-screen">
 	<Card
 		href="https://github.com/Nonexistent-Name/gradevue/issues"

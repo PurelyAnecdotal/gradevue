@@ -65,6 +65,10 @@
 	}
 </script>
 
+<svelte:head>
+	<title>Log In - Gradevue</title>
+</svelte:head>
+
 <LoadingBanner show={loggingIn} loadingMsg="Logging you in..." />
 
 {#if loginErrorShown}

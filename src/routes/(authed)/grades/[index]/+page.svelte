@@ -28,6 +28,8 @@
 
 	$: course = $gradebook?.Courses.Course?.[parseInt($page.params.index)];
 
+	$: courseName = course ? removeClassID(course._Title) : '';
+
 	$: gradeCalcSummary = course?.Marks.Mark.GradeCalculationSummary;
 
 	$: categories =
@@ -347,6 +349,10 @@
 	}
 </script>
 
+<svelte:head>
+	<title>{courseName} - GradeVue</title>
+</svelte:head>
+
 {#if course}
 	<div class="h-12 md:h-14" />
 
@@ -492,7 +498,7 @@
 		<div class="absolute w-full md:pl-64">
 			<div class="p-4 rounded-b-lg bg-gray-900 rounded flex justify-between">
 				<span class="line-clamp-1 text-2xl">
-					{removeClassID(course._Title)}
+					{courseName}
 				</span>
 				<span class="shrink-0 text-2xl flex items-center">
 					{#if hypotheticalMode}
