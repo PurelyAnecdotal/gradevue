@@ -4,6 +4,8 @@ An improved StudentVue experience.
 
 ## Developing
 
+[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/PurelyAnecdotal/gradevue)
+
 Make sure to have [Bun](https://bun.sh) installed, then run `bun install` to install dependencies.
 To start a development server:
 
