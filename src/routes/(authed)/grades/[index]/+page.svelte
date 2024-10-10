@@ -18,7 +18,6 @@
 		Tabs
 	} from 'flowbite-svelte';
 	import {
-		ExclamationCircleOutline,
 		ExclamationCircleSolid,
 		GridPlusOutline,
 		InfoCircleOutline,
@@ -398,12 +397,23 @@
 				GradeVue cannot show hidden assignments for this class. If there are any, they have not significantly
 				affected the grade percentage.
 			</Alert>
+		{:else if hypotheticalMode}
+			<Alert class="m-4" color="red" border>
+				<ExclamationCircleSolid slot="icon" size="sm" class="focus:outline-none" />
+				Your class's official grade percentage does not match GradeVue's calculated grade percentage.
+				This could mean that there are hidden assignments that GradeVue can't see, or that GradeVue
+				isn't calculating your grade correctly.
+				<span class="font-bold"> Grade calculations in Hypothetical Mode are inaccurate. </span>
+			</Alert>
 		{:else}
 			<Alert class="m-4" color="red" border>
 				<ExclamationCircleSolid slot="icon" size="sm" class="focus:outline-none" />
-				Your class's grade percentage does not match the calculated grade percentage. This indicates
-				the presence of hidden assignments that cannot be revealed.
-				<span class="font-bold">Hypothetical grade calculations will be inaccurate.</span>
+				Your class's official grade percentage does not match GradeVue's calculated grade percentage.
+				This could mean that there are hidden assignments that GradeVue can't show, or that GradeVue
+				isn't calculating your grade correctly. While the grade shown is your actual grade,
+				<span class="font-bold">
+					any grade calculations in Hypothetical Mode will be inaccurate.
+				</span>
 			</Alert>
 		{/if}
 	{/if}
@@ -503,7 +513,7 @@
 				<span class="shrink-0 text-2xl flex items-center">
 					{#if hypotheticalMode}
 						{#if !gradeCategories && !rawGradeCalcMatches}
-							<ExclamationCircleOutline class="mr-2 focus:outline-none" />
+							<ExclamationCircleSolid class="mr-2 focus:outline-none" />
 						{/if}
 						{Math.round(hypotheticalGrade * 1000) / 1000}%
 					{:else}
