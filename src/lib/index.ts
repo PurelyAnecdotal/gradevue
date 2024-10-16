@@ -19,7 +19,9 @@ export function extractPoints(score: string): [number, number] {
 		return [NaN, parseFloat(score.replace(/ Points Possible$/, ''))];
 
 	const [num, denom] = score.split(' / ').map(parseFloat);
-	return [num, denom];
+
+	// Some extra credit assignments have a score of ex: "3 /", so the denom may be undefined
+	return [num, denom ?? 0];
 }
 
 export function calculatePercent(score: string) {
