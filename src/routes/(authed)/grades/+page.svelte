@@ -2,7 +2,7 @@
 	import { getColorForGrade, removeClassID } from '$lib';
 	import { gradebook, gradebookLoaded, studentAccount } from '$lib/stores';
 	import { Button, Card, Dropdown, DropdownItem, Progressbar } from 'flowbite-svelte';
-	import { ChevronDownOutline, ChevronUpOutline, MapPinOutline } from 'flowbite-svelte-icons';
+	import { ChevronDownOutline, ChevronUpOutline, MapPinAltOutline } from 'flowbite-svelte-icons';
 
 	let dropdownOpen = false;
 
@@ -25,23 +25,21 @@
 
 {#if $gradebook}
 	<div class="m-4 flex flex-col justify-center">
-		<div class="flex justify-center">
-			<Button color="light" on:click={showDropdown}>
-				{$gradebook.ReportingPeriod._GradePeriod}
+		<Button color="light" on:click={showDropdown} class="mx-auto flex items-center">
+			{$gradebook.ReportingPeriod._GradePeriod}
 
-				{#if dropdownOpen}
-					<ChevronUpOutline size="xs" class="ml-2 focus:outline-none" />
-				{:else}
-					<ChevronDownOutline size="xs" class="ml-2 focus:outline-none" />
-				{/if}
-			</Button>
-		</div>
+			{#if dropdownOpen}
+				<ChevronUpOutline size="sm" class="ml-2 focus:outline-none" />
+			{:else}
+				<ChevronDownOutline size="sm" class="ml-2 focus:outline-none" />
+			{/if}
+		</Button>
 
 		<Dropdown bind:open={dropdownOpen}>
 			{#each $gradebook.ReportingPeriods.ReportPeriod ?? [] as period, index}
 				<DropdownItem on:click={() => changeReportPeriod(index)} class="flex items-center">
 					{#if period._GradePeriod == $gradebook.ReportingPeriod._GradePeriod}
-						<MapPinOutline size="sm" class="mr-2" />
+						<MapPinAltOutline size="sm" class="mr-2" />
 					{/if}
 					{period._GradePeriod}
 				</DropdownItem>
@@ -50,7 +48,7 @@
 	</div>
 
 	<ol class="space-y-4 p-4 pt-0">
-		{#each $gradebook.Courses.Course ?? [] as {_Title: title, Marks: { Mark: {_CalculatedScoreString: grade, _CalculatedScoreRaw: percent}}}, index}
+		{#each $gradebook.Courses.Course ?? [] as { _Title: title, Marks: { Mark: { _CalculatedScoreString: grade, _CalculatedScoreRaw: percent } } }, index}
 			<li>
 				<Card
 					class="dark:text-white text-xl max-w-none flex flex-row justify-between items-center"
