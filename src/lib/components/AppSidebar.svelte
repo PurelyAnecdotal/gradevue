@@ -34,7 +34,7 @@
 </script>
 
 <Sidebar activeUrl={$page.url.pathname} class="h-screen">
-	<SidebarWrapper class="h-screen flex flex-col justify-between">
+	<SidebarWrapper class="h-screen flex flex-col justify-between gap-2">
 		<SidebarGroup>
 			<SidebarBrand
 				site={{
