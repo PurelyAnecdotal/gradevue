@@ -18,10 +18,11 @@
 		Tabs
 	} from 'flowbite-svelte';
 	import {
+		ChevronDownOutline,
+		ChevronUpOutline,
 		ExclamationCircleSolid,
 		GridPlusOutline,
-		InfoCircleOutline,
-		InfoCircleSolid
+		InfoCircleOutline
 	} from 'flowbite-svelte-icons';
 	import { fade } from 'svelte/transition';
 
@@ -346,6 +347,12 @@
 			...hypotheticalAssignments
 		];
 	}
+
+	let calcWarningOpen = false;
+
+	function toggleCalcWarning() {
+		calcWarningOpen = !calcWarningOpen;
+	}
 </script>
 
 <svelte:head>
@@ -390,32 +397,36 @@
 		</div>
 	{/if}
 
-	{#if !gradeCategories}
-		{#if rawGradeCalcMatches}
-			<Alert class="m-4" color="dark">
-				<InfoCircleSolid slot="icon" size="sm" class="focus:outline-none" />
-				GradeVue cannot show hidden assignments for this class. If there are any, they have not significantly
-				affected the grade percentage.
-			</Alert>
-		{:else if hypotheticalMode}
-			<Alert class="m-4" color="red" border>
-				<ExclamationCircleSolid slot="icon" size="sm" class="focus:outline-none" />
-				Your class's official grade percentage does not match GradeVue's calculated grade percentage.
-				This could mean that there are hidden assignments that GradeVue can't see, or that GradeVue
-				isn't calculating your grade correctly.
-				<span class="font-bold"> Grade calculations in Hypothetical Mode are inaccurate. </span>
-			</Alert>
-		{:else}
-			<Alert class="m-4" color="red" border>
-				<ExclamationCircleSolid slot="icon" size="sm" class="focus:outline-none" />
-				Your class's official grade percentage does not match GradeVue's calculated grade percentage.
-				This could mean that there are hidden assignments that GradeVue can't show, or that GradeVue
-				isn't calculating your grade correctly. While the grade shown is your actual grade,
-				<span class="font-bold">
-					any grade calculations in Hypothetical Mode will be inaccurate.
-				</span>
-			</Alert>
-		{/if}
+	{#if !rawGradeCalcMatches}
+		<Alert class="m-4" color="red" border>
+			<ExclamationCircleSolid slot="icon" size="sm" class="focus:outline-none" />
+
+			<div class="flex flex-col gap-2">
+				<button class="flex items-center" on:click={toggleCalcWarning}>
+					<span class="font-bold text-left">
+						{#if hypotheticalMode}
+							Grade calculations in Hypothetical Mode are inaccurate
+						{:else}
+							Grade calculation error
+						{/if}
+					</span>
+					{#if calcWarningOpen}
+						<ChevronUpOutline size="md" class="focus" />
+					{:else}
+						<ChevronDownOutline size="md" class="focus" />
+					{/if}
+				</button>
+
+				{#if calcWarningOpen}
+					<span>
+						Your class's official grade percentage does not match GradeVue's calculated grade
+						percentage. This could mean that there are hidden assignments that GradeVue can't see,
+						or that GradeVue isn't calculating your grade correctly. Your overall grade is still
+						correct, but other things might be off.
+					</span>
+				{/if}
+			</div>
+		</Alert>
 	{/if}
 
 	<div class="flex flex-wrap justify-between items-center">
