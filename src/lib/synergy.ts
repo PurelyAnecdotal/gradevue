@@ -7,6 +7,7 @@ import type { ReportCardDocument } from '$lib/types/ReportCardDocument';
 import type { ReportCardListEntity } from '$lib/types/ReportCardListEntity';
 import type { StudentInfo } from '$lib/types/StudentInfo';
 import { XMLBuilder, XMLParser } from 'fast-xml-parser';
+import type { MailData } from './types/MailData';
 
 const alwaysArray = [
 	'Gradebook.Courses.Course',
@@ -130,5 +131,9 @@ export class StudentAccount {
 
 	async messages(): Promise<Message[]> {
 		return (await this.request('GetPXPMessages')).PXPMessagesData.MessageListings.MessageListing;
+	}
+
+	async mail(): Promise<MailData> {
+		return (await this.request('SynergyMailGetData')).SynergyMailDataXML;
 	}
 }

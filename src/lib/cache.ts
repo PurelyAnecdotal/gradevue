@@ -6,6 +6,8 @@ import {
 	documentsListLoaded,
 	gradebook,
 	gradebookLoaded,
+	mail,
+	mailLoaded,
 	messages,
 	messagesLoaded,
 	reportCardList,
@@ -103,4 +105,17 @@ export const loadMessages = async () => {
 	localStorage.setItem('messages', JSON.stringify(messagesRecord));
 
 	messagesLoaded.set(true);
+};
+
+export const loadMail = async () => {
+	mailLoaded.set(false);
+
+	writeCacheToStore('mail', mail);
+
+	const mailRecord = await get(studentAccount)?.mail();
+
+	mail.set(mailRecord);
+	localStorage.setItem('mail', JSON.stringify(mailRecord));
+
+	mailLoaded.set(true);
 };
