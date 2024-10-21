@@ -109,7 +109,7 @@ export interface RecipientSectionListClass {
 export interface RecipientSection {
 	_SectionGU: string;
 	_Teacher: string;
-  _Period: string;
+	_Period: string;
 	_Term: Term;
 	_SectionID: string;
 	_CourseID: string;
@@ -211,7 +211,7 @@ export interface InboxItemListingsMessageXML {
 }
 
 export interface AttachmentsClass {
-	AttachmentXML: AttachmentXML;
+	AttachmentXML: AttachmentXML | AttachmentXML[];
 }
 
 export interface AttachmentXML {

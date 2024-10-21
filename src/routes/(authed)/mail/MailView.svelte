@@ -1,11 +1,12 @@
 <script lang="ts">
 	import type { InboxItemListingsMessageXML } from '$lib/types/MailData';
-	import { Badge } from 'flowbite-svelte';
-	import { ChevronDownOutline, ChevronRightOutline } from 'flowbite-svelte-icons';
+	import { Badge, Card } from 'flowbite-svelte';
+	import { ChevronDownOutline, ChevronRightOutline, LinkOutline, PaperClipOutline } from 'flowbite-svelte-icons';
 
 	export let touchscreen = false;
 	export let message: InboxItemListingsMessageXML;
 	export let content = '';
+	export let links: string[] = [];
 
 	$: from = message.From.RecipientXML;
 	$: recipients =
@@ -14,11 +15,20 @@
 				? message.To.RecipientXML
 				: [message.To.RecipientXML]
 			: undefined;
+	$: attachments =
+		typeof message.Attachments !== 'string'
+			? message.Attachments.AttachmentXML instanceof Array
+				? message.Attachments.AttachmentXML
+				: [message.Attachments.AttachmentXML]
+			: undefined;
 
 	let showRecipients = false;
 </script>
 
 <ol>
+	<li class="text-md text-white">
+		{message._SendDateTimeFormattedLong}
+	</li>
 	<li class="text-md text-white">
 		From: {from._Details1}
 		({from._Details2})
@@ -110,8 +120,42 @@
 						${content}
 					</body>
 				</html>
-				`}
+			`}
 	sandbox=""
 	class="w-full h-96 bg-white"
 	title="Message Content"
 />
+
+{#if attachments || links.length > 0}
+	<ul class="flex flex-wrap gap-2">
+		{#each links as link}
+			<li>
+				<Card
+					padding="xs"
+					horizontal={true}
+					class="dark:text-white max-w-none w-fit flex items-center gap-2"
+					href={link}
+					target="_blank"
+				>
+					<LinkOutline size="sm" class="focus:outline-none" />
+					{new URL(link).hostname}
+				</Card>
+			</li>
+		{/each}
+
+		{#each attachments ?? [] as attachment}
+			<li>
+				<Card
+					padding="xs"
+					horizontal={true}
+					class="dark:text-white max-w-none w-fit flex items-center gap-2"
+					href="/mail/attachment?attachmentGU={attachment._SmAttachmentGU}"
+					target="_blank"
+				>
+					<PaperClipOutline size="sm" class="focus:outline-none" />
+					{attachment._DocumentName}
+				</Card>
+			</li>
+		{/each}
+	</ul>
+{/if}

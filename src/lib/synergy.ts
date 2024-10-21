@@ -1,13 +1,14 @@
+import type { Attachment } from '$lib/types/Attachment';
 import type { Attendance } from '$lib/types/Attendance';
 import type { AuthToken } from '$lib/types/AuthToken';
 import type { DocumentsList } from '$lib/types/DocumentsList';
 import type { Gradebook } from '$lib/types/Gradebook';
+import type { MailData } from '$lib/types/MailData';
 import type { Message } from '$lib/types/Message';
 import type { ReportCardDocument } from '$lib/types/ReportCardDocument';
 import type { ReportCardListEntity } from '$lib/types/ReportCardListEntity';
 import type { StudentInfo } from '$lib/types/StudentInfo';
 import { XMLBuilder, XMLParser } from 'fast-xml-parser';
-import type { MailData } from './types/MailData';
 
 const alwaysArray = [
 	'Gradebook.Courses.Course',
@@ -135,5 +136,10 @@ export class StudentAccount {
 
 	async mail(): Promise<MailData> {
 		return (await this.request('SynergyMailGetData')).SynergyMailDataXML;
+	}
+
+	async attachmentBase64(attachmentGU: string): Promise<Attachment> {
+		return (await this.request('SynergyMailGetAttachment', { SmAttachmentGU: attachmentGU }))
+			.AttachmentXML;
 	}
 }
