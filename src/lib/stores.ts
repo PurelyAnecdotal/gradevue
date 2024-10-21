@@ -7,8 +7,8 @@ import type { DocumentsList } from '$lib/types/DocumentsList';
 import type { Gradebook } from '$lib/types/Gradebook';
 import type { ReportCardListEntity } from '$lib/types/ReportCardListEntity';
 import type { StudentInfo } from '$lib/types/StudentInfo';
-import type { MailData } from './types/MailData';
-import type { Message } from './types/Message';
+import type { MailData } from '$lib/types/MailData';
+import type { Message } from '$lib/types/Message';
 
 export const studentAccount: Writable<StudentAccount | undefined> = writable();
 

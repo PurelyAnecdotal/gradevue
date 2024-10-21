@@ -24,7 +24,7 @@
 
 <Card class="dark:text-white max-w-none flex flex-row justify-between gap-2" padding="sm" href="#">
 	<div class="flex flex-col gap-2">
-		<h2 class="text-md">{message._Subject}</h2>
+		<h2 class="text-md text-left">{message._Subject}</h2>
 
 		<div class="flex flex-row items-center gap-2 flex-wrap">
 			<Badge color="blue">
