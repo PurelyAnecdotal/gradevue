@@ -1,13 +1,13 @@
 <script lang="ts">
+	import MessageCard from './MessageCard.svelte';
+
 	import { browser } from '$app/environment';
 	import { loadMail } from '$lib/cache';
-	import DateBadge from '$lib/components/DateBadge.svelte';
 	import LoadingBanner from '$lib/components/LoadingBanner.svelte';
 	import { mail, mailLoaded } from '$lib/stores';
 	import type { InboxItemListingsMessageXML } from '$lib/types/MailData';
-	import { Badge, Card, Modal } from 'flowbite-svelte';
-	import { UserOutline } from 'flowbite-svelte-icons';
-	import MailView from './MailView.svelte';
+	import { Modal } from 'flowbite-svelte';
+	import MessageView from './MessageView.svelte';
 
 	if (!$mail && browser) loadMail();
 
@@ -58,24 +58,9 @@
 					touchscreen = true;
 				}}
 			>
-				<Card
-					class="dark:text-white max-w-none flex flex-row justify-between gap-2"
-					padding="sm"
-					href="#"
-					on:click={() => openMessage(message)}
-				>
-					<div class="flex flex-col gap-2">
-						<h2 class="text-md">{message._Subject}</h2>
-						<div class="flex flex-row items-center gap-2 flex-wrap">
-							<Badge color="blue">
-								<UserOutline size="xs" class="focus:outline-none mr-1" />
-								{message.From.RecipientXML._Details1}
-								({message.From.RecipientXML._Details2})
-							</Badge>
-							<DateBadge date={new Date(message._SendDateTime)} />
-						</div>
-					</div>
-				</Card>
+				<button class="w-full" on:click={() => openMessage(message)}>
+					<MessageCard {message} />
+				</button>
 			</li>
 		{/each}
 	</ol>
@@ -87,7 +72,7 @@
 			classHeader="dark:text-white"
 			outsideclose
 		>
-			<MailView
+			<MessageView
 				message={openedMessage}
 				content={openedMessageContent}
 				links={openedMessageLinks}

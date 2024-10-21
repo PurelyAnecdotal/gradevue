@@ -2,9 +2,28 @@
 	import { page } from '$app/stores';
 	import LoadingBanner from '$lib/components/LoadingBanner.svelte';
 	import { studentAccount } from '$lib/stores';
+	import type { Attachment } from '$lib/types/Attachment';
+	import { Buffer } from 'buffer';
+	import { fileTypeFromBuffer } from 'file-type';
 	import { Button, Card } from 'flowbite-svelte';
 
 	const attachmentGU = $page.url.searchParams.get('attachmentGU');
+
+	let attachmentPromise: Promise<Attachment>;
+
+	let mimeType: string;
+
+	if ($studentAccount && attachmentGU) {
+		attachmentPromise = $studentAccount.attachmentBase64(attachmentGU);
+
+		attachmentPromise.then((attachment) => {
+			fileTypeFromBuffer(Buffer.from(attachment.Base64Code, 'base64')).then((type) => {
+				if (!type?.mime) return;
+
+				mimeType = type.mime;
+			});
+		});
+	}
 </script>
 
 <svelte:head>
@@ -13,13 +32,13 @@
 
 {#if $studentAccount}
 	{#if attachmentGU}
-		{#await $studentAccount.attachmentBase64(attachmentGU)}
+		{#await attachmentPromise}
 			<LoadingBanner loadingMsg="Loading attachment..." />
 		{:then attachment}
 			<iframe
 				class="w-full h-full"
-				src="data:application/pdf;base64,{attachment.Base64Code}"
-				title="Report Card PDF"
+				src="data:{mimeType};base64,{attachment.Base64Code}"
+				title="Attachment"
 			/>
 		{/await}
 	{:else}
