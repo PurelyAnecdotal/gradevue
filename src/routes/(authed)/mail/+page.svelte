@@ -70,6 +70,7 @@
 			bind:open={messageOpen}
 			title={openedMessage._Subject}
 			classHeader="dark:text-white"
+			size="lg"
 			outsideclose
 		>
 			<MessageView
