@@ -37,7 +37,8 @@
 	},
 	"type": "module",
 	"dependencies": {
-		"fast-xml-parser": "^4.5.0"
+		"fast-xml-parser": "^4.5.0",
+		"file-type": "^19.6.0"
 	},
 	"engines": {
 		"node": "20.x"
