@@ -12,7 +12,7 @@
 		"format": "prettier --write ."
 	},
 	"devDependencies": {
-		"@sveltejs/adapter-auto": "^3.2.4",
+		"@sveltejs/adapter-vercel": "^5.4.6",
 		"@sveltejs/kit": "^2.5.26",
 		"@sveltejs/vite-plugin-svelte": "^3.1.2",
 		"@typescript-eslint/eslint-plugin": "^8.4.0",
@@ -23,7 +23,7 @@
 		"eslint-config-prettier": "^9.1.0",
 		"eslint-plugin-svelte": "^2.43.0",
 		"flowbite": "^2.5.1",
-		"flowbite-svelte": "^0.46.16",
+		"flowbite-svelte": "^0.47.1",
 		"flowbite-svelte-icons": "^1.6.1",
 		"postcss": "^8.4.45",
 		"prettier": "^3.3.3",
