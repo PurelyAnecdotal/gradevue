@@ -9,7 +9,9 @@
 	import { onDestroy } from 'svelte';
 	import { sineIn } from 'svelte/easing';
 
-	let drawerHidden = true;
+	let { children } = $props();
+
+	let drawerHidden = $state(true);
 
 	let transitionParams = {
 		x: -320,
@@ -50,5 +52,5 @@
 </div>
 
 <main class="pt-16 md:pt-0 md:pl-64 h-screen">
-	<slot />
+	{@render children?.()}
 </main>

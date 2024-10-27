@@ -2,10 +2,19 @@
 	import { getColorForGrade } from '$lib';
 	import { Card, Progressbar } from 'flowbite-svelte';
 
-	export let href: string;
-	export let courseName: string;
-	export let scoreGrade: string;
-	export let scorePercent: number;
+	interface Props {
+		href: string;
+		courseName: string;
+		scoreGrade: string;
+		scorePercent: number;
+	}
+
+	let {
+		href,
+		courseName,
+		scoreGrade,
+		scorePercent
+	}: Props = $props();
 </script>
 
 <Card class="dark:text-white text-xl max-w-none flex flex-row justify-between items-center" {href}>

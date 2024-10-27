@@ -14,20 +14,37 @@
 	} from 'flowbite-svelte';
 	import { ChevronDownOutline, InfoCircleOutline } from 'flowbite-svelte-icons';
 
-	export let name: string;
-	export let pointsEarned: number;
-	export let pointsPossible: number;
-	export let gradePercentageChange: number;
-	export let notForGrade = false;
-	export let hidden = false;
-	export let hypothetical = false;
-	export let category: string | undefined = undefined;
-	export let categoryDropdownOptions: string[] = [];
-	export let date: Date | undefined = undefined;
-	export let editable = false;
-	export let recalculateGradePercentage: () => void;
+	interface Props {
+		name: string;
+		pointsEarned: number;
+		pointsPossible: number;
+		gradePercentageChange: number;
+		notForGrade?: boolean;
+		hidden?: boolean;
+		hypothetical?: boolean;
+		category?: string | undefined;
+		categoryDropdownOptions?: string[];
+		date?: Date | undefined;
+		editable?: boolean;
+		recalculateGradePercentage: () => void;
+	}
 
-	let categoryDropdownOpen = false;
+	let {
+		name = $bindable(),
+		pointsEarned = $bindable(),
+		pointsPossible = $bindable(),
+		gradePercentageChange,
+		notForGrade = $bindable(false),
+		hidden = false,
+		hypothetical = false,
+		category = $bindable(undefined),
+		categoryDropdownOptions = [],
+		date = undefined,
+		editable = false,
+		recalculateGradePercentage
+	}: Props = $props();
+
+	let categoryDropdownOpen = $state(false);
 
 	const getCategoryColor = (category: string) => {
 		if (category.match(/final/i)) return 'red';
@@ -37,9 +54,9 @@
 		return 'primary';
 	};
 
-	$: percentage = (pointsEarned / pointsPossible) * 100;
+	let percentage = $derived((pointsEarned / pointsPossible) * 100);
 
-	$: percentageChange = Math.round(gradePercentageChange * 100) / 100;
+	let percentageChange = $derived(Math.round(gradePercentageChange * 100) / 100);
 </script>
 
 <Card class="dark:text-white max-w-none flex flex-row items-center sm:p-4">

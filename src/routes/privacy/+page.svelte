@@ -2,7 +2,7 @@
 	import { browser } from '$app/environment';
 	import { Card } from 'flowbite-svelte';
 
-	let email = '[email protected]';
+	let email = $state('[email protected]');
 	if (browser) email = 'hello@gradevue.org';
 </script>
 

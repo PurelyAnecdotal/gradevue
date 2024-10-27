@@ -9,19 +9,26 @@
 
 	const attachmentGU = $page.url.searchParams.get('attachmentGU');
 
-	let attachmentPromise: Promise<Attachment>;
-
-	let mimeType: string;
+	let attachmentPromise:
+		| Promise<{
+				attachment: Attachment;
+				mimeType: string;
+		  }>
+		| undefined = $state();
 
 	if ($studentAccount && attachmentGU) {
-		attachmentPromise = $studentAccount.attachmentBase64(attachmentGU);
+		attachmentPromise = new Promise(async (resolve, reject) => {
+			const attachment = await $studentAccount.attachmentBase64(attachmentGU);
 
-		attachmentPromise.then((attachment) => {
-			fileTypeFromBuffer(Buffer.from(attachment.Base64Code, 'base64')).then((type) => {
-				if (!type?.mime) return;
+			const mimeType = (await fileTypeFromBuffer(Buffer.from(attachment.Base64Code, 'base64')))
+				?.mime;
 
-				mimeType = type.mime;
-			});
+			if (!mimeType) {
+				reject(new Error('Could not determine MIME type of attachment'));
+				return;
+			}
+
+			resolve({ attachment, mimeType });
 		});
 	}
 </script>
@@ -31,15 +38,23 @@
 </svelte:head>
 
 {#if $studentAccount}
-	{#if attachmentGU}
+	{#if attachmentGU && attachmentPromise}
 		{#await attachmentPromise}
 			<LoadingBanner loadingMsg="Loading attachment..." />
-		{:then attachment}
+		{:then { attachment, mimeType }}
 			<iframe
 				class="w-full h-full"
 				src="data:{mimeType};base64,{attachment.Base64Code}"
 				title="Attachment"
-			/>
+			></iframe>
+		{:catch error}
+			<div class="flex items-center justify-center min-h-screen">
+				<Card class="text-sm dark:text-gray-200 leading-relaxed space-y-4">
+					<h1 class="text-2xl dark:text-white">{error}</h1>
+
+					<Button href="/mail" class="w-full">Return to Mail</Button>
+				</Card>
+			</div>
 		{/await}
 	{:else}
 		<div class="flex items-center justify-center min-h-screen">

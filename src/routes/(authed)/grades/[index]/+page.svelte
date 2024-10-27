@@ -360,7 +360,7 @@
 </svelte:head>
 
 {#if course}
-	<div class="h-12 md:h-14" />
+	<div class="h-12 md:h-14"></div>
 
 	{#if gradeCategories}
 		<div class="sm:mx-4">
@@ -402,7 +402,7 @@
 			<ExclamationCircleSolid slot="icon" size="sm" class="focus:outline-none" />
 
 			<div class="flex flex-col gap-2">
-				<button class="flex items-center" on:click={toggleCalcWarning}>
+				<button class="flex items-center" onclick={toggleCalcWarning}>
 					<span class="font-bold text-left">
 						{#if hypotheticalMode}
 							Grade calculations in Hypothetical Mode are inaccurate
@@ -482,7 +482,7 @@
 					</ol>
 				</TabItem>
 
-				{#each assignmentCategories as category}
+				{#each [...assignmentCategories] as category}
 					<TabItem title={category}>
 						<ol class="space-y-4">
 							{#each (hypotheticalMode ? hypotheticalAssignments : displayAssignments)

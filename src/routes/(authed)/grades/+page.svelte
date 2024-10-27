@@ -4,7 +4,7 @@
 	import { Button, Card, Dropdown, DropdownItem, Progressbar } from 'flowbite-svelte';
 	import { ChevronDownOutline, ChevronUpOutline, MapPinAltOutline } from 'flowbite-svelte-icons';
 
-	let dropdownOpen = false;
+	let dropdownOpen = $state(false);
 
 	const showDropdown = () => {
 		dropdownOpen = true;
