@@ -106,7 +106,7 @@
 				</svelte:fragment>
 			</SidebarItem>
 
-			<SidebarItem label="Messages" href="/messages">
+			<SidebarItem label="Mail" href="/mail">
 				<svelte:fragment slot="icon">
 					<MailBoxOutline class="focus:outline-none" />
 				</svelte:fragment>
