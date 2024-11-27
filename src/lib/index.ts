@@ -14,26 +14,52 @@ export function getColorForGrade(grade: string | number) {
 
 export const removeClassID = (name: string) => name.replace(/ \([A-Z]+\)( \([0-9]+\))?$/, '');
 
-export function extractPoints(score: string): [number, number] {
+export function extractPoints(score: string): {
+	pointsEarned: number | undefined;
+	pointsPossible: number;
+} {
 	if (score.endsWith(' Points Possible'))
-		return [NaN, parseFloat(score.replace(/ Points Possible$/, ''))];
+		return {
+			pointsEarned: undefined,
+			pointsPossible: parseFloat(score.replace(/ Points Possible$/, ''))
+		};
 
-	const [num, denom] = score.split(' / ').map(parseFloat);
+	
+	// Ungraded assignments
+	if (score.startsWith('/'))
+		return {
+			pointsEarned: undefined,
+			pointsPossible: parseFloat(score.replace('/ ', ''))
+		};
 
-	// Some extra credit assignments have a score of ex: "3 /", so the denom may be undefined
-	return [num, denom ?? 0];
+	// Some extra credit assignments
+	if (score.endsWith(' /'))
+		return {
+			pointsEarned: parseFloat(score.replace(' /', '')),
+			pointsPossible: 0
+		};
+
+	if (!score.match(/[0-9]+ \/ [0-9]+/))
+		console.warn('Score does not match expected format:', score);
+
+	const [pointsEarned, pointsPossible] = score.split(' / ').map(parseFloat);
+
+	if (isNaN(pointsEarned)) console.error('Points earned is NaN for score:', score);
+	if (isNaN(pointsPossible)) console.error('Points possible is NaN for score:', score);
+
+	return { pointsEarned, pointsPossible };
 }
 
 export function calculatePercent(score: string) {
-	const points = extractPoints(score);
-	if (points == null) return 0;
+	let { pointsEarned, pointsPossible } = extractPoints(score);
 
-	let [num, denom] = points;
-	if (denom == 0) return 100;
+	if (pointsEarned === undefined) return 0;
 
-	if (isNaN(num)) num = 0;
-	if (isNaN(denom)) denom = 0;
-	return (num / denom) * 100;
+	if (pointsPossible == 0) return 100;
+
+	if (isNaN(pointsEarned)) pointsEarned = 0;
+	if (isNaN(pointsPossible)) pointsPossible = 0;
+	return (pointsEarned / pointsPossible) * 100;
 }
 
 const rtf = new Intl.RelativeTimeFormat('en-US', { numeric: 'auto' });

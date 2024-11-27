@@ -2,12 +2,12 @@
 	import { browser } from '$app/environment';
 	import { goto } from '$app/navigation';
 	import { navigating } from '$app/stores';
-	import AppSidebar from '$lib/components/AppSidebar.svelte';
 	import { studentAccount } from '$lib/stores';
 	import { StudentAccount } from '$lib/synergy';
 	import { Drawer, Navbar, NavBrand, NavHamburger } from 'flowbite-svelte';
 	import { onDestroy } from 'svelte';
 	import { sineIn } from 'svelte/easing';
+	import AppSidebar from './AppSidebar.svelte';
 
 	let { children } = $props();
 

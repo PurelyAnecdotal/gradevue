@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { getColorForGrade } from '$lib';
+	import { calculateGradePercentage } from '$lib/assignments';
 	import DateBadge from '$lib/components/DateBadge.svelte';
 	import {
 		Badge,
@@ -16,17 +17,17 @@
 
 	interface Props {
 		name: string;
-		pointsEarned: number;
+		pointsEarned?: number;
 		pointsPossible: number;
 		gradePercentageChange: number;
 		notForGrade?: boolean;
 		hidden?: boolean;
-		hypothetical?: boolean;
+		showHypotheticalLabel?: boolean;
 		category?: string | undefined;
 		categoryDropdownOptions?: string[];
 		date?: Date | undefined;
 		editable?: boolean;
-		recalculateGradePercentage: () => void;
+		recalculateGradePercentage?: () => void;
 	}
 
 	let {
@@ -36,12 +37,12 @@
 		gradePercentageChange,
 		notForGrade = $bindable(false),
 		hidden = false,
-		hypothetical = false,
+		showHypotheticalLabel = false,
 		category = $bindable(undefined),
 		categoryDropdownOptions = [],
 		date = undefined,
 		editable = false,
-		recalculateGradePercentage
+		recalculateGradePercentage = () => {}
 	}: Props = $props();
 
 	let categoryDropdownOpen = $state(false);
@@ -54,14 +55,16 @@
 		return 'primary';
 	};
 
-	let percentage = $derived((pointsEarned / pointsPossible) * 100);
+	let percentage = $derived(
+		pointsEarned ? calculateGradePercentage(pointsEarned, pointsPossible) : 0
+	);
 
 	let percentageChange = $derived(Math.round(gradePercentageChange * 100) / 100);
 </script>
 
 <Card class="dark:text-white max-w-none flex flex-row items-center sm:p-4">
 	<div class="mr-2">
-		{#if editable && hypothetical}
+		{#if editable}
 			<Input bind:value={name} class="w-48 inline" />
 
 			{#if categoryDropdownOptions.length > 0}
@@ -87,7 +90,7 @@
 		{:else}
 			<span>{name}</span>
 		{/if}
-		{#if category && !hypothetical}
+		{#if category && (!editable || categoryDropdownOptions.length === 0) && !showHypotheticalLabel}
 			<Badge color={getCategoryColor(category)}>
 				{category}
 			</Badge>
@@ -95,7 +98,7 @@
 		{#if percentage == Infinity}
 			<Badge border color="indigo">Extra Credit</Badge>
 		{/if}
-		{#if isNaN(pointsEarned)}
+		{#if pointsEarned === undefined}
 			<Badge border color="purple">Not Graded</Badge>
 		{/if}
 		{#if notForGrade}
@@ -114,7 +117,7 @@
 				Hidden Assignments <InfoCircleOutline size="xs" class="ml-1 focus:outline-none" />
 			</Badge>
 		{/if}
-		{#if hypothetical && name != 'Hypothetical Assignment'}
+		{#if showHypotheticalLabel}
 			<Badge border color="dark">Hypothetical Assignment</Badge>
 		{/if}
 		{#if date}
@@ -131,30 +134,42 @@
 			<span class="text-green-500">
 				+{percentageChange}%
 			</span>
-		{:else if !notForGrade && !isNaN(pointsEarned)}
+		{:else if !notForGrade && pointsEarned && !isNaN(pointsEarned)}
 			<span class="text-gray-500">+0%</span>
 		{/if}
 
 		{#if editable}
 			<div class="w-32 flex items-center">
-				<NumberInput type="number" size="sm" bind:value={pointsEarned} on:input={recalculateGradePercentage}/>
+				<NumberInput
+					type="number"
+					size="sm"
+					bind:value={pointsEarned}
+					on:input={recalculateGradePercentage}
+				/>
 				<span class="mx-1"> / </span>
-				<NumberInput type="number" size="sm" bind:value={pointsPossible} on:input={recalculateGradePercentage} />
+				<NumberInput
+					type="number"
+					size="sm"
+					bind:value={pointsPossible}
+					on:input={recalculateGradePercentage}
+				/>
 			</div>
-		{:else if isNaN(pointsEarned)}
+		{:else if pointsEarned === undefined}
 			{pointsPossible}
 		{:else}
 			{pointsEarned}/{pointsPossible}
-			{#if percentage != Infinity}
+			{#if percentage && percentage != Infinity}
 				{Math.round(percentage * 100) / 100}%
 			{/if}
 		{/if}
 	</div>
 
-	<Progressbar
-		color={getColorForGrade(percentage)}
-		progress={Math.min(isNaN(percentage) ? 0 : percentage, 100)}
-		animate={true}
-		class="hidden sm:block w-1/3 shrink-0"
-	/>
+	{#if pointsEarned || editable}
+		<Progressbar
+			color={getColorForGrade(percentage)}
+			progress={Math.min(isNaN(percentage) ? 0 : percentage, 100)}
+			animate={true}
+			class="hidden sm:block w-1/3 shrink-0"
+		/>
+	{/if}
 </Card>
