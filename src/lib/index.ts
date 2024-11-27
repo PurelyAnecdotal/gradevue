@@ -24,7 +24,6 @@ export function extractPoints(score: string): {
 			pointsPossible: parseFloat(score.replace(/ Points Possible$/, ''))
 		};
 
-	
 	// Ungraded assignments
 	if (score.startsWith('/'))
 		return {
@@ -39,8 +38,7 @@ export function extractPoints(score: string): {
 			pointsPossible: 0
 		};
 
-	if (!score.match(/[0-9]+ \/ [0-9]+/))
-		console.warn('Score does not match expected format:', score);
+	if (!/^\d+ \/ \d+$/.test(score)) console.warn('Score does not match expected format:', score);
 
 	const [pointsEarned, pointsPossible] = score.split(' / ').map(parseFloat);
 
