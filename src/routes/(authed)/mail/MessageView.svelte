@@ -8,26 +8,35 @@
 		PaperClipOutline
 	} from 'flowbite-svelte-icons';
 
-	export let touchscreen = false;
-	export let message: InboxItemListingsMessageXML;
-	export let content = '';
-	export let links: string[] = [];
+	interface Props {
+		touchscreen?: boolean;
+		message: InboxItemListingsMessageXML;
+		content?: string;
+		links?: string[];
+	}
 
-	$: from = message.From.RecipientXML;
-	$: recipients =
-		typeof message.To !== 'string'
+	let {
+		touchscreen = false,
+		message,
+		content = '',
+		links = []
+	}: Props = $props();
+
+	let from = $derived(message.From.RecipientXML);
+	let recipients =
+		$derived(typeof message.To !== 'string'
 			? message.To.RecipientXML instanceof Array
 				? message.To.RecipientXML
 				: [message.To.RecipientXML]
-			: undefined;
-	$: attachments =
-		typeof message.Attachments !== 'string'
+			: undefined);
+	let attachments =
+		$derived(typeof message.Attachments !== 'string'
 			? message.Attachments.AttachmentXML instanceof Array
 				? message.Attachments.AttachmentXML
 				: [message.Attachments.AttachmentXML]
-			: undefined;
+			: undefined);
 
-	let showRecipients = false;
+	let showRecipients = $state(false);
 </script>
 
 <ol>
@@ -45,7 +54,7 @@
 				<div class="flex gap-2">
 					To:
 					<button
-						on:click={() => {
+						onclick={() => {
 							showRecipients = !showRecipients;
 						}}
 						class="flex items-center"
@@ -129,7 +138,7 @@
 	sandbox=""
 	class="w-full h-96 bg-white"
 	title="Message Content"
-/>
+></iframe>
 
 {#if attachments || links.length > 0}
 	<ul class="flex flex-wrap gap-2">
