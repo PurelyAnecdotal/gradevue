@@ -95,7 +95,7 @@
 				{category}
 			</Badge>
 		{/if}
-		{#if percentage == Infinity}
+		{#if percentage === Infinity}
 			<Badge border color="indigo">Extra Credit</Badge>
 		{/if}
 		{#if pointsEarned === undefined}

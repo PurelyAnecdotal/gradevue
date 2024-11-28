@@ -2,17 +2,19 @@
 	import { page } from '$app/stores';
 	import { extractPoints, removeClassID } from '$lib';
 	import {
+		type Assignment,
 		calculateAssignmentGradePercentageChanges,
 		calculateCourseGradePercentageFromTotals,
 		calculateGradePercentage,
 		type Category,
 		getHiddenAssignmentsFromCategories,
 		getPointsByCategory,
+		getSynergyCourseAssignmentCategories,
 		gradesMatch,
 		type NewHypotheticalAssignment,
 		type ReactiveAssignment,
 		type RealAssignment,
-		recalculateGrade
+		calculateGradeFlow
 	} from '$lib/assignments';
 	import { gradebook } from '$lib/stores';
 	import {
@@ -38,30 +40,18 @@
 	} from 'flowbite-svelte-icons';
 	import { fade } from 'svelte/transition';
 	import AssignmentCard from './AssignmentCard.svelte';
+	import { untrack } from 'svelte';
 
 	const synergyCourse = $derived($gradebook?.Courses.Course?.[parseInt($page.params.index)]);
 
 	const courseName = $derived(synergyCourse ? removeClassID(synergyCourse._Title) : '');
 
-	const synergyGradeCalcSummary = $derived(synergyCourse?.Marks.Mark.GradeCalculationSummary);
-
 	const synergyGradePercentage = $derived(
 		parseFloat(synergyCourse?.Marks.Mark._CalculatedScoreRaw ?? '')
 	);
 
-	const synergyCategories = $derived(
-		typeof synergyGradeCalcSummary != 'string' ? synergyGradeCalcSummary?.AssignmentGradeCalc : null
-	);
-
 	const categories: Category[] | undefined = $derived(
-		synergyCategories?.map((category) => ({
-			name: category._Type,
-			weightPercentage: parseFloat(category._Weight),
-			pointsEarned: parseFloat(category._Points),
-			pointsPossible: parseFloat(category._PointsPossible),
-			weightedPercentage: parseFloat(category._WeightedPct),
-			gradeLetter: category._CalculatedMark
-		}))
+		synergyCourse ? getSynergyCourseAssignmentCategories(synergyCourse) : undefined
 	);
 
 	const gradeCategories = $derived(categories?.filter((category) => category.name !== 'TOTAL'));
@@ -102,22 +92,31 @@
 
 	let hypotheticalMode = $state(false);
 
-	let hypotheticalGrade = $state(0);
+	let hypotheticalGrade = $state(NaN);
 	let rawGradeCalcMatches = $derived(
 		gradesMatch(calculateCourseGradePercentageFromTotals(realAssignments), synergyGradePercentage)
 	);
 
 	let reactiveAssignments: ReactiveAssignment[] = $state([]);
 
+	// Initialize reactive assignments and re-initialize them when assignments change
 	$effect(() => {
-		reactiveAssignments = [...hiddenAssignments, ...realAssignments].map((assignment) => {
-			const reactiveAssignment: ReactiveAssignment = $state({
-				...assignment,
-				reactive: true,
-				newHypothetical: false
-			});
+		assignments;
 
-			return reactiveAssignment;
+		untrack(() => {
+			const flow = calculateGradeFlow(
+				assignments.map((assignment) => {
+					const reactiveAssignment: ReactiveAssignment = $state({
+						...assignment,
+						reactive: true,
+						newHypothetical: false
+					});
+					return reactiveAssignment;
+				}),
+				gradeCategories
+			);
+			reactiveAssignments = flow.assignments;
+			hypotheticalGrade = flow.grade;
 		});
 	});
 
@@ -127,7 +126,9 @@
 			if (assignment.pointsEarned === null) assignment.pointsEarned = undefined;
 			return assignment;
 		});
-		const recalculation = recalculateGrade(reactiveAssignments);
+		
+		const recalculation = calculateGradeFlow(reactiveAssignments);
+		
 		reactiveAssignments = recalculation.assignments;
 		hypotheticalGrade = recalculation.grade;
 	}
@@ -151,10 +152,6 @@
 	$inspect(reactiveAssignments);
 
 	let calcWarningOpen = $state(false);
-
-	function toggleCalcWarning() {
-		calcWarningOpen = !calcWarningOpen;
-	}
 </script>
 
 <svelte:head>
@@ -212,7 +209,12 @@
 			<ExclamationCircleSolid slot="icon" size="sm" class="focus:outline-none" />
 
 			<div class="flex flex-col gap-2">
-				<button class="flex items-center" onclick={toggleCalcWarning}>
+				<button
+					class="flex items-center"
+					onclick={() => {
+						calcWarningOpen = !calcWarningOpen;
+					}}
+				>
 					<span class="font-bold text-left">
 						{#if hypotheticalMode}
 							Grade calculations in Hypothetical Mode are inaccurate

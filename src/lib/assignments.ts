@@ -1,3 +1,5 @@
+import type { CourseEntity } from './types/Gradebook';
+
 export interface Category {
 	name: string;
 	weightPercentage: number;
@@ -95,16 +97,18 @@ export function calculateAssignmentGradePercentageChanges<T extends Assignment>(
 	assignments: T[],
 	gradeCategories?: Category[]
 ): T[] {
+	const validAssignments = assignments.filter(includeAssignmentInGradeCalc);
+
 	if (!gradeCategories) {
 		let totalPointsEarned = 0;
 		let totalPointsPossible = 0;
 
-		return assignments
+		return validAssignments
 			.toReversed()
 			.map((assignment) => {
-				const { notForGrade, pointsEarned, pointsPossible } = assignment;
+				const { pointsEarned, pointsPossible } = assignment;
 
-				if (notForGrade || !pointsEarned || isNaN(pointsEarned)) return assignment;
+				if (pointsEarned === undefined) return assignment;
 
 				const priorGrade = calculateGradePercentage(totalPointsEarned, totalPointsPossible);
 
@@ -122,12 +126,12 @@ export function calculateAssignmentGradePercentageChanges<T extends Assignment>(
 
 	let pointsByCategory: PointsByCategory = {};
 
-	return assignments
+	return validAssignments
 		.toReversed()
 		.map((assignment) => {
-			const { category, notForGrade, pointsEarned, pointsPossible } = assignment;
+			const { category, pointsEarned, pointsPossible } = assignment;
 
-			if (notForGrade || !pointsEarned || isNaN(pointsEarned)) return assignment;
+			if (pointsEarned === undefined) return assignment;
 
 			const priorGrade = calculateCourseGradePercentageFromCategories(
 				pointsByCategory,
@@ -200,10 +204,10 @@ export function getHiddenAssignmentsFromCategories(
 export function getPointsByCategory(assignments: Assignment[]) {
 	let pointsByCategory: PointsByCategory = {};
 
-	assignments.forEach((assignment) => {
-		const { category, notForGrade, pointsEarned, pointsPossible } = assignment;
+	assignments.filter(includeAssignmentInGradeCalc).forEach((assignment) => {
+		const { category, pointsEarned, pointsPossible } = assignment;
 
-		if (notForGrade || !pointsEarned || isNaN(pointsEarned)) return;
+		if (pointsEarned === undefined) return;
 
 		const categoryPoints = pointsByCategory[category] ?? { pointsEarned: 0, pointsPossible: 0 };
 		pointsByCategory[category] = {
@@ -226,10 +230,10 @@ export function getAssignmentPointTotals(assignments: Assignment[]) {
 	let pointsEarned = 0;
 	let pointsPossible = 0;
 
-	assignments.forEach((assignment) => {
-		const { notForGrade, pointsEarned: earned, pointsPossible: possible } = assignment;
+	assignments.filter(includeAssignmentInGradeCalc).forEach((assignment) => {
+		const { pointsEarned: earned, pointsPossible: possible } = assignment;
 
-		if (notForGrade || !earned || isNaN(earned)) return;
+		if (earned === undefined) return;
 
 		pointsEarned += earned;
 		pointsPossible += possible;
@@ -238,7 +242,10 @@ export function getAssignmentPointTotals(assignments: Assignment[]) {
 	return { pointsEarned, pointsPossible };
 }
 
-export function recalculateGrade<T extends Assignment>(assignments: T[], gradeCategories?: Category[]) {
+export function calculateGradeFlow<T extends Assignment>(
+	assignments: T[],
+	gradeCategories?: Category[]
+) {
 	return {
 		assignments: calculateAssignmentGradePercentageChanges(assignments, gradeCategories),
 		grade: gradeCategories
@@ -248,4 +255,26 @@ export function recalculateGrade<T extends Assignment>(assignments: T[], gradeCa
 				)
 			: calculateCourseGradePercentageFromTotals(assignments)
 	};
+}
+
+export function getSynergyCourseAssignmentCategories(course: CourseEntity) {
+	const gradeCalcSummary = course?.Marks.Mark.GradeCalculationSummary;
+
+	if (typeof gradeCalcSummary == 'string' || !gradeCalcSummary?.AssignmentGradeCalc)
+		return undefined;
+
+	const categories: Category[] = gradeCalcSummary.AssignmentGradeCalc.map((category) => ({
+		name: category._Type,
+		weightPercentage: parseFloat(category._Weight),
+		pointsEarned: parseFloat(category._Points),
+		pointsPossible: parseFloat(category._PointsPossible),
+		weightedPercentage: parseFloat(category._WeightedPct),
+		gradeLetter: category._CalculatedMark
+	}));
+
+	return categories;
+}
+
+function includeAssignmentInGradeCalc(assignment: Assignment) {
+	return !assignment.notForGrade && assignment.pointsEarned !== undefined;
 }
