@@ -6,9 +6,6 @@
 
 	let dropdownOpen = $state(false);
 
-	const showDropdown = () => {
-		dropdownOpen = true;
-	};
 
 	const changeReportPeriod = async (period: number) => {
 		dropdownOpen = false;
@@ -25,7 +22,7 @@
 
 {#if $gradebook}
 	<div class="m-4 flex flex-col justify-center">
-		<Button color="light" on:click={showDropdown} class="mx-auto flex items-center">
+		<Button color="light" class="mx-auto flex items-center">
 			{$gradebook.ReportingPeriod._GradePeriod}
 
 			{#if dropdownOpen}
@@ -37,7 +34,7 @@
 
 		<Dropdown bind:open={dropdownOpen}>
 			{#each $gradebook.ReportingPeriods.ReportPeriod ?? [] as period, index}
-				<DropdownItem on:click={() => changeReportPeriod(index)} class="flex items-center">
+				<DropdownItem onclick={() => changeReportPeriod(index)} class="flex items-center">
 					{#if period._GradePeriod == $gradebook.ReportingPeriod._GradePeriod}
 						<MapPinAltOutline size="sm" class="mr-2" />
 					{/if}

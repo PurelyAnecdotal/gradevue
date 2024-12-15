@@ -289,7 +289,7 @@
 
 		{#if hypotheticalMode}
 			<div transition:fade={{ duration: 200 }}>
-				<Button color="light" class="mx-4" on:click={addHypotheticalAssignment}>
+				<Button color="light" class="mx-4" onclick={addHypotheticalAssignment}>
 					<GridPlusOutline size="sm" class="mr-2 focus:outline-none" />
 					Add Hypothetical Assignment
 				</Button>

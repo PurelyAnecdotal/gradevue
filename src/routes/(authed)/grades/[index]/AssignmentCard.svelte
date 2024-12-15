@@ -77,7 +77,7 @@
 				<Dropdown bind:open={categoryDropdownOpen}>
 					{#each categoryDropdownOptions as categoryOption}
 						<DropdownItem
-							on:click={() => {
+							onclick={() => {
 								category = categoryOption;
 								categoryDropdownOpen = false;
 								recalculateGradePercentage();
@@ -105,7 +105,7 @@
 		{#if notForGrade}
 			<Badge border color="pink">
 				{#if editable}
-					<Checkbox bind:checked={notForGrade} on:change={recalculateGradePercentage}>
+					<Checkbox bind:checked={notForGrade} onchange={recalculateGradePercentage}>
 						<span class="text-xs">Not For Grade</span>
 					</Checkbox>
 				{:else}
@@ -151,14 +151,14 @@
 					type="number"
 					size="sm"
 					bind:value={pointsEarned}
-					on:input={recalculateGradePercentage}
+					oninput={recalculateGradePercentage}
 				/>
 				<span class="mx-1"> / </span>
 				<NumberInput
 					type="number"
 					size="sm"
 					bind:value={pointsPossible}
-					on:input={recalculateGradePercentage}
+					oninput={recalculateGradePercentage}
 				/>
 			</div>
 		{:else if pointsEarned === undefined}
