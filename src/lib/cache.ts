@@ -15,7 +15,7 @@ import {
 	studentAccount,
 	studentInfo,
 	studentInfoLoaded
-} from './stores';
+} from '$lib/stores';
 
 const writeCacheToStore = (key: string, store: Writable<unknown>) => {
 	const cache = localStorage.getItem(key);

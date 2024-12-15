@@ -21,11 +21,11 @@
 		}
 	}
 
-	$: documents = $documentsList?.StudentDocumentDatas?.StudentDocumentData ?? [];
+	let documents = $derived($documentsList?.StudentDocumentDatas?.StudentDocumentData ?? []);
 
 	const sortPriority = ['Transcript', 'Report Card'];
 
-	$: documentCategories = new Set(
+	let documentCategories = $derived(new Set(
 		documents
 			.map((document) => document._DocumentType)
 			.toSorted((a, b) => {
@@ -36,7 +36,7 @@
 				if (bPriority == -1) return -1;
 				return aPriority - bPriority;
 			})
-	);
+	));
 </script>
 
 <svelte:head>

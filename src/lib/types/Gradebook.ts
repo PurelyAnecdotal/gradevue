@@ -1,4 +1,4 @@
-﻿export interface Gradebook {
+export interface Gradebook {
 	ReportingPeriods: ReportingPeriods;
 	ReportingPeriod: ReportingPeriod;
 	Courses: Courses;

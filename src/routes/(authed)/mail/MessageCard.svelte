@@ -4,7 +4,11 @@
 	import { Badge, Card } from 'flowbite-svelte';
 	import { UserOutline } from 'flowbite-svelte-icons';
 
-	export let message: InboxItemListingsMessageXML;
+	interface Props {
+		message: InboxItemListingsMessageXML;
+	}
+
+	let { message }: Props = $props();
 
 	const domParser = new DOMParser();
 
@@ -14,12 +18,12 @@
 		(link) => new URL(link.href).hostname
 	).length;
 
-	$: attachments =
-		typeof message.Attachments !== 'string'
+	let attachments =
+		$derived(typeof message.Attachments !== 'string'
 			? message.Attachments.AttachmentXML instanceof Array
 				? message.Attachments.AttachmentXML
 				: [message.Attachments.AttachmentXML]
-			: undefined;
+			: undefined);
 </script>
 
 <Card class="dark:text-white max-w-none flex flex-row justify-between gap-2" padding="sm" href="#">

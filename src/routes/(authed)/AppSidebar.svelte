@@ -94,12 +94,6 @@
 				</svelte:fragment>
 			</SidebarItem>
 
-			<SidebarItem label="Report Cards" href="/reportcards">
-				<svelte:fragment slot="icon">
-					<FileLinesOutline class="focus:outline-none" />
-				</svelte:fragment>
-			</SidebarItem>
-
 			<SidebarItem label="Documents" href="/documents">
 				<svelte:fragment slot="icon">
 					<FolderOpenOutline class="focus:outline-none" />
@@ -126,7 +120,7 @@
 				</svelte:fragment>
 			</SidebarItem>
 
-			<SidebarItem on:click={logOut} label="Log Out" href="/login">
+			<SidebarItem onclick={logOut} label="Log Out" href="/login">
 				<svelte:fragment slot="icon">
 					<ArrowRightToBracketOutline class="focus:outline-none" />
 				</svelte:fragment>

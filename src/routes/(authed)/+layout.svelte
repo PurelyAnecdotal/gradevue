@@ -2,14 +2,16 @@
 	import { browser } from '$app/environment';
 	import { goto } from '$app/navigation';
 	import { navigating } from '$app/stores';
-	import AppSidebar from '$lib/components/AppSidebar.svelte';
 	import { studentAccount } from '$lib/stores';
 	import { StudentAccount } from '$lib/synergy';
 	import { Drawer, Navbar, NavBrand, NavHamburger } from 'flowbite-svelte';
 	import { onDestroy } from 'svelte';
 	import { sineIn } from 'svelte/easing';
+	import AppSidebar from './AppSidebar.svelte';
 
-	let drawerHidden = true;
+	let { children } = $props();
+
+	let drawerHidden = $state(true);
 
 	let transitionParams = {
 		x: -320,
@@ -50,5 +52,5 @@
 </div>
 
 <main class="pt-16 md:pt-0 md:pl-64 h-screen">
-	<slot />
+	{@render children?.()}
 </main>

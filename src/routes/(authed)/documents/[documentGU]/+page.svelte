@@ -18,6 +18,6 @@
 			class="w-full h-full"
 			src="data:application/pdf;base64,{reportCard.Base64Code}"
 			title="Report Card PDF"
-		/>
+		></iframe>
 	{/await}
 {/if}

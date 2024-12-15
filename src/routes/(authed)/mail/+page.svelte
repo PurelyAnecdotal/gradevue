@@ -14,12 +14,12 @@
 	let domParser: DOMParser;
 	if (browser) domParser = new DOMParser();
 
-	let messageOpen = false;
-	let openedMessage: InboxItemListingsMessageXML | undefined = undefined;
-	let openedMessageContent = '';
-	let openedMessageLinks: string[] = [];
+	let messageOpen = $state(false);
+	let openedMessage: InboxItemListingsMessageXML | undefined = $state(undefined);
+	let openedMessageContent = $state('');
+	let openedMessageLinks: string[] = $state([]);
 
-	let touchscreen = false;
+	let touchscreen = $state(false);
 
 	function openMessage(message: InboxItemListingsMessageXML) {
 		openedMessage = message;
@@ -54,11 +54,11 @@
 	<ol class="p-4 space-y-4">
 		{#each $mail.InboxItemListings.MessageXML as message}
 			<li
-				on:touchend={() => {
+				ontouchend={() => {
 					touchscreen = true;
 				}}
 			>
-				<button class="w-full" on:click={() => openMessage(message)}>
+				<button class="w-full" onclick={() => openMessage(message)}>
 					<MessageCard {message} />
 				</button>
 			</li>

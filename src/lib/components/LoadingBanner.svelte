@@ -2,8 +2,12 @@
 	import { Spinner } from 'flowbite-svelte';
 	import { fade, fly } from 'svelte/transition';
 
-	export let show = true;
-	export let loadingMsg = 'Loading...';
+	interface Props {
+		show?: boolean;
+		loadingMsg?: string;
+	}
+
+	let { show = true, loadingMsg = 'Loading...' }: Props = $props();
 </script>
 
 {#if show}

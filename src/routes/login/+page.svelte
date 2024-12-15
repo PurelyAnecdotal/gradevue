@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { preventDefault } from 'svelte/legacy';
+
 	import { browser } from '$app/environment';
 	import { goto } from '$app/navigation';
 	import LoadingBanner from '$lib/components/LoadingBanner.svelte';
@@ -30,16 +32,17 @@
 		goto('/grades');
 	}
 
-	let username: string;
-	let password: string;
-	let domain: string = 'ca-pleas-psv.edupoint.com';
+	let username: string = $state('');
+	let password: string = $state('');
+	let domain: string = $state('ca-pleas-psv.edupoint.com');
 
-	let loginErrorShown = false;
-	let loginError: string;
+	let loginError: string | undefined = $state();
 
-	let loggingIn = false;
+	let loggingIn = $state(false);
 
-	async function login() {
+	async function login(event: SubmitEvent) {
+		event.preventDefault();
+
 		if (loggingIn) return;
 		loggingIn = true;
 
@@ -50,7 +53,6 @@
 		} catch (e) {
 			loggingIn = false;
 
-			loginErrorShown = true;
 			loginError = e instanceof Error ? e.message : 'An unknown error occurred';
 			return;
 		}
@@ -71,7 +73,7 @@
 
 <LoadingBanner show={loggingIn} loadingMsg="Logging you in..." />
 
-{#if loginErrorShown}
+{#if loginError}
 	<div in:fly={{ y: -50, duration: 200 }} class="fixed w-full p-4 top-0 left-0 flex justify-center">
 		<Alert color="red">
 			<ExclamationCircleSolid slot="icon" />
@@ -83,7 +85,7 @@
 
 <div class="flex items-center justify-center min-h-screen">
 	<Card>
-		<form on:submit|preventDefault={login}>
+		<form onsubmit={login}>
 			<h1 class="text-xl mb-4 dark:text-white">Sign in to GradeVue</h1>
 			<Label class="space-y-2 mb-4">
 				<span>Username</span>
@@ -111,7 +113,7 @@
 				</Helper>
 			</Label>
 			<Accordion flush class="mb-4">
-				<AccordionItem paddingFlush="mb-2" borderBottomClass="" class="text-white">
+				<AccordionItem paddingFlush="mb-2" borderBottomClass="">
 					<span slot="header" class="text-sm dark:text-gray-300">Advanced</span>
 					<Label class="space-y-2">
 						<span>Domain</span>
