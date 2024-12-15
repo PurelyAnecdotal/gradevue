@@ -2,19 +2,23 @@
 	import { page } from '$app/stores';
 	import { extractPoints, removeClassID } from '$lib';
 	import {
-		type Assignment,
-		calculateAssignmentGradePercentageChanges,
+		calculateAssignmentGPCs,
+		calculateAssignmentGPCsFromCategories,
+		calculateAssignmentGPCsFromTotals,
+		calculateCourseGradePercentageFromCategories,
 		calculateCourseGradePercentageFromTotals,
 		calculateGradePercentage,
 		type Category,
+		type Flowed,
+		getCalculableAssignments,
 		getHiddenAssignmentsFromCategories,
 		getPointsByCategory,
 		getSynergyCourseAssignmentCategories,
 		gradesMatch,
+		type HiddenAssignment,
 		type NewHypotheticalAssignment,
 		type ReactiveAssignment,
-		type RealAssignment,
-		calculateGradeFlow
+		type RealAssignment
 	} from '$lib/assignments';
 	import { gradebook } from '$lib/stores';
 	import {
@@ -38,9 +42,9 @@
 		GridPlusOutline,
 		InfoCircleOutline
 	} from 'flowbite-svelte-icons';
+	import { untrack } from 'svelte';
 	import { fade } from 'svelte/transition';
 	import AssignmentCard from './AssignmentCard.svelte';
-	import { untrack } from 'svelte';
 
 	const synergyCourse = $derived($gradebook?.Courses.Course?.[parseInt($page.params.index)]);
 
@@ -61,19 +65,20 @@
 	const synergyAssignments = $derived(synergyCourse?.Marks.Mark.Assignments.Assignment ?? []);
 
 	const realAssignments = $derived(
-		calculateAssignmentGradePercentageChanges(
+		calculateAssignmentGPCs(
 			synergyAssignments.map((synergyAssignment) => {
 				const { pointsEarned, pointsPossible } = extractPoints(synergyAssignment._Points);
 
 				const assignment: RealAssignment = {
 					name: synergyAssignment._Measure,
-					pointsEarned,
+					pointsEarned: pointsEarned,
 					pointsPossible,
 					gradePercentageChange: 0,
 					notForGrade: synergyAssignment._Notes === '(Not For Grading)',
 					hidden: false,
 					category: synergyAssignment._Type,
-					date: new Date(synergyAssignment._Date)
+					date: new Date(synergyAssignment._Date),
+					newHypothetical: false
 				};
 
 				return assignment;
@@ -84,18 +89,23 @@
 
 	const hiddenAssignments = $derived(
 		categories
-			? getHiddenAssignmentsFromCategories(categories, getPointsByCategory(realAssignments))
+			? getHiddenAssignmentsFromCategories(
+					categories,
+					getPointsByCategory(getCalculableAssignments(realAssignments))
+				)
 			: []
 	);
 
-	const assignments = $derived([...hiddenAssignments, ...realAssignments]);
+	const assignments: (RealAssignment | Flowed<RealAssignment | HiddenAssignment>)[] = $derived([
+		...hiddenAssignments,
+		...realAssignments
+	]);
 
 	let hypotheticalMode = $state(false);
 
+	let calculatedGrade = $state(NaN);
 	let hypotheticalGrade = $state(NaN);
-	let rawGradeCalcMatches = $derived(
-		gradesMatch(calculateCourseGradePercentageFromTotals(realAssignments), synergyGradePercentage)
-	);
+	let rawGradeCalcMatches = $derived(gradesMatch(calculatedGrade, synergyGradePercentage));
 
 	let reactiveAssignments: ReactiveAssignment[] = $state([]);
 
@@ -104,52 +114,66 @@
 		assignments;
 
 		untrack(() => {
-			const flow = calculateGradeFlow(
-				assignments.map((assignment) => {
-					const reactiveAssignment: ReactiveAssignment = $state({
-						...assignment,
-						reactive: true,
-						newHypothetical: false
-					});
-					return reactiveAssignment;
-				}),
-				gradeCategories
-			);
-			reactiveAssignments = flow.assignments;
-			hypotheticalGrade = flow.grade;
+			reactiveAssignments = assignments.map((assignment) => {
+				const reactiveAssignment: ReactiveAssignment = $state({
+					...assignment,
+					pointsEarned: assignment.pointsEarned,
+					gradePercentageChange: assignment.gradePercentageChange,
+					newHypothetical: false,
+					reactive: true
+				});
+
+				return reactiveAssignment;
+			});
+
+			const calculable = getCalculableAssignments(assignments);
+
+			calculatedGrade = gradeCategories
+				? calculateCourseGradePercentageFromCategories(
+						getPointsByCategory(calculable),
+						gradeCategories
+					)
+				: calculateCourseGradePercentageFromTotals(calculable);
+
+			hypotheticalGrade = calculatedGrade;
 		});
 	});
 
 	function recalculateGradePercentage() {
-		// Fix Svelte treating empty numeric inputs as "null"
-		reactiveAssignments = reactiveAssignments.map((assignment) => {
-			if (assignment.pointsEarned === null) assignment.pointsEarned = undefined;
-			return assignment;
-		});
-		
-		const recalculation = calculateGradeFlow(reactiveAssignments);
-		
-		reactiveAssignments = recalculation.assignments;
-		hypotheticalGrade = recalculation.grade;
+		if (gradeCategories === undefined) {
+			reactiveAssignments = calculateAssignmentGPCsFromTotals(reactiveAssignments);
+		} else {
+			reactiveAssignments = calculateAssignmentGPCsFromCategories(
+				reactiveAssignments,
+				gradeCategories
+			);
+		}
+		const calculable = getCalculableAssignments(reactiveAssignments);
+
+		hypotheticalGrade = gradeCategories
+			? calculateCourseGradePercentageFromCategories(
+					getPointsByCategory(calculable),
+					gradeCategories
+				)
+			: calculateCourseGradePercentageFromTotals(calculable);
 	}
 
 	function addHypotheticalAssignment() {
 		const newHypotheticalAssignment: NewHypotheticalAssignment = $state({
 			name: 'Hypothetical Assignment',
-			pointsEarned: 0,
-			pointsPossible: 0,
-			gradePercentageChange: 0,
+			pointsEarned: undefined,
+			pointsPossible: undefined,
+			gradePercentageChange: undefined,
 			notForGrade: false,
 			hidden: false,
 			category: 'Select category',
 			newHypothetical: true,
+			date: undefined,
 			reactive: true
 		});
 
 		reactiveAssignments = [newHypotheticalAssignment, ...reactiveAssignments];
 	}
-
-	$inspect(reactiveAssignments);
 
 	let calcWarningOpen = $state(false);
 </script>
@@ -174,12 +198,17 @@
 					{#each gradeCategories.toSorted() as category}
 						<TableBodyRow>
 							<TableBodyCell>{category.name}</TableBodyCell>
-							<TableBodyCell
-								>{category.gradeLetter} ({calculateGradePercentage(
-									category.pointsEarned,
-									category.pointsPossible
-								)})</TableBodyCell
-							>
+							<TableBodyCell>
+								{#if category.pointsEarned !== 0 || category.pointsPossible !== 0}
+									{category.gradeLetter}
+									{#if rawGradeCalcMatches}
+										({Math.round(
+											calculateGradePercentage(category.pointsEarned, category.pointsPossible) *
+												1000
+										) / 1000}%)
+									{/if}
+								{/if}
+							</TableBodyCell>
 							<TableBodyCell>{category.weightPercentage}%</TableBodyCell>
 							<TableBodyCell>
 								{category.pointsEarned} / {category.pointsPossible}
@@ -188,12 +217,17 @@
 					{/each}
 					<TableBodyRow>
 						<TableBodyCell>Total</TableBodyCell>
-						<TableBodyCell
-							>{totalCategory.gradeLetter} ({calculateGradePercentage(
-								totalCategory.pointsEarned,
-								totalCategory.pointsPossible
-							)})</TableBodyCell
-						>
+						<TableBodyCell>
+							{totalCategory.gradeLetter}
+							{#if rawGradeCalcMatches}
+								({Math.round(
+									calculateGradePercentage(
+										totalCategory.pointsEarned,
+										totalCategory.pointsPossible
+									) * 1000
+								) / 1000}%)
+							{/if}
+						</TableBodyCell>
 						<TableBodyCell />
 						<TableBodyCell>
 							{totalCategory.pointsEarned} / {totalCategory.pointsPossible}
@@ -264,11 +298,6 @@
 	</div>
 
 	{#if synergyAssignments.length > 0 || hypotheticalMode}
-		<Popover triggeredBy=".hidden-badge" class="max-w-md">
-			Teachers can choose to have assignments hidden from the assignment list but still calculated
-			toward your grade. GradeVue can reveal these assignments.
-		</Popover>
-
 		<div transition:fade={{ duration: 200 }}>
 			<Tabs class="m-4 mb-0" contentClass="p-4">
 				<TabItem open title="All">
@@ -280,7 +309,7 @@
 										bind:name={reactiveAssignments[i].name}
 										bind:pointsEarned={reactiveAssignments[i].pointsEarned}
 										bind:pointsPossible={reactiveAssignments[i].pointsPossible}
-										{gradePercentageChange}
+										gradePercentageChange={rawGradeCalcMatches ? gradePercentageChange : undefined}
 										bind:notForGrade={reactiveAssignments[i].notForGrade}
 										{hidden}
 										showHypotheticalLabel={newHypothetical}
@@ -299,7 +328,7 @@
 										{name}
 										{pointsEarned}
 										{pointsPossible}
-										{gradePercentageChange}
+										gradePercentageChange={rawGradeCalcMatches ? gradePercentageChange : undefined}
 										{notForGrade}
 										{hidden}
 										{category}
@@ -324,7 +353,9 @@
 												bind:name={reactiveAssignments[i].name}
 												bind:pointsEarned={reactiveAssignments[i].pointsEarned}
 												bind:pointsPossible={reactiveAssignments[i].pointsPossible}
-												{gradePercentageChange}
+												gradePercentageChange={rawGradeCalcMatches
+													? gradePercentageChange
+													: undefined}
 												bind:notForGrade={reactiveAssignments[i].notForGrade}
 												{hidden}
 												showHypotheticalLabel={newHypothetical}
@@ -345,7 +376,9 @@
 												{name}
 												{pointsEarned}
 												{pointsPossible}
-												{gradePercentageChange}
+												gradePercentageChange={rawGradeCalcMatches
+													? gradePercentageChange
+													: undefined}
 												{notForGrade}
 												{hidden}
 												{date}

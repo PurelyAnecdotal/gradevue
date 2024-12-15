@@ -11,6 +11,7 @@
 		DropdownItem,
 		Input,
 		NumberInput,
+		Popover,
 		Progressbar
 	} from 'flowbite-svelte';
 	import { ChevronDownOutline, InfoCircleOutline } from 'flowbite-svelte-icons';
@@ -18,8 +19,8 @@
 	interface Props {
 		name: string;
 		pointsEarned?: number;
-		pointsPossible: number;
-		gradePercentageChange: number;
+		pointsPossible?: number;
+		gradePercentageChange?: number;
 		notForGrade?: boolean;
 		hidden?: boolean;
 		showHypotheticalLabel?: boolean;
@@ -56,10 +57,10 @@
 	};
 
 	let percentage = $derived(
-		pointsEarned ? calculateGradePercentage(pointsEarned, pointsPossible) : 0
+		pointsEarned && pointsPossible ? calculateGradePercentage(pointsEarned, pointsPossible) : 0
 	);
 
-	let percentageChange = $derived(Math.round(gradePercentageChange * 100) / 100);
+	let percentageChange = $derived(Math.round((gradePercentageChange ?? 0) * 100) / 100);
 </script>
 
 <Card class="dark:text-white max-w-none flex flex-row items-center sm:p-4">
@@ -113,6 +114,10 @@
 			</Badge>
 		{/if}
 		{#if hidden}
+			<Popover triggeredBy=".hidden-badge" class="max-w-md">
+				Teachers can choose to have assignments hidden from the assignment list but still calculated
+				toward your grade. GradeVue can reveal these assignments.
+			</Popover>
 			<Badge border color="dark" class="hidden-badge">
 				Hidden Assignments <InfoCircleOutline size="xs" class="ml-1 focus:outline-none" />
 			</Badge>
@@ -126,16 +131,18 @@
 	</div>
 
 	<div class="ml-auto mr-2 shrink-0 flex items-center gap-2">
-		{#if percentageChange < 0}
-			<span class="text-red-500">
-				{percentageChange}%
-			</span>
-		{:else if percentageChange > 0}
-			<span class="text-green-500">
-				+{percentageChange}%
-			</span>
-		{:else if !notForGrade && pointsEarned && !isNaN(pointsEarned)}
-			<span class="text-gray-500">+0%</span>
+		{#if gradePercentageChange !== undefined}
+			{#if percentageChange < 0}
+				<span class="text-red-500">
+					{percentageChange}%
+				</span>
+			{:else if percentageChange > 0}
+				<span class="text-green-500">
+					+{percentageChange}%
+				</span>
+			{:else if !notForGrade && pointsEarned && !isNaN(pointsEarned)}
+				<span class="text-gray-500">+0%</span>
+			{/if}
 		{/if}
 
 		{#if editable}
@@ -164,7 +171,7 @@
 		{/if}
 	</div>
 
-	{#if pointsEarned || editable}
+	{#if pointsEarned !== undefined || editable}
 		<Progressbar
 			color={getColorForGrade(percentage)}
 			progress={Math.min(isNaN(percentage) ? 0 : percentage, 100)}

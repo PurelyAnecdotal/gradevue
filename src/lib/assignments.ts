@@ -1,3 +1,4 @@
+import { roundToLeastPrecision } from '$lib';
 import type { CourseEntity } from './types/Gradebook';
 
 export interface Category {
@@ -9,40 +10,56 @@ export interface Category {
 	gradeLetter: string;
 }
 
-interface BaseAssignment {
+interface Assignment {
 	name: string;
-	pointsEarned?: number;
-	pointsPossible: number;
-	gradePercentageChange: number;
+	pointsEarned: number | undefined;
+	pointsPossible: number | undefined;
+	gradePercentageChange: number | undefined;
 	notForGrade: boolean;
 	hidden: boolean;
-	category: string;
-	date?: Date;
-}
-
-export interface RealAssignment extends BaseAssignment {
-	hidden: false;
-	date: Date;
-}
-
-export interface HiddenAssignment extends BaseAssignment {
-	pointsEarned: number;
-	notForGrade: false;
-	hidden: true;
-}
-
-export interface ReactiveAssignment extends BaseAssignment {
-	reactive: true;
+	category: string | undefined;
+	date: Date | undefined;
 	newHypothetical: boolean;
 }
 
-export interface NewHypotheticalAssignment extends ReactiveAssignment {
+export interface RealAssignment extends Assignment {
+	pointsPossible: number;
 	hidden: false;
-	notForGrade: false;
-	newHypothetical: true;
+	category: string;
+	date: Date;
+	newHypothetical: false;
 }
 
-export type Assignment = RealAssignment | HiddenAssignment | ReactiveAssignment;
+export interface HiddenAssignment extends Assignment {
+	pointsEarned: number;
+	pointsPossible: number;
+	notForGrade: false;
+	hidden: true;
+	category: string;
+	date: undefined;
+	newHypothetical: false;
+}
+
+export interface ReactiveAssignment extends Assignment {
+	reactive: true;
+}
+
+export interface NewHypotheticalAssignment extends ReactiveAssignment {
+	newHypothetical: true;
+	hidden: false;
+	date: undefined;
+}
+
+type Calculable<T extends Assignment> = T & {
+	pointsEarned: number;
+	pointsPossible: number;
+	notForGrade: false;
+	category: string;
+};
+
+export type Flowed<T extends Assignment> = Calculable<T> & {
+	gradePercentageChange: number;
+};
 
 interface PointsByCategory {
 	[categoryName: string]: {
@@ -59,7 +76,7 @@ export function calculateGradePercentage(pointsEarned: number, pointsPossible: n
 	return gradePercentage;
 }
 
-function calculateCourseGradePercentageFromCategories(
+export function calculateCourseGradePercentageFromCategories(
 	pointsByCategory: PointsByCategory,
 	gradeCategories: Category[]
 ) {
@@ -87,73 +104,147 @@ function calculateCourseGradePercentageFromCategories(
 	return gradePercentage;
 }
 
-export function calculateCourseGradePercentageFromTotals(assignments: Assignment[]) {
+export function calculateCourseGradePercentageFromTotals<T extends Assignment>(
+	assignments: Calculable<T>[]
+) {
 	const { pointsEarned, pointsPossible } = getAssignmentPointTotals(assignments);
 
 	return calculateGradePercentage(pointsEarned, pointsPossible);
 }
 
-export function calculateAssignmentGradePercentageChanges<T extends Assignment>(
+function flowAssignmentFromTotals<T extends Assignment>(
+	assignment: Calculable<T>,
+	totalPointsEarned: number,
+	totalPointsPossible: number
+): { assignment: Flowed<T>; totalPointsEarned: number; totalPointsPossible: number } {
+	const { pointsEarned, pointsPossible } = assignment;
+
+	const priorGrade = calculateGradePercentage(totalPointsEarned, totalPointsPossible);
+
+	totalPointsEarned += pointsEarned;
+	totalPointsPossible += pointsPossible;
+
+	const afterGrade = calculateGradePercentage(totalPointsEarned, totalPointsPossible);
+
+	const gradePercentageChange = afterGrade - priorGrade;
+
+	const calculable = { ...assignment, gradePercentageChange };
+
+	return { assignment: calculable, totalPointsEarned, totalPointsPossible };
+}
+
+function flowAssignmentFromCategories<T extends Assignment>(
+	assignment: Calculable<T>,
+	pointsByCategory: PointsByCategory,
+	gradeCategories: Category[]
+): { assignment: Flowed<T>; pointsByCategory: PointsByCategory } {
+	const { pointsEarned, pointsPossible, category } = assignment;
+
+	const priorGrade = calculateCourseGradePercentageFromCategories(
+		pointsByCategory,
+		gradeCategories
+	);
+
+	const categoryPoints = pointsByCategory[category] ?? { pointsEarned: 0, pointsPossible: 0 };
+	pointsByCategory[category] = {
+		pointsEarned: categoryPoints.pointsEarned + pointsEarned,
+		pointsPossible: categoryPoints.pointsPossible + pointsPossible
+	};
+
+	const afterGrade = calculateCourseGradePercentageFromCategories(
+		pointsByCategory,
+		gradeCategories
+	);
+
+	const gradePercentageChange = afterGrade - priorGrade;
+
+	const calculable = { ...assignment, gradePercentageChange };
+
+	return { assignment: calculable, pointsByCategory };
+}
+
+export function calculateAssignmentGPCsFromCategories<T extends Assignment>(
 	assignments: T[],
-	gradeCategories?: Category[]
-): T[] {
-	const validAssignments = assignments.filter(includeAssignmentInGradeCalc);
-
-	if (!gradeCategories) {
-		let totalPointsEarned = 0;
-		let totalPointsPossible = 0;
-
-		return validAssignments
-			.toReversed()
-			.map((assignment) => {
-				const { pointsEarned, pointsPossible } = assignment;
-
-				if (pointsEarned === undefined) return assignment;
-
-				const priorGrade = calculateGradePercentage(totalPointsEarned, totalPointsPossible);
-
-				totalPointsEarned += pointsEarned;
-				totalPointsPossible += pointsPossible;
-
-				const afterGrade = calculateGradePercentage(totalPointsEarned, totalPointsPossible);
-
-				const gradePercentageChange = afterGrade - priorGrade;
-
-				return { ...assignment, gradePercentageChange };
-			})
-			.toReversed();
-	}
-
+	gradeCategories: Category[]
+) {
 	let pointsByCategory: PointsByCategory = {};
 
-	return validAssignments
+	const flowedAssignments: (T | Flowed<T>)[] = assignments
 		.toReversed()
 		.map((assignment) => {
-			const { category, pointsEarned, pointsPossible } = assignment;
+			const { pointsEarned, pointsPossible, notForGrade, category } = assignment;
 
-			if (pointsEarned === undefined) return assignment;
+			if (
+				pointsEarned === undefined ||
+				pointsPossible === undefined ||
+				notForGrade ||
+				category === undefined
+			)
+				return assignment;
 
-			const priorGrade = calculateCourseGradePercentageFromCategories(
-				pointsByCategory,
-				gradeCategories
-			);
-
-			const categoryPoints = pointsByCategory[category] ?? { pointsEarned: 0, pointsPossible: 0 };
-			pointsByCategory[category] = {
-				pointsEarned: categoryPoints.pointsEarned + pointsEarned,
-				pointsPossible: categoryPoints.pointsPossible + pointsPossible
+			const calculable: Calculable<T> = {
+				...assignment,
+				pointsEarned,
+				pointsPossible,
+				notForGrade,
+				category
 			};
 
-			const afterGrade = calculateCourseGradePercentageFromCategories(
-				pointsByCategory,
-				gradeCategories
-			);
+			const flowed = flowAssignmentFromCategories(calculable, pointsByCategory, gradeCategories);
 
-			const gradePercentageChange = afterGrade - priorGrade;
+			pointsByCategory = flowed.pointsByCategory;
 
-			return { ...assignment, gradePercentageChange };
+			return flowed.assignment;
 		})
 		.toReversed();
+
+	return flowedAssignments;
+}
+
+export function calculateAssignmentGPCsFromTotals<T extends Assignment>(assignments: T[]) {
+	let totalPointsEarned = 0;
+	let totalPointsPossible = 0;
+
+	const flowedAssignments: (T | Flowed<T>)[] = assignments
+		.toReversed()
+		.map((assignment) => {
+			const { pointsEarned, pointsPossible, notForGrade, category } = assignment;
+
+			if (
+				pointsEarned === undefined ||
+				pointsPossible === undefined ||
+				notForGrade ||
+				category === undefined
+			)
+				return assignment;
+
+			const calculable: Calculable<T> = {
+				...assignment,
+				pointsEarned,
+				pointsPossible,
+				notForGrade,
+				category
+			};
+
+			const flowed = flowAssignmentFromTotals(calculable, totalPointsEarned, totalPointsPossible);
+			totalPointsEarned = flowed.totalPointsEarned;
+			totalPointsPossible = flowed.totalPointsPossible;
+			return flowed.assignment;
+		})
+		.toReversed();
+
+	return flowedAssignments;
+}
+
+export function calculateAssignmentGPCs<T extends Assignment>(
+	assignments: T[],
+	gradeCategories?: Category[]
+) {
+	if (gradeCategories === undefined) {
+		return calculateAssignmentGPCsFromTotals(assignments);
+	}
+
+	return calculateAssignmentGPCsFromCategories(assignments, gradeCategories);
 }
 
 export function getHiddenAssignmentsFromCategories(
@@ -187,27 +278,27 @@ export function getHiddenAssignmentsFromCategories(
 			// Calculate grade percentage change and initalize hypothetical gradebook
 			const gradePercentageChange = afterGrade - priorGrade;
 
-			const hiddenAssignment: HiddenAssignment = {
+			const hiddenAssignment: Flowed<HiddenAssignment> = {
 				name: `Hidden ${category.name} Assignments`,
 				pointsEarned: hiddenPointsEarned,
 				pointsPossible: hiddenPointsPossible,
 				gradePercentageChange,
 				notForGrade: false,
 				hidden: true,
-				category: category.name
+				category: category.name,
+				date: undefined,
+				newHypothetical: false
 			};
 
 			return hiddenAssignment;
 		});
 }
 
-export function getPointsByCategory(assignments: Assignment[]) {
+export function getPointsByCategory<T extends Assignment>(assignments: Calculable<T>[]) {
 	let pointsByCategory: PointsByCategory = {};
 
-	assignments.filter(includeAssignmentInGradeCalc).forEach((assignment) => {
+	assignments.forEach((assignment) => {
 		const { category, pointsEarned, pointsPossible } = assignment;
-
-		if (pointsEarned === undefined) return;
 
 		const categoryPoints = pointsByCategory[category] ?? { pointsEarned: 0, pointsPossible: 0 };
 		pointsByCategory[category] = {
@@ -220,41 +311,23 @@ export function getPointsByCategory(assignments: Assignment[]) {
 }
 
 export function gradesMatch(rawGrade: number, expectedGrade: number) {
-	// const decimalPlaces = expectedGrade % 1 !== 0 ? expectedGrade.toString().split('.')[1].length : 0;
+	const [a, b] = roundToLeastPrecision(rawGrade, expectedGrade);
 
-	// return Math.floor(rawGrade * 10 ** decimalPlaces) / 10 ** decimalPlaces === expectedGrade;
-	return true;
+	return a === b;
 }
 
-export function getAssignmentPointTotals(assignments: Assignment[]) {
+function getAssignmentPointTotals<T extends Assignment>(assignments: Calculable<T>[]) {
 	let pointsEarned = 0;
 	let pointsPossible = 0;
 
-	assignments.filter(includeAssignmentInGradeCalc).forEach((assignment) => {
+	assignments.forEach((assignment) => {
 		const { pointsEarned: earned, pointsPossible: possible } = assignment;
-
-		if (earned === undefined) return;
 
 		pointsEarned += earned;
 		pointsPossible += possible;
 	});
 
 	return { pointsEarned, pointsPossible };
-}
-
-export function calculateGradeFlow<T extends Assignment>(
-	assignments: T[],
-	gradeCategories?: Category[]
-) {
-	return {
-		assignments: calculateAssignmentGradePercentageChanges(assignments, gradeCategories),
-		grade: gradeCategories
-			? calculateCourseGradePercentageFromCategories(
-					getPointsByCategory(assignments),
-					gradeCategories
-				)
-			: calculateCourseGradePercentageFromTotals(assignments)
-	};
 }
 
 export function getSynergyCourseAssignmentCategories(course: CourseEntity) {
@@ -275,6 +348,28 @@ export function getSynergyCourseAssignmentCategories(course: CourseEntity) {
 	return categories;
 }
 
-function includeAssignmentInGradeCalc(assignment: Assignment) {
-	return !assignment.notForGrade && assignment.pointsEarned !== undefined;
+export function getCalculableAssignments<T extends Assignment>(assignments: T[]) {
+	return assignments
+		.map((assignment) => {
+			const { pointsEarned, pointsPossible, notForGrade, category } = assignment;
+
+			if (
+				pointsEarned === undefined ||
+				pointsPossible === undefined ||
+				notForGrade ||
+				category === undefined
+			)
+				return null;
+
+			const calculable: Calculable<T> = {
+				...assignment,
+				pointsEarned,
+				pointsPossible,
+				notForGrade,
+				category
+			};
+
+			return calculable;
+		})
+		.filter((assignments) => assignments !== null);
 }
