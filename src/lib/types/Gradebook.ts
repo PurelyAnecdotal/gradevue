@@ -74,9 +74,15 @@ export interface AssignmentEntity {
 	_Type: string;
 	_Date: string;
 	_DueDate: string;
-	_Score: string;
-	_ScoreType: string;
+	_DisplayScore: string;
+	_ScoreCalValue: string;
+	_TimeSincePost: string;
+	_TotalSecondsSincePost: string;
+	_ScoreMaxValue: string;
+	_ScoreType: ScoreType;
 	_Points: string;
+	_Point: string;
+	_PointPossible: string;
 	_Notes: string;
 	_TeacherID: string;
 	_StudentID: string;
@@ -84,4 +90,8 @@ export interface AssignmentEntity {
 	_HasDropBox: string;
 	_DropStartDate: string;
 	_DropEndDate: string;
+}
+
+export enum ScoreType {
+	RawScore = 'Raw Score'
 }

@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { page } from '$app/stores';
-	import { extractPoints, removeClassID } from '$lib';
+	import { removeClassID } from '$lib';
 	import {
 		calculateAssignmentGPCs,
 		calculateAssignmentGPCsFromCategories,
@@ -67,12 +67,10 @@
 	const realAssignments = $derived(
 		calculateAssignmentGPCs(
 			synergyAssignments.map((synergyAssignment) => {
-				const { pointsEarned, pointsPossible } = extractPoints(synergyAssignment._Points);
-
 				const assignment: RealAssignment = {
 					name: synergyAssignment._Measure,
-					pointsEarned: pointsEarned,
-					pointsPossible,
+					pointsEarned: parseFloat(synergyAssignment._ScoreCalValue),
+					pointsPossible: parseFloat(synergyAssignment._ScoreMaxValue),
 					gradePercentageChange: 0,
 					notForGrade: synergyAssignment._Notes === '(Not For Grading)',
 					hidden: false,
