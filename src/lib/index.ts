@@ -14,53 +14,6 @@ export function getColorForGrade(grade: string | number) {
 
 export const removeClassID = (name: string) => name.replace(/ \([A-Z]+\)( \([0-9]+\))?$/, '');
 
-export function extractPoints(score: string): {
-	pointsEarned: number | undefined;
-	pointsPossible: number;
-} {
-	if (score.endsWith(' Points Possible'))
-		return {
-			pointsEarned: undefined,
-			pointsPossible: parseFloat(score.replace(/ Points Possible$/, ''))
-		};
-
-	// Ungraded assignments
-	if (score.startsWith('/ '))
-		return {
-			pointsEarned: undefined,
-			pointsPossible: parseFloat(score.replace('/ ', ''))
-		};
-
-	// Some extra credit assignments
-	if (score.endsWith(' /'))
-		return {
-			pointsEarned: parseFloat(score.replace(' /', '')),
-			pointsPossible: 0
-		};
-
-	if (!/^\d+(\.\d+)? \/ \d+(\.\d+)?$/.test(score))
-		console.warn('Score does not match expected format:', score);
-
-	const [pointsEarned, pointsPossible] = score.split(' / ').map(parseFloat);
-
-	if (isNaN(pointsEarned)) console.error('Points earned is NaN for score:', score);
-	if (isNaN(pointsPossible)) console.error('Points possible is NaN for score:', score);
-
-	return { pointsEarned, pointsPossible };
-}
-
-export function calculatePercent(score: string) {
-	let { pointsEarned, pointsPossible } = extractPoints(score);
-
-	if (pointsEarned === undefined) return 0;
-
-	if (pointsPossible == 0) return 100;
-
-	if (isNaN(pointsEarned)) pointsEarned = 0;
-	if (isNaN(pointsPossible)) pointsPossible = 0;
-	return (pointsEarned / pointsPossible) * 100;
-}
-
 const rtf = new Intl.RelativeTimeFormat('en-US', { numeric: 'auto' });
 
 export function getRelativeTime(date: Date) {
