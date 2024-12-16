@@ -1,5 +1,5 @@
 import { roundToLeastPrecision } from '$lib';
-import type { CourseEntity } from './types/Gradebook';
+import type { Course } from './types/Gradebook';
 
 export interface Category {
 	name: string;
@@ -14,6 +14,7 @@ interface Assignment {
 	name: string;
 	pointsEarned: number | undefined;
 	pointsPossible: number | undefined;
+	extraCredit: boolean;
 	gradePercentageChange: number | undefined;
 	notForGrade: boolean;
 	hidden: boolean;
@@ -33,6 +34,7 @@ export interface RealAssignment extends Assignment {
 export interface HiddenAssignment extends Assignment {
 	pointsEarned: number;
 	pointsPossible: number;
+	extraCredit: false;
 	notForGrade: false;
 	hidden: true;
 	category: string;
@@ -46,6 +48,7 @@ export interface ReactiveAssignment extends Assignment {
 
 export interface NewHypotheticalAssignment extends ReactiveAssignment {
 	newHypothetical: true;
+	extraCredit: false;
 	hidden: false;
 	date: undefined;
 }
@@ -117,12 +120,12 @@ function flowAssignmentFromTotals<T extends Assignment>(
 	totalPointsEarned: number,
 	totalPointsPossible: number
 ): { assignment: Flowed<T>; totalPointsEarned: number; totalPointsPossible: number } {
-	const { pointsEarned, pointsPossible } = assignment;
+	const { pointsEarned, pointsPossible, extraCredit } = assignment;
 
 	const priorGrade = calculateGradePercentage(totalPointsEarned, totalPointsPossible);
 
 	totalPointsEarned += pointsEarned;
-	totalPointsPossible += pointsPossible;
+	totalPointsPossible += extraCredit ? 0 : pointsPossible;
 
 	const afterGrade = calculateGradePercentage(totalPointsEarned, totalPointsPossible);
 
@@ -138,7 +141,7 @@ function flowAssignmentFromCategories<T extends Assignment>(
 	pointsByCategory: PointsByCategory,
 	gradeCategories: Category[]
 ): { assignment: Flowed<T>; pointsByCategory: PointsByCategory } {
-	const { pointsEarned, pointsPossible, category } = assignment;
+	const { pointsEarned, pointsPossible, category, extraCredit } = assignment;
 
 	const priorGrade = calculateCourseGradePercentageFromCategories(
 		pointsByCategory,
@@ -148,7 +151,7 @@ function flowAssignmentFromCategories<T extends Assignment>(
 	const categoryPoints = pointsByCategory[category] ?? { pointsEarned: 0, pointsPossible: 0 };
 	pointsByCategory[category] = {
 		pointsEarned: categoryPoints.pointsEarned + pointsEarned,
-		pointsPossible: categoryPoints.pointsPossible + pointsPossible
+		pointsPossible: categoryPoints.pointsPossible + (extraCredit ? 0 : pointsPossible)
 	};
 
 	const afterGrade = calculateCourseGradePercentageFromCategories(
@@ -282,6 +285,7 @@ export function getHiddenAssignmentsFromCategories(
 				name: `Hidden ${category.name} Assignments`,
 				pointsEarned: hiddenPointsEarned,
 				pointsPossible: hiddenPointsPossible,
+				extraCredit: false,
 				gradePercentageChange,
 				notForGrade: false,
 				hidden: true,
@@ -298,12 +302,13 @@ export function getPointsByCategory<T extends Assignment>(assignments: Calculabl
 	let pointsByCategory: PointsByCategory = {};
 
 	assignments.forEach((assignment) => {
-		const { category, pointsEarned, pointsPossible } = assignment;
+		const { category, pointsEarned, pointsPossible, extraCredit } = assignment;
 
 		const categoryPoints = pointsByCategory[category] ?? { pointsEarned: 0, pointsPossible: 0 };
+
 		pointsByCategory[category] = {
 			pointsEarned: categoryPoints.pointsEarned + pointsEarned,
-			pointsPossible: categoryPoints.pointsPossible + pointsPossible
+			pointsPossible: categoryPoints.pointsPossible + (extraCredit ? 0 : pointsPossible)
 		};
 	});
 
@@ -321,16 +326,16 @@ function getAssignmentPointTotals<T extends Assignment>(assignments: Calculable<
 	let pointsPossible = 0;
 
 	assignments.forEach((assignment) => {
-		const { pointsEarned: earned, pointsPossible: possible } = assignment;
+		const { pointsEarned: earned, pointsPossible: possible, extraCredit } = assignment;
 
 		pointsEarned += earned;
-		pointsPossible += possible;
+		if (!extraCredit) pointsPossible += possible;
 	});
 
 	return { pointsEarned, pointsPossible };
 }
 
-export function getSynergyCourseAssignmentCategories(course: CourseEntity) {
+export function getSynergyCourseAssignmentCategories(course: Course) {
 	const gradeCalcSummary = course?.Marks.Mark.GradeCalculationSummary;
 
 	if (typeof gradeCalcSummary == 'string' || !gradeCalcSummary?.AssignmentGradeCalc)

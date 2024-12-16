@@ -67,12 +67,54 @@
 	const realAssignments = $derived(
 		calculateAssignmentGPCs(
 			synergyAssignments.map((synergyAssignment) => {
+				// Edge Cases:
+
+				// Normal:
+				// _Point: "3"
+				// _PointPossible: "4"
+				// _Points: "3 / 4"
+				// _ScoreCalValue: "3"
+				// _ScoreMaxValue: "4"
+				// _DisplayScore: "3 out of 4"
+
+				// Not Graded:
+				// _Point: undefined
+				// _PointPossible: undefined
+				// _Points: "4 Points Possible"
+				// _ScoreCalValue: undefined
+				// _ScoreMaxValue: "4"
+				// _DisplayScore: "Not Graded"
+
+				// Extra Credit:
+				// _Point: "3"
+				// _PointPossible: ""
+				// _Points: "3 /"
+				// _ScoreCalValue: "3"
+				// _ScoreMaxValue: "4"
+				// _DisplayScore: "3 out of 4"
+
+				// Not For Grading:
+				// _Point: "3"
+				// _PointPossible: "4"
+				// _Points: "3 / 4"
+				// _ScoreCalValue: "3"
+				// _ScoreMaxValue: "4"
+				// _DisplayScore: "3 out of 4"
+				// _Notes : "(Not For Grading)"
+
+				const pointsEarned = synergyAssignment._ScoreCalValue
+					? parseFloat(synergyAssignment._ScoreCalValue)
+					: undefined;
+
+				const pointsPossible = parseFloat(synergyAssignment._ScoreMaxValue);
+
 				const assignment: RealAssignment = {
 					name: synergyAssignment._Measure,
-					pointsEarned: parseFloat(synergyAssignment._ScoreCalValue),
-					pointsPossible: parseFloat(synergyAssignment._ScoreMaxValue),
+					pointsEarned,
+					pointsPossible,
+					extraCredit: synergyAssignment._PointPossible === '',
 					gradePercentageChange: 0,
-					notForGrade: synergyAssignment._Notes === '(Not For Grading)',
+					notForGrade: synergyAssignment._Notes.includes('(Not For Grading)'),
 					hidden: false,
 					category: synergyAssignment._Type,
 					date: new Date(synergyAssignment._Date),
@@ -161,6 +203,7 @@
 			name: 'Hypothetical Assignment',
 			pointsEarned: undefined,
 			pointsPossible: undefined,
+			extraCredit: false,
 			gradePercentageChange: undefined,
 			notForGrade: false,
 			hidden: false,
@@ -307,6 +350,7 @@
 										bind:name={reactiveAssignments[i].name}
 										bind:pointsEarned={reactiveAssignments[i].pointsEarned}
 										bind:pointsPossible={reactiveAssignments[i].pointsPossible}
+										bind:extraCredit={reactiveAssignments[i].extraCredit}
 										gradePercentageChange={rawGradeCalcMatches ? gradePercentageChange : undefined}
 										bind:notForGrade={reactiveAssignments[i].notForGrade}
 										{hidden}
@@ -320,12 +364,13 @@
 								</li>
 							{/each}
 						{:else}
-							{#each assignments as { name, pointsEarned, pointsPossible, gradePercentageChange, notForGrade, hidden, category, date }}
+							{#each assignments as { name, pointsEarned, pointsPossible, extraCredit, gradePercentageChange, notForGrade, hidden, category, date }}
 								<li>
 									<AssignmentCard
 										{name}
 										{pointsEarned}
 										{pointsPossible}
+										{extraCredit}
 										gradePercentageChange={rawGradeCalcMatches ? gradePercentageChange : undefined}
 										{notForGrade}
 										{hidden}
@@ -351,6 +396,7 @@
 												bind:name={reactiveAssignments[i].name}
 												bind:pointsEarned={reactiveAssignments[i].pointsEarned}
 												bind:pointsPossible={reactiveAssignments[i].pointsPossible}
+												bind:extraCredit={reactiveAssignments[i].extraCredit}
 												gradePercentageChange={rawGradeCalcMatches
 													? gradePercentageChange
 													: undefined}
@@ -367,13 +413,14 @@
 									{/if}
 								{/each}
 							{:else}
-								{#each assignments as { name, pointsEarned, pointsPossible, gradePercentageChange, notForGrade, hidden, category, date }}
+								{#each assignments as { name, pointsEarned, pointsPossible, extraCredit, gradePercentageChange, notForGrade, hidden, category, date }}
 									{#if category === categoryName}
 										<li>
 											<AssignmentCard
 												{name}
 												{pointsEarned}
 												{pointsPossible}
+												{extraCredit}
 												gradePercentageChange={rawGradeCalcMatches
 													? gradePercentageChange
 													: undefined}
