@@ -20,6 +20,7 @@
 		name: string;
 		pointsEarned?: number;
 		pointsPossible?: number;
+		extraCredit?: boolean;
 		gradePercentageChange?: number;
 		notForGrade?: boolean;
 		hidden?: boolean;
@@ -35,6 +36,7 @@
 		name = $bindable(),
 		pointsEarned = $bindable(),
 		pointsPossible = $bindable(),
+		extraCredit = $bindable(false),
 		gradePercentageChange,
 		notForGrade = $bindable(false),
 		hidden = false,
@@ -96,8 +98,16 @@
 				{category}
 			</Badge>
 		{/if}
-		{#if percentage === Infinity}
-			<Badge border color="indigo">Extra Credit</Badge>
+		{#if extraCredit}
+			<Badge border color="indigo">
+				{#if editable}
+					<Checkbox bind:checked={extraCredit} onchange={recalculateGradePercentage}>
+						<span class="text-xs">Extra Credit</span>
+					</Checkbox>
+				{:else}
+					Extra Credit
+				{/if}
+			</Badge>
 		{/if}
 		{#if pointsEarned === undefined}
 			<Badge border color="purple">Not Graded</Badge>
@@ -173,7 +183,7 @@
 
 	{#if pointsEarned !== undefined || editable}
 		<Progressbar
-			color={getColorForGrade(percentage)}
+			color={extraCredit ? 'blue' : getColorForGrade(percentage)}
 			progress={Math.min(isNaN(percentage) ? 0 : percentage, 100)}
 			animate={true}
 			class="hidden sm:block w-1/3 shrink-0"
