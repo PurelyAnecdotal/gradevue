@@ -82,7 +82,7 @@
 				// _PointPossible: undefined
 				// _Points: "4 Points Possible"
 				// _ScoreCalValue: undefined
-				// _ScoreMaxValue: "4"
+				// _ScoreMaxValue: "4" or undefined
 				// _DisplayScore: "Not Graded"
 
 				// Extra Credit:
@@ -106,7 +106,9 @@
 					? parseFloat(synergyAssignment._ScoreCalValue)
 					: undefined;
 
-				const pointsPossible = parseFloat(synergyAssignment._ScoreMaxValue);
+				const pointsPossible = synergyAssignment._ScoreMaxValue
+					? parseFloat(synergyAssignment._ScoreMaxValue)
+					: parseFloat(synergyAssignment._Points.split(' Points Possible')[0]); // Sometimes ScoreMaxValue is undefined; you can still get the points possible from the _Points field
 
 				const assignment: RealAssignment = {
 					name: synergyAssignment._Measure,

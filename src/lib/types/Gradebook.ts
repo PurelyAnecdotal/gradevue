@@ -41,7 +41,7 @@ export interface Mark {
 	StandardViews: string;
 	GradeCalculationSummary: GradeCalculationSummaryClass | string;
 	Assignments: Assignments;
-	AssignmentsSinceLastAccess: string;
+	AssignmentsSinceLastAccess: Assignments | string;
 	_MarkName: string;
 	_ShortMarkName: string;
 	_CalculatedScoreString: string;
@@ -64,7 +64,7 @@ export interface AssignmentEntity {
 	_ScoreCalValue?: string;
 	_TimeSincePost: string;
 	_TotalSecondsSincePost: string;
-	_ScoreMaxValue: string;
+	_ScoreMaxValue?: string;
 	_ScoreType: ScoreType;
 	_Points: string;
 	_Point?: string;
