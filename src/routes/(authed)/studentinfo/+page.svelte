@@ -3,9 +3,48 @@
 	import { loadStudentInfo } from '$lib/cache';
 	import LoadingBanner from '$lib/components/LoadingBanner.svelte';
 	import { studentInfo, studentInfoLoaded } from '$lib/stores';
-	import { Card } from 'flowbite-svelte';
+	import {
+		Accordion,
+		AccordionItem,
+		Button,
+		Card,
+		Table,
+		TableBody,
+		TableBodyCell,
+		TableBodyRow
+	} from 'flowbite-svelte';
 
 	if (!$studentInfo && browser) loadStudentInfo();
+
+	const dataSources = ['gradebook', 'attendance', 'studentInfo', 'documentsList', 'mail'];
+
+	function copy(key: string) {
+		const data = localStorage.getItem(key);
+
+		if (!data) {
+			alert('Not found');
+			return;
+		}
+
+		navigator.clipboard.writeText(data);
+	}
+
+	async function paste(key: string) {
+		const text = await navigator.clipboard.readText();
+
+		try {
+			JSON.parse(text);
+		} catch {
+			alert('Invalid JSON');
+			return;
+		}
+
+		localStorage.setItem(key, text);
+	}
+
+	function remove(key: string) {
+		localStorage.removeItem(key);
+	}
 </script>
 
 <svelte:head>
@@ -14,8 +53,8 @@
 
 <LoadingBanner show={!$studentInfoLoaded} loadingMsg="Loading student info..." />
 
-{#if $studentInfo}
-	<div class="p-4 flex justify-center">
+<div class="p-4 flex flex-col gap-4 justify-center">
+	{#if $studentInfo}
 		<Card class="max-w-none flex flex-row gap-4 dark:text-white">
 			<img
 				class="rounded h-xl"
@@ -33,5 +72,68 @@
 				<span>{$studentInfo.Gender}</span>
 			</div>
 		</Card>
-	</div>
-{/if}
+	{/if}
+
+	<Accordion>
+		<AccordionItem paddingDefault="0">
+			<span slot="header" class="p-5">Developer Tools</span>
+
+			<svg
+				slot="arrowdown"
+				class="w-3 h-3 mr-5 text-gray-800 dark:text-white"
+				aria-hidden="true"
+				xmlns="http://www.w3.org/2000/svg"
+				fill="none"
+				viewBox="0 0 10 6"
+			>
+				<path
+					stroke="currentColor"
+					stroke-linecap="round"
+					stroke-linejoin="round"
+					stroke-width="2"
+					d="m1 1 4 4 4-4"
+				/>
+			</svg>
+
+			<svg
+				slot="arrowup"
+				class="w-3 h-3 mr-5 text-gray-800 dark:text-white"
+				aria-hidden="true"
+				xmlns="http://www.w3.org/2000/svg"
+				fill="none"
+				viewBox="0 0 10 6"
+			>
+				hi
+				<path
+					stroke="currentColor"
+					stroke-linecap="round"
+					stroke-linejoin="round"
+					stroke-width="2"
+					d="M9 5 5 1 1 5"
+				/>
+			</svg>
+
+			<Table>
+				<TableBody>
+					{#each dataSources as dataSource}
+						<TableBodyRow>
+							<TableBodyCell>{dataSource}</TableBodyCell>
+
+							<TableBodyCell>
+								<Button color="alternative" onclick={() => copy(dataSource)}>Copy</Button>
+							</TableBodyCell>
+
+							<TableBodyCell>
+								<Button color="alternative" onclick={() => paste(dataSource)}>Paste</Button>
+							</TableBodyCell>
+
+							<TableBodyCell>
+								<Button color="alternative" onclick={() => remove(dataSource)}>Delete</Button>
+							</TableBodyCell>
+						</TableBodyRow>
+					{/each}
+				</TableBody>
+			</Table>
+		</AccordionItem>
+	</Accordion>
+</div>
