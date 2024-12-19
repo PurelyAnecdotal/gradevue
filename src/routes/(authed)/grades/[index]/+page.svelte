@@ -17,6 +17,7 @@
 		gradesMatch,
 		type HiddenAssignment,
 		type NewHypotheticalAssignment,
+		parseSynergyAssignment,
 		type ReactiveAssignment,
 		type RealAssignment
 	} from '$lib/assignments';
@@ -65,69 +66,10 @@
 	const synergyAssignments = $derived(synergyCourse?.Marks.Mark.Assignments.Assignment ?? []);
 
 	const realAssignments = $derived(
-		calculateAssignmentGPCs(
-			synergyAssignments.map((synergyAssignment) => {
-				// Edge Cases:
-
-				// Normal:
-				// _Point: "3"
-				// _PointPossible: "4"
-				// _Points: "3 / 4"
-				// _ScoreCalValue: "3"
-				// _ScoreMaxValue: "4"
-				// _DisplayScore: "3 out of 4"
-
-				// Not Graded:
-				// _Point: undefined
-				// _PointPossible: undefined
-				// _Points: "4 Points Possible"
-				// _ScoreCalValue: undefined
-				// _ScoreMaxValue: "4" or undefined
-				// _DisplayScore: "Not Graded"
-
-				// Extra Credit:
-				// _Point: "3"
-				// _PointPossible: ""
-				// _Points: "3 /"
-				// _ScoreCalValue: "3"
-				// _ScoreMaxValue: "4"
-				// _DisplayScore: "3 out of 4"
-
-				// Not For Grading:
-				// _Point: "3"
-				// _PointPossible: "4"
-				// _Points: "3 / 4"
-				// _ScoreCalValue: "3"
-				// _ScoreMaxValue: "4"
-				// _DisplayScore: "3 out of 4"
-				// _Notes : "(Not For Grading)"
-
-				const pointsEarned = synergyAssignment._ScoreCalValue
-					? parseFloat(synergyAssignment._ScoreCalValue)
-					: undefined;
-
-				const pointsPossible = synergyAssignment._ScoreMaxValue
-					? parseFloat(synergyAssignment._ScoreMaxValue)
-					: parseFloat(synergyAssignment._Points.split(' Points Possible')[0]); // Sometimes ScoreMaxValue is undefined; you can still get the points possible from the _Points field
-
-				const assignment: RealAssignment = {
-					name: synergyAssignment._Measure,
-					pointsEarned,
-					pointsPossible,
-					extraCredit: synergyAssignment._PointPossible === '',
-					gradePercentageChange: 0,
-					notForGrade: synergyAssignment._Notes.includes('(Not For Grading)'),
-					hidden: false,
-					category: synergyAssignment._Type,
-					date: new Date(synergyAssignment._Date),
-					newHypothetical: false
-				};
-
-				return assignment;
-			}),
-			gradeCategories
-		)
+		calculateAssignmentGPCs(synergyAssignments.map(parseSynergyAssignment), gradeCategories)
 	);
+
+	$inspect(synergyAssignments);
 
 	const hiddenAssignments = $derived(
 		categories
@@ -205,6 +147,7 @@
 			name: 'Hypothetical Assignment',
 			pointsEarned: undefined,
 			pointsPossible: undefined,
+			unscaledPoints: undefined,
 			extraCredit: false,
 			gradePercentageChange: undefined,
 			notForGrade: false,
@@ -353,7 +296,9 @@
 										bind:pointsEarned={reactiveAssignments[i].pointsEarned}
 										bind:pointsPossible={reactiveAssignments[i].pointsPossible}
 										bind:extraCredit={reactiveAssignments[i].extraCredit}
-										gradePercentageChange={rawGradeCalcMatches ? gradePercentageChange : undefined}
+										gradePercentageChange={rawGradeCalcMatches
+											? gradePercentageChange
+											: gradePercentageChange}
 										bind:notForGrade={reactiveAssignments[i].notForGrade}
 										{hidden}
 										showHypotheticalLabel={newHypothetical}
@@ -366,14 +311,17 @@
 								</li>
 							{/each}
 						{:else}
-							{#each assignments as { name, pointsEarned, pointsPossible, extraCredit, gradePercentageChange, notForGrade, hidden, category, date }}
+							{#each assignments as { name, pointsEarned, pointsPossible, unscaledPoints, extraCredit, gradePercentageChange, notForGrade, hidden, category, date }}
 								<li>
 									<AssignmentCard
 										{name}
 										{pointsEarned}
 										{pointsPossible}
+										{unscaledPoints}
 										{extraCredit}
-										gradePercentageChange={rawGradeCalcMatches ? gradePercentageChange : undefined}
+										gradePercentageChange={rawGradeCalcMatches
+											? gradePercentageChange
+											: gradePercentageChange}
 										{notForGrade}
 										{hidden}
 										{category}
@@ -401,7 +349,7 @@
 												bind:extraCredit={reactiveAssignments[i].extraCredit}
 												gradePercentageChange={rawGradeCalcMatches
 													? gradePercentageChange
-													: undefined}
+													: gradePercentageChange}
 												bind:notForGrade={reactiveAssignments[i].notForGrade}
 												{hidden}
 												showHypotheticalLabel={newHypothetical}
@@ -415,17 +363,18 @@
 									{/if}
 								{/each}
 							{:else}
-								{#each assignments as { name, pointsEarned, pointsPossible, extraCredit, gradePercentageChange, notForGrade, hidden, category, date }}
+								{#each assignments as { name, pointsEarned, pointsPossible, unscaledPoints, extraCredit, gradePercentageChange, notForGrade, hidden, category, date }}
 									{#if category === categoryName}
 										<li>
 											<AssignmentCard
 												{name}
 												{pointsEarned}
 												{pointsPossible}
+												{unscaledPoints}
 												{extraCredit}
 												gradePercentageChange={rawGradeCalcMatches
 													? gradePercentageChange
-													: undefined}
+													: gradePercentageChange}
 												{notForGrade}
 												{hidden}
 												{date}
