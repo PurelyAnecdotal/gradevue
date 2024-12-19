@@ -20,6 +20,7 @@
 		name: string;
 		pointsEarned?: number;
 		pointsPossible?: number;
+		unscaledPoints?: { pointsEarned: number; pointsPossible: number };
 		extraCredit?: boolean;
 		gradePercentageChange?: number;
 		notForGrade?: boolean;
@@ -36,6 +37,7 @@
 		name = $bindable(),
 		pointsEarned = $bindable(),
 		pointsPossible = $bindable(),
+		unscaledPoints = $bindable(),
 		extraCredit = $bindable(false),
 		gradePercentageChange,
 		notForGrade = $bindable(false),
@@ -98,16 +100,8 @@
 				{category}
 			</Badge>
 		{/if}
-		{#if extraCredit}
-			<Badge border color="indigo">
-				{#if editable}
-					<Checkbox bind:checked={extraCredit} onchange={recalculateGradePercentage}>
-						<span class="text-xs">Extra Credit</span>
-					</Checkbox>
-				{:else}
-					Extra Credit
-				{/if}
-			</Badge>
+		{#if unscaledPoints}
+			<Badge border color="dark">Scaled</Badge>
 		{/if}
 		{#if pointsEarned === undefined}
 			<Badge border color="purple">Not Graded</Badge>
@@ -120,6 +114,17 @@
 					</Checkbox>
 				{:else}
 					Not For Grade
+				{/if}
+			</Badge>
+		{/if}
+		{#if extraCredit}
+			<Badge border color="indigo">
+				{#if editable}
+					<Checkbox bind:checked={extraCredit} onchange={recalculateGradePercentage}>
+						<span class="text-xs">Extra Credit</span>
+					</Checkbox>
+				{:else}
+					Extra Credit
 				{/if}
 			</Badge>
 		{/if}
@@ -153,6 +158,12 @@
 			{:else if !notForGrade && pointsEarned && !isNaN(pointsEarned)}
 				<span class="text-gray-500">+0%</span>
 			{/if}
+		{/if}
+
+		{#if unscaledPoints}
+			<span class="text-gray-400">
+				({unscaledPoints.pointsEarned}/{unscaledPoints.pointsPossible})
+			</span>
 		{/if}
 
 		{#if editable}

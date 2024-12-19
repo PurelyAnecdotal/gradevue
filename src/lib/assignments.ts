@@ -1,5 +1,5 @@
 import { roundToLeastPrecision } from '$lib';
-import type { Course } from './types/Gradebook';
+import type { AssignmentEntity, Course } from './types/Gradebook';
 
 export interface Category {
 	name: string;
@@ -14,6 +14,7 @@ interface Assignment {
 	name: string;
 	pointsEarned: number | undefined;
 	pointsPossible: number | undefined;
+	unscaledPoints: { pointsEarned: number; pointsPossible: number } | undefined;
 	extraCredit: boolean;
 	gradePercentageChange: number | undefined;
 	notForGrade: boolean;
@@ -24,7 +25,6 @@ interface Assignment {
 }
 
 export interface RealAssignment extends Assignment {
-	pointsPossible: number;
 	hidden: false;
 	category: string;
 	date: Date;
@@ -34,6 +34,7 @@ export interface RealAssignment extends Assignment {
 export interface HiddenAssignment extends Assignment {
 	pointsEarned: number;
 	pointsPossible: number;
+	unscaledPoints: undefined;
 	extraCredit: false;
 	notForGrade: false;
 	hidden: true;
@@ -48,6 +49,7 @@ export interface ReactiveAssignment extends Assignment {
 
 export interface NewHypotheticalAssignment extends ReactiveAssignment {
 	newHypothetical: true;
+	unscaledPoints: undefined;
 	extraCredit: false;
 	hidden: false;
 	date: undefined;
@@ -281,10 +283,13 @@ export function getHiddenAssignmentsFromCategories(
 			// Calculate grade percentage change and initalize hypothetical gradebook
 			const gradePercentageChange = afterGrade - priorGrade;
 
+			if (Math.abs(gradePercentageChange) < 0.0001) return null;
+
 			const hiddenAssignment: Flowed<HiddenAssignment> = {
 				name: `Hidden ${category.name} Assignments`,
 				pointsEarned: hiddenPointsEarned,
 				pointsPossible: hiddenPointsPossible,
+				unscaledPoints: undefined,
 				extraCredit: false,
 				gradePercentageChange,
 				notForGrade: false,
@@ -295,7 +300,8 @@ export function getHiddenAssignmentsFromCategories(
 			};
 
 			return hiddenAssignment;
-		});
+		})
+		.filter((x) => x !== null);
 }
 
 export function getPointsByCategory<T extends Assignment>(assignments: Calculable<T>[]) {
@@ -377,4 +383,120 @@ export function getCalculableAssignments<T extends Assignment>(assignments: T[])
 			return calculable;
 		})
 		.filter((assignments) => assignments !== null);
+}
+
+export function parseSynergyAssignment(synergyAssignment: AssignmentEntity) {
+	const {
+		_Date,
+		_Measure,
+		_Notes,
+		_Point,
+		_PointPossible,
+		_Points,
+		_ScoreCalValue,
+		_ScoreMaxValue,
+		_Type
+	} = synergyAssignment;
+
+	// Edge Cases:
+
+	// Normal:
+	// _Point: "3"
+	// _PointPossible: "4"
+	// _Points: "3 / 4"
+	// _ScoreCalValue: "3"
+	// _ScoreMaxValue: "4"
+	// _DisplayScore: "3 out of 4"
+
+	// Not Graded:
+	// _Point: undefined
+	// _PointPossible: undefined
+	// _Points: "4 Points Possible"
+	// _ScoreCalValue: undefined
+	// _ScoreMaxValue: "4" or undefined
+	// _DisplayScore: "Not Graded"
+
+	// Not Graded (Empty):
+	// _Point: undefined
+	// _PointPossible: undefined
+	// _Points: "Points Possible"
+	// _ScoreCalValue: undefined
+	// _ScoreMaxValue: undefined
+	// _DisplayScore: "Not Graded"
+
+	// Zero (Blank _Point):
+	// _Point: ""
+	// _PointPossible: "4"
+	// _Points: "/ 4"
+	// _ScoreCalValue: "0"
+	// _ScoreMaxValue: "4"
+	// _DisplayScore: "0 out of 4"
+
+	// Extra Credit:
+	// _Point: "3"
+	// _PointPossible: ""
+	// _Points: "3 /"
+	// _ScoreCalValue: "3"
+	// _ScoreMaxValue: "4"
+	// _DisplayScore: "3 out of 4"
+
+	// Not For Grading:
+	// _Point: "3"
+	// _PointPossible: "4"
+	// _Points: "3 / 4"
+	// _ScoreCalValue: "3"
+	// _ScoreMaxValue: "4"
+	// _DisplayScore: "3 out of 4"
+	// _Notes : "(Not For Grading)"
+
+	// Scaled:
+	// _Point: "6"
+	// _PointPossible: "8"
+	// _Points: "6 / 8"
+	// _ScoreCalValue: "3"
+	// _ScoreMaxValue: "4"
+	// _DisplayScore: "3 out of 4"
+
+	const pointsEarned = _Point === '' ? 0 : _Point ? parseFloat(_Point) : undefined; // _Point can be empty; equivalent to 0
+
+	const pointsPossible = _PointPossible
+		? parseFloat(_PointPossible)
+		: _ScoreMaxValue
+			? parseFloat(_ScoreMaxValue)
+			: _Points === 'Points Possible' // _Points can not provide the points possible at all
+				? undefined
+				: parseFloat(_Points.split(' Points Possible')[0]); // Sometimes ScoreMaxValue is undefined; you can still get the points possible from the _Points field
+
+	const pointsEarnedIsScaled =
+		_Point !== undefined && _ScoreCalValue !== undefined && _Point !== _ScoreCalValue;
+
+	const pointsPossibleIsScaled =
+		_PointPossible !== undefined &&
+		_ScoreMaxValue !== undefined &&
+		_PointPossible !== _ScoreMaxValue;
+
+	let unscaledPoints: { pointsEarned: number; pointsPossible: number } | undefined = undefined;
+
+	if ((pointsEarnedIsScaled || pointsPossibleIsScaled) && _ScoreCalValue && _ScoreMaxValue) {
+		unscaledPoints = {
+			pointsEarned: parseFloat(_ScoreCalValue),
+			pointsPossible: parseFloat(_ScoreMaxValue)
+		};
+	}
+
+	const assignment: RealAssignment = {
+		name: _Measure,
+		pointsEarned,
+		pointsPossible,
+		unscaledPoints,
+		extraCredit: _PointPossible === '',
+		gradePercentageChange: 0,
+		notForGrade: _Notes.includes('(Not For Grading)'),
+		hidden: false,
+		category: _Type,
+		date: new Date(_Date),
+		newHypothetical: false
+	};
+
+	return assignment;
 }
