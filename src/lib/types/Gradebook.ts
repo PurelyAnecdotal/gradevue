@@ -65,7 +65,7 @@ export interface AssignmentEntity {
 	_TimeSincePost: string;
 	_TotalSecondsSincePost: string;
 	_ScoreMaxValue?: string;
-	_ScoreType: ScoreType;
+	_ScoreType: 'Raw Score';
 	_Points: string;
 	_Point?: string;
 	_PointPossible?: string;
@@ -103,10 +103,6 @@ export enum FileType {
 
 export enum Type {
 	URL = 'URL'
-}
-
-export enum ScoreType {
-	RawScore = 'Raw Score'
 }
 
 export interface GradeCalculationSummaryClass {

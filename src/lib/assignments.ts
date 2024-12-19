@@ -457,21 +457,26 @@ export function parseSynergyAssignment(synergyAssignment: AssignmentEntity) {
 	// _ScoreMaxValue: "4"
 	// _DisplayScore: "3 out of 4"
 
-	const pointsEarned = _Point === '' ? 0 : _Point ? parseFloat(_Point) : undefined; // _Point can be empty; equivalent to 0
+	const pointsEarned = _Point !== undefined ? (_Point === '' ? 0 : parseFloat(_Point)) : undefined; // _Point can be empty; equivalent to 0
 
-	const pointsPossible = _PointPossible
-		? parseFloat(_PointPossible)
-		: _ScoreMaxValue
-			? parseFloat(_ScoreMaxValue)
-			: _Points === 'Points Possible' // _Points can not provide the points possible at all
-				? undefined
-				: parseFloat(_Points.split(' Points Possible')[0]); // Sometimes ScoreMaxValue is undefined; you can still get the points possible from the _Points field
+	const pointsPossible =
+		_PointPossible !== undefined && _PointPossible !== ''
+			? parseFloat(_PointPossible)
+			: _ScoreMaxValue !== undefined
+				? parseFloat(_ScoreMaxValue)
+				: _Points === 'Points Possible'
+					? undefined
+					: parseFloat(_Points.split(' Points Possible')[0]);
 
 	const pointsEarnedIsScaled =
-		_Point !== undefined && _ScoreCalValue !== undefined && _Point !== _ScoreCalValue;
+		_Point !== undefined &&
+		_Point !== '' &&
+		_ScoreCalValue !== undefined &&
+		_Point !== _ScoreCalValue;
 
 	const pointsPossibleIsScaled =
 		_PointPossible !== undefined &&
+		_PointPossible !== '' &&
 		_ScoreMaxValue !== undefined &&
 		_PointPossible !== _ScoreMaxValue;
 
@@ -490,7 +495,7 @@ export function parseSynergyAssignment(synergyAssignment: AssignmentEntity) {
 		pointsPossible,
 		unscaledPoints,
 		extraCredit: _PointPossible === '',
-		gradePercentageChange: 0,
+		gradePercentageChange: undefined,
 		notForGrade: _Notes.includes('(Not For Grading)'),
 		hidden: false,
 		category: _Type,
