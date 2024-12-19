@@ -25,7 +25,6 @@ interface Assignment {
 }
 
 export interface RealAssignment extends Assignment {
-	pointsPossible: number;
 	hidden: false;
 	category: string;
 	date: Date;
@@ -284,6 +283,8 @@ export function getHiddenAssignmentsFromCategories(
 			// Calculate grade percentage change and initalize hypothetical gradebook
 			const gradePercentageChange = afterGrade - priorGrade;
 
+			if (Math.abs(gradePercentageChange) < 0.0001) return null;
+
 			const hiddenAssignment: Flowed<HiddenAssignment> = {
 				name: `Hidden ${category.name} Assignments`,
 				pointsEarned: hiddenPointsEarned,
@@ -299,7 +300,8 @@ export function getHiddenAssignmentsFromCategories(
 			};
 
 			return hiddenAssignment;
-		});
+		})
+		.filter((x) => x !== null);
 }
 
 export function getPointsByCategory<T extends Assignment>(assignments: Calculable<T>[]) {
@@ -414,6 +416,22 @@ export function parseSynergyAssignment(synergyAssignment: AssignmentEntity) {
 	// _ScoreMaxValue: "4" or undefined
 	// _DisplayScore: "Not Graded"
 
+	// Not Graded (Empty):
+	// _Point: undefined
+	// _PointPossible: undefined
+	// _Points: "Points Possible"
+	// _ScoreCalValue: undefined
+	// _ScoreMaxValue: undefined
+	// _DisplayScore: "Not Graded"
+
+	// Zero (Blank _Point):
+	// _Point: ""
+	// _PointPossible: "4"
+	// _Points: "/ 4"
+	// _ScoreCalValue: "0"
+	// _ScoreMaxValue: "4"
+	// _DisplayScore: "0 out of 4"
+
 	// Extra Credit:
 	// _Point: "3"
 	// _PointPossible: ""
@@ -439,13 +457,15 @@ export function parseSynergyAssignment(synergyAssignment: AssignmentEntity) {
 	// _ScoreMaxValue: "4"
 	// _DisplayScore: "3 out of 4"
 
-	const pointsEarned = _Point ? parseFloat(_Point) : undefined;
+	const pointsEarned = _Point === '' ? 0 : _Point ? parseFloat(_Point) : undefined; // _Point can be empty; equivalent to 0
 
 	const pointsPossible = _PointPossible
 		? parseFloat(_PointPossible)
 		: _ScoreMaxValue
 			? parseFloat(_ScoreMaxValue)
-			: parseFloat(_Points.split(' Points Possible')[0]); // Sometimes ScoreMaxValue is undefined; you can still get the points possible from the _Points field
+			: _Points === 'Points Possible' // _Points can not provide the points possible at all
+				? undefined
+				: parseFloat(_Points.split(' Points Possible')[0]); // Sometimes ScoreMaxValue is undefined; you can still get the points possible from the _Points field
 
 	const pointsEarnedIsScaled =
 		_Point !== undefined && _ScoreCalValue !== undefined && _Point !== _ScoreCalValue;

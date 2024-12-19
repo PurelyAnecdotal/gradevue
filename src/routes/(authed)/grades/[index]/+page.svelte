@@ -298,7 +298,7 @@
 										bind:extraCredit={reactiveAssignments[i].extraCredit}
 										gradePercentageChange={rawGradeCalcMatches
 											? gradePercentageChange
-											: gradePercentageChange}
+											: undefined}
 										bind:notForGrade={reactiveAssignments[i].notForGrade}
 										{hidden}
 										showHypotheticalLabel={newHypothetical}
@@ -321,7 +321,7 @@
 										{extraCredit}
 										gradePercentageChange={rawGradeCalcMatches
 											? gradePercentageChange
-											: gradePercentageChange}
+											: undefined}
 										{notForGrade}
 										{hidden}
 										{category}
@@ -349,7 +349,7 @@
 												bind:extraCredit={reactiveAssignments[i].extraCredit}
 												gradePercentageChange={rawGradeCalcMatches
 													? gradePercentageChange
-													: gradePercentageChange}
+													: undefined}
 												bind:notForGrade={reactiveAssignments[i].notForGrade}
 												{hidden}
 												showHypotheticalLabel={newHypothetical}
@@ -374,7 +374,7 @@
 												{extraCredit}
 												gradePercentageChange={rawGradeCalcMatches
 													? gradePercentageChange
-													: gradePercentageChange}
+													: undefined}
 												{notForGrade}
 												{hidden}
 												{date}
