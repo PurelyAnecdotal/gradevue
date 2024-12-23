@@ -102,8 +102,11 @@ export class StudentAccount {
 	}
 
 	async grades(reportPeriod?: number): Promise<Gradebook> {
-		if (reportPeriod)
+		if (reportPeriod) {
+			// May return current reporting period instead of the one requested if the one requested cannot be found
+
 			return (await this.request('Gradebook', { ReportPeriod: reportPeriod })).Gradebook;
+		}
 
 		return (await this.request('Gradebook')).Gradebook;
 	}

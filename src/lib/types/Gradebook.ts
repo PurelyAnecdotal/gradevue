@@ -122,9 +122,12 @@ export interface ReportPeriod {
 	_GradePeriod: string;
 	_StartDate: string;
 	_EndDate: string;
-	_Index?: string;
+}
+
+export interface IndexedReportPeriod extends ReportPeriod {
+	_Index: string;
 }
 
 export interface ReportingPeriods {
-	ReportPeriod: ReportPeriod[];
+	ReportPeriod: IndexedReportPeriod[];
 }

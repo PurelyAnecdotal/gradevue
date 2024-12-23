@@ -39,6 +39,7 @@
 	import {
 		ChevronDownOutline,
 		ChevronUpOutline,
+		CloseCircleOutline,
 		ExclamationCircleSolid,
 		GridPlusOutline,
 		InfoCircleOutline
@@ -169,11 +170,26 @@
 </svelte:head>
 
 {#if synergyCourse}
-	<div class="h-12 md:h-14"></div>
+	<div class="sticky top-0 p-4 rounded-b-lg bg-gray-900 flex justify-between">
+		<span class="line-clamp-1 text-2xl">
+			{courseName}
+		</span>
+		<span class="shrink-0 text-2xl flex items-center">
+			{#if hypotheticalMode}
+				{#if !categories && !rawGradeCalcMatches}
+					<ExclamationCircleSolid class="mr-2 focus:outline-none" />
+				{/if}
+				{Math.round(hypotheticalGrade * 1000) / 1000}%
+			{:else}
+				{synergyCourse.Marks.Mark._CalculatedScoreString}
+				{synergyCourse.Marks.Mark._CalculatedScoreRaw}%
+			{/if}
+		</span>
+	</div>
 
 	{#if categories && gradeCategories && totalCategory}
 		<div class="sm:mx-4">
-			<Table shadow>
+			<Table shadow divClass="overflow-x-auto">
 				<TableHead>
 					<TableHeadCell>Category</TableHeadCell>
 					<TableHeadCell>Grade</TableHeadCell>
@@ -296,9 +312,7 @@
 										bind:pointsEarned={reactiveAssignments[i].pointsEarned}
 										bind:pointsPossible={reactiveAssignments[i].pointsPossible}
 										bind:extraCredit={reactiveAssignments[i].extraCredit}
-										gradePercentageChange={rawGradeCalcMatches
-											? gradePercentageChange
-											: undefined}
+										gradePercentageChange={rawGradeCalcMatches ? gradePercentageChange : undefined}
 										bind:notForGrade={reactiveAssignments[i].notForGrade}
 										{hidden}
 										showHypotheticalLabel={newHypothetical}
@@ -319,9 +333,7 @@
 										{pointsPossible}
 										{unscaledPoints}
 										{extraCredit}
-										gradePercentageChange={rawGradeCalcMatches
-											? gradePercentageChange
-											: undefined}
+										gradePercentageChange={rawGradeCalcMatches ? gradePercentageChange : undefined}
 										{notForGrade}
 										{hidden}
 										{category}
@@ -388,26 +400,13 @@
 				{/each}
 			</Tabs>
 		</div>
-	{/if}
+	{:else}
+		<div class="flex justify-center">
+			<Alert class="flex items-center w-fit mx-4" color="dark">
+				<CloseCircleOutline />
 
-	<div class="top-12 left-0 w-full fixed md:top-0">
-		<div class="absolute w-full md:pl-64">
-			<div class="p-4 rounded-b-lg bg-gray-900 rounded flex justify-between">
-				<span class="line-clamp-1 text-2xl">
-					{courseName}
-				</span>
-				<span class="shrink-0 text-2xl flex items-center">
-					{#if hypotheticalMode}
-						{#if !categories && !rawGradeCalcMatches}
-							<ExclamationCircleSolid class="mr-2 focus:outline-none" />
-						{/if}
-						{Math.round(hypotheticalGrade * 1000) / 1000}%
-					{:else}
-						{synergyCourse.Marks.Mark._CalculatedScoreString}
-						{synergyCourse.Marks.Mark._CalculatedScoreRaw}%
-					{/if}
-				</span>
-			</div>
+				Looks like this this course doesn't have any grades yet.
+			</Alert>
 		</div>
-	</div>
+	{/if}
 {/if}
