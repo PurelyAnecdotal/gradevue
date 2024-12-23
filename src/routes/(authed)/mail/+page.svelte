@@ -48,10 +48,10 @@
 
 <LoadingBanner show={!$mailLoaded} loadingMsg="Loading mail..." />
 
-<h1 class="text-2xl font-bold p-4 pb-0">Inbox</h1>
+<h1 class="p-4 pb-0 text-2xl font-bold">Inbox</h1>
 
 {#if $mail}
-	<ol class="p-4 space-y-4">
+	<ol class="space-y-4 p-4">
 		{#each $mail.InboxItemListings.MessageXML as message}
 			<li
 				ontouchend={() => {

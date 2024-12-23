@@ -72,7 +72,7 @@
 <LoadingBanner show={loggingIn} loadingMsg="Logging you in..." />
 
 {#if loginError}
-	<div in:fly={{ y: -50, duration: 200 }} class="fixed w-full p-4 top-0 left-0 flex justify-center">
+	<div in:fly={{ y: -50, duration: 200 }} class="fixed left-0 top-0 flex w-full justify-center p-4">
 		<Alert color="red">
 			<ExclamationCircleSolid slot="icon" />
 			<span class="font-bold">Couldn't log in</span>
@@ -81,11 +81,11 @@
 	</div>
 {/if}
 
-<div class="flex items-center justify-center min-h-screen">
+<div class="flex min-h-screen items-center justify-center">
 	<Card>
 		<form onsubmit={login}>
-			<h1 class="text-xl mb-4 dark:text-white">Sign in to GradeVue</h1>
-			<Label class="space-y-2 mb-4">
+			<h1 class="mb-4 text-xl dark:text-white">Sign in to GradeVue</h1>
+			<Label class="mb-4 space-y-2">
 				<span>Username</span>
 				<Input
 					type="text"
@@ -95,14 +95,14 @@
 					required
 				/>
 			</Label>
-			<Label class="space-y-2 mb-4">
+			<Label class="mb-4 space-y-2">
 				<span>Password</span>
 				<Input type="password" id="password" bind:value={password} class="mb-2" required />
-				<Helper class="text-xs flex items-center">
+				<Helper class="flex items-center text-xs">
 					<EyeSlashOutline size="sm" class="mr-2 focus:outline-none" />
 					Your device connects directly to StudentVue. We can't see your password or your grades.
 				</Helper>
-				<Helper class="text-xs flex items-center">
+				<Helper class="flex items-center text-xs">
 					<InfoCircleOutline size="sm" class="mr-2 focus:outline-none" />
 					<span>
 						If you've never used GradeVue or SynergyPlus before, you may need to

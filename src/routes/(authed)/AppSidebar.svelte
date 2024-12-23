@@ -33,7 +33,7 @@
 </script>
 
 <Sidebar activeUrl={page.url.pathname} class="h-screen">
-	<SidebarWrapper class="h-screen flex flex-col justify-between gap-2">
+	<SidebarWrapper class="flex h-screen flex-col justify-between gap-2">
 		<SidebarGroup>
 			<SidebarBrand
 				site={{
@@ -44,10 +44,10 @@
 			/>
 
 			{#if page.url.pathname.startsWith('/grades')}
-				<li class="bg-gray-900 rounded-lg">
+				<li class="rounded-lg bg-gray-900">
 					<a
 						href="/grades"
-						class="flex items-center p-2 text-base font-normal text-gray-900 bg-gray-200 dark:bg-gray-700 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700"
+						class="flex items-center rounded-lg bg-gray-200 p-2 text-base font-normal text-gray-900 hover:bg-gray-100 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-700"
 					>
 						<AddressBookOutline class="focus:outline-none" />
 						<span class="ms-3">Grades</span>
@@ -63,7 +63,7 @@
 								<li>
 									<a
 										href={`/grades/${index.toString()}`}
-										class="flex items-center p-2 w-full text-base font-normal text-gray-90 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
+										class="text-gray-90 group flex w-full items-center rounded-lg p-2 text-base font-normal transition duration-75 hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
 									>
 										<MapPinAltOutline
 											class={page.params.index !== index.toString()

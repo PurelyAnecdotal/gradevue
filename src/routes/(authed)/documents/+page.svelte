@@ -55,7 +55,7 @@
 					<li>
 						<Card
 							href="/documents/{document._DocumentGU}"
-							class="dark:text-white max-w-none flex flex-row items-center gap-2 flex-wrap"
+							class="flex max-w-none flex-row flex-wrap items-center gap-2 dark:text-white"
 						>
 							<h2 class="text-md">{document._DocumentComment}</h2>
 							<DateBadge date={new Date(document._DocumentDate)} />
@@ -74,7 +74,7 @@
 						<li>
 							<Card
 								href="/documents/{document._DocumentGU}"
-								class="dark:text-white max-w-none flex flex-row items-center gap-2 flex-wrap"
+								class="flex max-w-none flex-row flex-wrap items-center gap-2 dark:text-white"
 							>
 								<h2 class="text-md">{document._DocumentComment}</h2>
 								<DateBadge date={new Date(document._DocumentDate)} />

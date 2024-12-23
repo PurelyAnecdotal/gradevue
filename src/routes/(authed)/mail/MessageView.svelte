@@ -133,7 +133,7 @@
 				</html>
 			`}
 	sandbox=""
-	class="w-full h-96 bg-white"
+	class="h-96 w-full bg-white"
 	title="Message Content"
 ></iframe>
 
@@ -144,7 +144,7 @@
 				<Card
 					padding="xs"
 					horizontal={true}
-					class="dark:text-white w-fit max-w-full flex flex-row items-center gap-2"
+					class="flex w-fit max-w-full flex-row items-center gap-2 dark:text-white"
 					href={link}
 					target="_blank"
 				>
@@ -159,7 +159,7 @@
 				<Card
 					padding="xs"
 					horizontal
-					class="dark:text-white w-fit max-w-full flex flex-row items-center gap-2"
+					class="flex w-fit max-w-full flex-row items-center gap-2 dark:text-white"
 					href="/mail/attachment?attachmentGU={attachment._SmAttachmentGU}"
 					target="_blank"
 				>

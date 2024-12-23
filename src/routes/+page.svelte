@@ -26,7 +26,7 @@
 	<title>Gradevue - The best way to check your grades on StudentVue</title>
 </svelte:head>
 
-<div class="p-4 flex flex-col gap-4 items-center justify-center min-h-screen">
+<div class="flex min-h-screen flex-col items-center justify-center gap-4 p-4">
 	<Card class="w-full sm:w-auto">
 		<h1 class="text-2xl font-bold tracking-tight text-gray-900 dark:text-white">GradeVue</h1>
 		<p class="mt-2 font-normal text-gray-700 dark:text-gray-400">
@@ -39,9 +39,9 @@
 		</div>
 	</Card>
 
-	<div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+	<div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
 		<Card>
-			<h2 class="text-xl dark:text-white mb-2 flex items-center gap-2">
+			<h2 class="mb-2 flex items-center gap-2 text-xl dark:text-white">
 				<ChartOutline class="inline focus:outline-none" />
 				Grade Calculator
 			</h2>
@@ -51,7 +51,7 @@
 			</p>
 		</Card>
 		<Card>
-			<h2 class="text-xl dark:text-white mb-2 flex items-center gap-2">
+			<h2 class="mb-2 flex items-center gap-2 text-xl dark:text-white">
 				<GridPlusOutline class="inline focus:outline-none" />
 				Shows Hidden Assignments
 			</h2>
@@ -61,7 +61,7 @@
 			</p>
 		</Card>
 		<Card>
-			<h2 class="text-xl dark:text-white mb-2 flex items-center gap-2">
+			<h2 class="mb-2 flex items-center gap-2 text-xl dark:text-white">
 				<EyeSlashOutline class="inline focus:outline-none" />
 				Private Login
 			</h2>
@@ -72,7 +72,7 @@
 			</p>
 		</Card>
 		<Card>
-			<h2 class="text-xl dark:text-white mb-2 flex items-center gap-2">
+			<h2 class="mb-2 flex items-center gap-2 text-xl dark:text-white">
 				<ClockOutline class="inline focus:outline-none" />
 				Attendance and more
 			</h2>

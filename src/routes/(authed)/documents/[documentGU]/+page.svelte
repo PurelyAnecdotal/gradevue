@@ -15,7 +15,7 @@
 		<LoadingBanner loadingMsg="Loading report card..." />
 	{:then reportCard}
 		<iframe
-			class="w-full h-full"
+			class="h-full w-full"
 			src="data:application/pdf;base64,{reportCard.Base64Code}"
 			title="Report Card PDF"
 		></iframe>
