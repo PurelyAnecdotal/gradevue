@@ -1,4 +1,3 @@
-import { roundToLeastPrecision } from '$lib';
 import type { AssignmentEntity, Course } from './types/Gradebook';
 
 export interface Category {
@@ -321,10 +320,35 @@ export function getPointsByCategory<T extends Assignment>(assignments: Calculabl
 	return pointsByCategory;
 }
 
-export function gradesMatch(rawGrade: number, expectedGrade: number) {
-	const [a, b] = roundToLeastPrecision(rawGrade, expectedGrade);
+function countDecimalPlaces(num: number) {
+	const numStr = num.toString();
+	const decimalIndex = numStr.indexOf('.');
 
-	return a === b;
+	if (decimalIndex === -1) return 0;
+
+	return numStr.length - decimalIndex - 1;
+}
+
+function roundToPrecision(num: number, precision: number) {
+	const factor = Math.pow(10, precision);
+	return Math.round(num * factor) / factor;
+}
+
+function floorToPrecision(num: number, precision: number) {
+	const factor = Math.pow(10, precision);
+	return Math.floor(num * factor) / factor;
+}
+
+export function gradesMatch(rawGrade: number, expectedGrade: number) {
+	const leastPrecision = Math.min(countDecimalPlaces(rawGrade), countDecimalPlaces(expectedGrade));
+
+	const roundedMatches =
+		roundToPrecision(rawGrade, leastPrecision) === roundToPrecision(expectedGrade, leastPrecision);
+
+	const flooredMatches =
+		floorToPrecision(rawGrade, leastPrecision) === floorToPrecision(expectedGrade, leastPrecision);
+
+	return roundedMatches || flooredMatches;
 }
 
 function getAssignmentPointTotals<T extends Assignment>(assignments: Calculable<T>[]) {

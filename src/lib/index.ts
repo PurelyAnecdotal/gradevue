@@ -47,23 +47,3 @@ export const shortDateFormatter = new Intl.DateTimeFormat('en-US', {
 export const fullDateFormatter = new Intl.DateTimeFormat('en-US', {
 	dateStyle: 'full'
 });
-
-export function roundToLeastPrecision(num1: number, num2: number): [number, number] {
-	const countDecimalPlaces = (num: number): number => {
-		const numStr = num.toString();
-		const decimalIndex = numStr.indexOf('.');
-
-		if (decimalIndex === -1) return 0;
-
-		return numStr.length - decimalIndex - 1;
-	};
-
-	const leastPrecision = Math.min(countDecimalPlaces(num1), countDecimalPlaces(num2));
-
-	const roundToPrecision = (num: number, precision: number): number => {
-		const factor = Math.pow(10, precision);
-		return Math.round(num * factor) / factor;
-	};
-
-	return [roundToPrecision(num1, leastPrecision), roundToPrecision(num2, leastPrecision)];
-}
