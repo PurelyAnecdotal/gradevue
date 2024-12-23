@@ -25,18 +25,20 @@
 
 	const sortPriority = ['Transcript', 'Report Card'];
 
-	let documentCategories = $derived(new Set(
-		documents
-			.map((document) => document._DocumentType)
-			.toSorted((a, b) => {
-				const aPriority = sortPriority.indexOf(a);
-				const bPriority = sortPriority.indexOf(b);
-				if (aPriority == -1 && bPriority == -1) return a.localeCompare(b);
-				if (aPriority == -1) return 1;
-				if (bPriority == -1) return -1;
-				return aPriority - bPriority;
-			})
-	));
+	let documentCategories = $derived(
+		new Set(
+			documents
+				.map((document) => document._DocumentType)
+				.toSorted((a, b) => {
+					const aPriority = sortPriority.indexOf(a);
+					const bPriority = sortPriority.indexOf(b);
+					if (aPriority == -1 && bPriority == -1) return a.localeCompare(b);
+					if (aPriority == -1) return 1;
+					if (bPriority == -1) return -1;
+					return aPriority - bPriority;
+				})
+		)
+	);
 </script>
 
 <svelte:head>
@@ -53,7 +55,7 @@
 					<li>
 						<Card
 							href="/documents/{document._DocumentGU}"
-							class="dark:text-white max-w-none flex flex-row items-center gap-2 flex-wrap"
+							class="flex max-w-none flex-row flex-wrap items-center gap-2 dark:text-white"
 						>
 							<h2 class="text-md">{document._DocumentComment}</h2>
 							<DateBadge date={new Date(document._DocumentDate)} />
@@ -72,7 +74,7 @@
 						<li>
 							<Card
 								href="/documents/{document._DocumentGU}"
-								class="dark:text-white max-w-none flex flex-row items-center gap-2 flex-wrap"
+								class="flex max-w-none flex-row flex-wrap items-center gap-2 dark:text-white"
 							>
 								<h2 class="text-md">{document._DocumentComment}</h2>
 								<DateBadge date={new Date(document._DocumentDate)} />

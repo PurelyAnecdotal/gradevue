@@ -53,16 +53,16 @@
 
 <LoadingBanner show={!$studentInfoLoaded} loadingMsg="Loading student info..." />
 
-<div class="p-4 flex flex-col gap-4 justify-center">
+<div class="flex flex-col justify-center gap-4 p-4">
 	{#if $studentInfo}
-		<Card class="max-w-none flex flex-row gap-4 dark:text-white">
+		<Card class="flex max-w-none flex-row gap-4 dark:text-white">
 			<img
-				class="rounded h-xl"
+				class="h-xl rounded"
 				src="data:image/png;base64,{$studentInfo.Photo}"
 				alt="Student Portrait"
 			/>
-			<div class="w-full flex flex-col">
-				<h1 class="text-2xl w-full">
+			<div class="flex w-full flex-col">
+				<h1 class="w-full text-2xl">
 					{$studentInfo.FormattedName}
 				</h1>
 				<span class="text-xl">
@@ -80,7 +80,7 @@
 
 			<svg
 				slot="arrowdown"
-				class="w-3 h-3 mr-5 text-gray-800 dark:text-white"
+				class="mr-5 h-3 w-3 text-gray-800 dark:text-white"
 				aria-hidden="true"
 				xmlns="http://www.w3.org/2000/svg"
 				fill="none"
@@ -97,7 +97,7 @@
 
 			<svg
 				slot="arrowup"
-				class="w-3 h-3 mr-5 text-gray-800 dark:text-white"
+				class="mr-5 h-3 w-3 text-gray-800 dark:text-white"
 				aria-hidden="true"
 				xmlns="http://www.w3.org/2000/svg"
 				fill="none"

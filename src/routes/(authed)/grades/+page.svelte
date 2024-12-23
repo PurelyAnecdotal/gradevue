@@ -94,7 +94,7 @@
 		</div>
 
 		{#if $gradebook.Courses.Course.map((course) => course.Marks.Mark._CalculatedScoreString).every((score) => score === 'N/A') && !displayPeriodOverride.period}
-			<Alert class="flex items-center w-fit mx-auto" color="dark">
+			<Alert class="mx-auto flex w-fit items-center" color="dark">
 				<CloseCircleOutline />
 				It looks like you don't have any grades yet in this reporting period.
 
@@ -114,11 +114,11 @@
 			{#each $gradebook.Courses.Course ?? [] as { _Title: title, Marks: { Mark: { _CalculatedScoreString: grade, _CalculatedScoreRaw: percent } } }, index}
 				<li>
 					<Card
-						class="dark:text-white text-xl max-w-none flex flex-row justify-between items-center"
+						class="flex max-w-none flex-row items-center justify-between text-xl dark:text-white"
 						href="/grades/{index.toString()}"
 					>
-						<span class="line-clamp-1 mr-2">{removeClassID(title)}</span>
-						<span class="shrink-0 ml-auto mr-2">
+						<span class="mr-2 line-clamp-1">{removeClassID(title)}</span>
+						<span class="ml-auto mr-2 shrink-0">
 							{grade}
 							{parseFloat(percent)}%
 						</span>
@@ -127,7 +127,7 @@
 							color={getColorForGrade(grade)}
 							progress={Math.min(isNaN(parseFloat(percent)) ? 0 : parseFloat(percent), 100)}
 							animate={true}
-							class="hidden sm:block w-1/3 shrink-0"
+							class="hidden w-1/3 shrink-0 sm:block"
 						/>
 					</Card>
 				</li>

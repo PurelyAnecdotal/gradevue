@@ -305,7 +305,7 @@ export function getHiddenAssignmentsFromCategories(
 }
 
 export function getPointsByCategory<T extends Assignment>(assignments: Calculable<T>[]) {
-	let pointsByCategory: PointsByCategory = {};
+	const pointsByCategory: PointsByCategory = {};
 
 	assignments.forEach((assignment) => {
 		const { category, pointsEarned, pointsPossible, extraCredit } = assignment;

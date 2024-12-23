@@ -15,26 +15,23 @@
 		links?: string[];
 	}
 
-	let {
-		touchscreen = false,
-		message,
-		content = '',
-		links = []
-	}: Props = $props();
+	let { touchscreen = false, message, content = '', links = [] }: Props = $props();
 
 	let from = $derived(message.From.RecipientXML);
-	let recipients =
-		$derived(typeof message.To !== 'string'
+	let recipients = $derived(
+		typeof message.To !== 'string'
 			? message.To.RecipientXML instanceof Array
 				? message.To.RecipientXML
 				: [message.To.RecipientXML]
-			: undefined);
-	let attachments =
-		$derived(typeof message.Attachments !== 'string'
+			: undefined
+	);
+	let attachments = $derived(
+		typeof message.Attachments !== 'string'
 			? message.Attachments.AttachmentXML instanceof Array
 				? message.Attachments.AttachmentXML
 				: [message.Attachments.AttachmentXML]
-			: undefined);
+			: undefined
+	);
 
 	let showRecipients = $state(false);
 </script>
@@ -136,7 +133,7 @@
 				</html>
 			`}
 	sandbox=""
-	class="w-full h-96 bg-white"
+	class="h-96 w-full bg-white"
 	title="Message Content"
 ></iframe>
 
@@ -147,7 +144,7 @@
 				<Card
 					padding="xs"
 					horizontal={true}
-					class="dark:text-white w-fit max-w-full flex flex-row items-center gap-2"
+					class="flex w-fit max-w-full flex-row items-center gap-2 dark:text-white"
 					href={link}
 					target="_blank"
 				>
@@ -162,7 +159,7 @@
 				<Card
 					padding="xs"
 					horizontal
-					class="dark:text-white w-fit max-w-full flex flex-row items-center gap-2"
+					class="flex w-fit max-w-full flex-row items-center gap-2 dark:text-white"
 					href="/mail/attachment?attachmentGU={attachment._SmAttachmentGU}"
 					target="_blank"
 				>

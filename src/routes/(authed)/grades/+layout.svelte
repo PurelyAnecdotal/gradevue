@@ -14,7 +14,7 @@
 <LoadingBanner show={!$gradebookLoaded} loadingMsg="Loading grades..." />
 
 {#if periodState.new && periodState.original}
-	<Alert class="m-4 flex justify-between items-center" color="light" border>
+	<Alert class="m-4 flex items-center justify-between" color="light" border>
 		Temporarily viewing reporting period {periodState.new.name}
 
 		<Button

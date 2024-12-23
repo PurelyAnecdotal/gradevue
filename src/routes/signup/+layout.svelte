@@ -8,8 +8,8 @@
 	<title>Sign Up - GradeVue</title>
 </svelte:head>
 
-<div class="flex items-center justify-center min-h-screen">
-	<Card class="text-sm dark:text-gray-200 leading-relaxed space-y-4">
+<div class="flex min-h-screen items-center justify-center">
+	<Card class="space-y-4 text-sm leading-relaxed dark:text-gray-200">
 		<h1 class="text-xl dark:text-white">Sign up for GradeVue</h1>
 
 		{@render children?.()}

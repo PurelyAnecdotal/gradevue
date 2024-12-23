@@ -10,7 +10,7 @@
 	<title>Privacy - GradeVue</title>
 </svelte:head>
 
-<div class="flex items-center justify-center min-h-screen">
+<div class="flex min-h-screen items-center justify-center">
 	<Card size="lg" class="gap-4">
 		<h1 class="text-2xl text-white">About the privacy of GradeVue</h1>
 		<p>

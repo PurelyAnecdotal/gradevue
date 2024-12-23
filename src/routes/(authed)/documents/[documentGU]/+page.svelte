@@ -1,9 +1,9 @@
 <script lang="ts">
-	import { page } from '$app/stores';
+	import { page } from '$app/state';
 	import LoadingBanner from '$lib/components/LoadingBanner.svelte';
 	import { studentAccount } from '$lib/stores';
 
-	const reportCardPromise = $studentAccount?.reportCard($page.params.documentGU);
+	const reportCardPromise = $studentAccount?.reportCard(page.params.documentGU);
 </script>
 
 <svelte:head>
@@ -15,7 +15,7 @@
 		<LoadingBanner loadingMsg="Loading report card..." />
 	{:then reportCard}
 		<iframe
-			class="w-full h-full"
+			class="h-full w-full"
 			src="data:application/pdf;base64,{reportCard.Base64Code}"
 			title="Report Card PDF"
 		></iframe>

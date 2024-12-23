@@ -12,9 +12,9 @@
 
 {#if show}
 	<div class="flex justify-center">
-		<div class="fixed top-6 bg-gray-900 rounded-lg opacity-90 z-10" in:fade out:fly={{ y: '-50%' }}>
+		<div class="fixed top-6 z-10 rounded-lg bg-gray-900 opacity-90" in:fade out:fly={{ y: '-50%' }}>
 			<Spinner class="m-4" />
-			<span class="dark:text-white mr-4">{loadingMsg}</span>
+			<span class="mr-4 dark:text-white">{loadingMsg}</span>
 		</div>
 	</div>
 {/if}

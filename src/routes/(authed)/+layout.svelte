@@ -37,17 +37,17 @@
 	}
 </script>
 
-<div class="hidden md:block md:fixed top-0">
+<div class="top-0 hidden md:fixed md:block">
 	<AppSidebar />
 </div>
 
-<Drawer {transitionParams} bind:hidden={drawerHidden} class="p-0 m-0 w-auto">
+<Drawer {transitionParams} bind:hidden={drawerHidden} class="m-0 w-auto p-0">
 	<AppSidebar />
 </Drawer>
 
-<div class="md:pt-0 md:pl-64 h-screen flex flex-col">
-	<div class="sticky top-0 flex p-2 pr-4 bg-slate-800 md:hidden items-center">
-		<NavHamburger onClick={showSidebar} class="text-white ml-0" />
+<div class="flex h-screen flex-col md:pl-64 md:pt-0">
+	<div class="sticky top-0 flex items-center bg-slate-800 p-2 pr-4 md:hidden">
+		<NavHamburger onClick={showSidebar} class="ml-0 text-white" />
 		<a href="/grades" class="mr-auto text-xl text-white">GradeVue</a>
 		<div>{$studentInfo?.FormattedName}</div>
 	</div>

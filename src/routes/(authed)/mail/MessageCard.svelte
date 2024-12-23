@@ -18,21 +18,22 @@
 		(link) => new URL(link.href).hostname
 	).length;
 
-	let attachments =
-		$derived(typeof message.Attachments !== 'string'
+	let attachments = $derived(
+		typeof message.Attachments !== 'string'
 			? message.Attachments.AttachmentXML instanceof Array
 				? message.Attachments.AttachmentXML
 				: [message.Attachments.AttachmentXML]
-			: undefined);
+			: undefined
+	);
 </script>
 
-<Card class="dark:text-white max-w-none flex flex-row justify-between gap-2" padding="sm" href="#">
+<Card class="flex max-w-none flex-row justify-between gap-2 dark:text-white" padding="sm" href="#">
 	<div class="flex flex-col gap-2">
 		<h2 class="text-md text-left">{message._Subject}</h2>
 
-		<div class="flex flex-row items-center gap-2 flex-wrap">
+		<div class="flex flex-row flex-wrap items-center gap-2">
 			<Badge color="blue">
-				<UserOutline size="xs" class="focus:outline-none mr-1" />
+				<UserOutline size="xs" class="mr-1 focus:outline-none" />
 				{message.From.RecipientXML._Details1} ({message.From.RecipientXML._Details2})
 			</Badge>
 

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { page } from '$app/stores';
+	import { page } from '$app/state';
 	import { removeClassID } from '$lib';
 	import {
 		calculateAssignmentGPCs,
@@ -48,7 +48,7 @@
 	import { fade } from 'svelte/transition';
 	import AssignmentCard from './AssignmentCard.svelte';
 
-	const synergyCourse = $derived($gradebook?.Courses.Course?.[parseInt($page.params.index)]);
+	const synergyCourse = $derived($gradebook?.Courses.Course?.[parseInt(page.params.index)]);
 
 	const courseName = $derived(synergyCourse ? removeClassID(synergyCourse._Title) : '');
 
@@ -170,11 +170,11 @@
 </svelte:head>
 
 {#if synergyCourse}
-	<div class="sticky top-0 p-4 rounded-b-lg bg-gray-900 flex justify-between">
+	<div class="sticky top-0 flex justify-between rounded-b-lg bg-gray-900 p-4">
 		<span class="line-clamp-1 text-2xl">
 			{courseName}
 		</span>
-		<span class="shrink-0 text-2xl flex items-center">
+		<span class="flex shrink-0 items-center text-2xl">
 			{#if hypotheticalMode}
 				{#if !categories && !rawGradeCalcMatches}
 					<ExclamationCircleSolid class="mr-2 focus:outline-none" />
@@ -251,7 +251,7 @@
 						calcWarningOpen = !calcWarningOpen;
 					}}
 				>
-					<span class="font-bold text-left">
+					<span class="text-left font-bold">
 						{#if hypotheticalMode}
 							Grade calculations in Hypothetical Mode are inaccurate
 						{:else}
@@ -277,9 +277,9 @@
 		</Alert>
 	{/if}
 
-	<div class="flex flex-wrap justify-between items-center">
+	<div class="flex flex-wrap items-center justify-between">
 		<Checkbox bind:checked={hypotheticalMode} class="m-4">
-			<div id="hypothetical-toggle" class="flex items-center mr-2">
+			<div id="hypothetical-toggle" class="mr-2 flex items-center">
 				Hypothetical Mode
 				<InfoCircleOutline size="sm" class="ml-2 focus:outline-none" />
 			</div>
@@ -402,7 +402,7 @@
 		</div>
 	{:else}
 		<div class="flex justify-center">
-			<Alert class="flex items-center w-fit mx-4" color="dark">
+			<Alert class="mx-4 flex w-fit items-center" color="dark">
 				<CloseCircleOutline />
 
 				Looks like this this course doesn't have any grades yet.

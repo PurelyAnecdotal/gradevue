@@ -67,10 +67,10 @@
 	let percentageChange = $derived(Math.round((gradePercentageChange ?? 0) * 100) / 100);
 </script>
 
-<Card class="dark:text-white max-w-none flex flex-row items-center sm:p-4">
+<Card class="flex max-w-none flex-row items-center dark:text-white sm:p-4">
 	<div class="mr-2">
 		{#if editable}
-			<Input bind:value={name} class="w-48 inline" />
+			<Input bind:value={name} class="inline w-48" />
 
 			{#if categoryDropdownOptions.length > 0}
 				<Button color="light">
@@ -145,7 +145,7 @@
 		{/if}
 	</div>
 
-	<div class="ml-auto mr-2 shrink-0 flex items-center gap-2">
+	<div class="ml-auto mr-2 flex shrink-0 items-center gap-2">
 		{#if gradePercentageChange !== undefined}
 			{#if percentageChange < 0}
 				<span class="text-red-500">
@@ -167,7 +167,7 @@
 		{/if}
 
 		{#if editable}
-			<div class="w-32 flex items-center">
+			<div class="flex w-32 items-center">
 				<NumberInput
 					type="number"
 					size="sm"
@@ -197,7 +197,7 @@
 			color={extraCredit ? 'blue' : getColorForGrade(percentage)}
 			progress={Math.min(isNaN(percentage) ? 0 : percentage, 100)}
 			animate={true}
-			class="hidden sm:block w-1/3 shrink-0"
+			class="hidden w-1/3 shrink-0 sm:block"
 		/>
 	{/if}
 </Card>
