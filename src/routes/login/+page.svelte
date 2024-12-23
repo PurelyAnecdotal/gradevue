@@ -1,6 +1,4 @@
 <script lang="ts">
-	import { preventDefault } from 'svelte/legacy';
-
 	import { browser } from '$app/environment';
 	import { goto } from '$app/navigation';
 	import LoadingBanner from '$lib/components/LoadingBanner.svelte';

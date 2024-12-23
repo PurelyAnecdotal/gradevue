@@ -1,3 +1,4 @@
+import flowbitePlugin from 'flowbite/plugin';
 import type { Config } from 'tailwindcss';
 
 export default {
@@ -26,7 +27,7 @@ export default {
 		}
 	},
 
-	plugins: [require('flowbite/plugin')],
-	
+	plugins: [flowbitePlugin],
+
 	darkMode: 'class'
 } satisfies Config;

@@ -54,7 +54,7 @@
 {#if $attendance}
 	<Accordion class="p-4">
 		{#each $attendance.Absences.Absence ?? [] as absence}
-			<AccordionItem class="dark:">
+			<AccordionItem>
 				<div slot="header">
 					{fullDateFormatter.format(new Date(absence._AbsenceDate))}
 					{#if getAbsenceType(absence.Periods.Period ?? [])}

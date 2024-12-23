@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { page } from '$app/stores';
+	import { page } from '$app/state';
 	import LoadingBanner from '$lib/components/LoadingBanner.svelte';
 	import { studentAccount } from '$lib/stores';
 	import type { Attachment } from '$lib/types/Attachment';
@@ -7,7 +7,7 @@
 	import { fileTypeFromBuffer } from 'file-type';
 	import { Button, Card } from 'flowbite-svelte';
 
-	const attachmentGU = $page.url.searchParams.get('attachmentGU');
+	const attachmentGU = page.url.searchParams.get('attachmentGU');
 
 	let attachmentPromise:
 		| Promise<{
@@ -20,8 +20,9 @@
 		attachmentPromise = new Promise(async (resolve, reject) => {
 			const attachment = await $studentAccount.attachmentBase64(attachmentGU);
 
-			const mimeType = (await fileTypeFromBuffer(Buffer.from(attachment.Base64Code, 'base64')))
-				?.mime;
+			const mimeType = (
+				await fileTypeFromBuffer(new Uint8Array(Buffer.from(attachment.Base64Code, 'base64')))
+			)?.mime;
 
 			if (!mimeType) {
 				reject(new Error('Could not determine MIME type of attachment'));
@@ -43,13 +44,13 @@
 			<LoadingBanner loadingMsg="Loading attachment..." />
 		{:then { attachment, mimeType }}
 			<iframe
-				class="w-full h-full"
+				class="h-full w-full"
 				src="data:{mimeType};base64,{attachment.Base64Code}"
 				title="Attachment"
 			></iframe>
 		{:catch error}
-			<div class="flex items-center justify-center min-h-screen">
-				<Card class="text-sm dark:text-gray-200 leading-relaxed space-y-4">
+			<div class="flex min-h-screen items-center justify-center">
+				<Card class="space-y-4 text-sm leading-relaxed dark:text-gray-200">
 					<h1 class="text-2xl dark:text-white">{error}</h1>
 
 					<Button href="/mail" class="w-full">Return to Mail</Button>
@@ -57,8 +58,8 @@
 			</div>
 		{/await}
 	{:else}
-		<div class="flex items-center justify-center min-h-screen">
-			<Card class="text-sm dark:text-gray-200 leading-relaxed space-y-4">
+		<div class="flex min-h-screen items-center justify-center">
+			<Card class="space-y-4 text-sm leading-relaxed dark:text-gray-200">
 				<h1 class="text-2xl dark:text-white">AttachmentGU Required</h1>
 
 				<Button href="/mail" class="w-full">Return to Mail</Button>

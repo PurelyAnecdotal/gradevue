@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { browser } from '$app/environment';
-	import { page } from '$app/stores';
+	import { page } from '$app/state';
 	import { removeClassID } from '$lib';
 	import { loadStudentInfo } from '$lib/cache';
 	import { gradebook, studentInfo } from '$lib/stores';
@@ -18,7 +18,6 @@
 		BellOutline,
 		ChevronDownOutline,
 		ChevronUpOutline,
-		FileLinesOutline,
 		FolderOpenOutline,
 		MailBoxOutline,
 		MapPinAltOutline,
@@ -33,7 +32,7 @@
 	if (!$studentInfo && browser) loadStudentInfo();
 </script>
 
-<Sidebar activeUrl={$page.url.pathname} class="h-screen">
+<Sidebar activeUrl={page.url.pathname} class="h-screen">
 	<SidebarWrapper class="h-screen flex flex-col justify-between gap-2">
 		<SidebarGroup>
 			<SidebarBrand
@@ -44,7 +43,7 @@
 				}}
 			/>
 
-			{#if $page.url.pathname.startsWith('/grades')}
+			{#if page.url.pathname.startsWith('/grades')}
 				<li class="bg-gray-900 rounded-lg">
 					<a
 						href="/grades"
@@ -52,13 +51,13 @@
 					>
 						<AddressBookOutline class="focus:outline-none" />
 						<span class="ms-3">Grades</span>
-						{#if $page.params.index}
+						{#if page.params.index}
 							<ChevronUpOutline />
 						{:else}
 							<ChevronDownOutline />
 						{/if}
 					</a>
-					{#if $page.params.index}
+					{#if page.params.index}
 						<ul>
 							{#each $gradebook?.Courses.Course ?? [] as { _Title: title }, index}
 								<li>
@@ -67,7 +66,7 @@
 										class="flex items-center p-2 w-full text-base font-normal text-gray-90 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
 									>
 										<MapPinAltOutline
-											class={$page.params.index !== index.toString()
+											class={page.params.index !== index.toString()
 												? 'opacity-0 transition'
 												: 'transition'}
 										/>
