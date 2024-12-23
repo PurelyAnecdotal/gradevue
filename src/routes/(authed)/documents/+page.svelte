@@ -25,18 +25,20 @@
 
 	const sortPriority = ['Transcript', 'Report Card'];
 
-	let documentCategories = $derived(new Set(
-		documents
-			.map((document) => document._DocumentType)
-			.toSorted((a, b) => {
-				const aPriority = sortPriority.indexOf(a);
-				const bPriority = sortPriority.indexOf(b);
-				if (aPriority == -1 && bPriority == -1) return a.localeCompare(b);
-				if (aPriority == -1) return 1;
-				if (bPriority == -1) return -1;
-				return aPriority - bPriority;
-			})
-	));
+	let documentCategories = $derived(
+		new Set(
+			documents
+				.map((document) => document._DocumentType)
+				.toSorted((a, b) => {
+					const aPriority = sortPriority.indexOf(a);
+					const bPriority = sortPriority.indexOf(b);
+					if (aPriority == -1 && bPriority == -1) return a.localeCompare(b);
+					if (aPriority == -1) return 1;
+					if (bPriority == -1) return -1;
+					return aPriority - bPriority;
+				})
+		)
+	);
 </script>
 
 <svelte:head>

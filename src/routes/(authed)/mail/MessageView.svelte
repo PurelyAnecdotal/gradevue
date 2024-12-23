@@ -15,26 +15,23 @@
 		links?: string[];
 	}
 
-	let {
-		touchscreen = false,
-		message,
-		content = '',
-		links = []
-	}: Props = $props();
+	let { touchscreen = false, message, content = '', links = [] }: Props = $props();
 
 	let from = $derived(message.From.RecipientXML);
-	let recipients =
-		$derived(typeof message.To !== 'string'
+	let recipients = $derived(
+		typeof message.To !== 'string'
 			? message.To.RecipientXML instanceof Array
 				? message.To.RecipientXML
 				: [message.To.RecipientXML]
-			: undefined);
-	let attachments =
-		$derived(typeof message.Attachments !== 'string'
+			: undefined
+	);
+	let attachments = $derived(
+		typeof message.Attachments !== 'string'
 			? message.Attachments.AttachmentXML instanceof Array
 				? message.Attachments.AttachmentXML
 				: [message.Attachments.AttachmentXML]
-			: undefined);
+			: undefined
+	);
 
 	let showRecipients = $state(false);
 </script>

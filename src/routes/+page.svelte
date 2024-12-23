@@ -77,8 +77,8 @@
 				Attendance and more
 			</h2>
 			<p>
-				GradeVue breaks down your attendance by day and shows what periods you missed. It also
-				shows your report cards, documents, and messages.
+				GradeVue breaks down your attendance by day and shows what periods you missed. It also shows
+				your report cards, documents, and messages.
 			</p>
 		</Card>
 	</div>

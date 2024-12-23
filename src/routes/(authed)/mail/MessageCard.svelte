@@ -18,12 +18,13 @@
 		(link) => new URL(link.href).hostname
 	).length;
 
-	let attachments =
-		$derived(typeof message.Attachments !== 'string'
+	let attachments = $derived(
+		typeof message.Attachments !== 'string'
 			? message.Attachments.AttachmentXML instanceof Array
 				? message.Attachments.AttachmentXML
 				: [message.Attachments.AttachmentXML]
-			: undefined);
+			: undefined
+	);
 </script>
 
 <Card class="dark:text-white max-w-none flex flex-row justify-between gap-2" padding="sm" href="#">
