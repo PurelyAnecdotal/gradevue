@@ -8,12 +8,7 @@
 		CloseCircleOutline,
 		MapPinAltOutline
 	} from 'flowbite-svelte-icons';
-	import {
-		changeReportPeriod,
-		displayPeriodOverride,
-		periodState,
-		type Period
-	} from './reportingPeriods.svelte';
+	import { changeReportPeriod, periodOverrideState, type Period } from './reportingPeriods.svelte';
 
 	let dropdownOpen = $state(false);
 
@@ -51,7 +46,7 @@
 	async function setReportPeriodIndex(index: number) {
 		if (!allPeriods || !currentPeriod) return;
 
-		periodState.original ??= { period: currentPeriod, index: currentPeriodIndex };
+		periodOverrideState.original ??= { period: currentPeriod, index: currentPeriodIndex };
 
 		await changeReportPeriod(allPeriods[index], index);
 	}
@@ -65,7 +60,7 @@
 	<main class="m-4 space-y-4">
 		<div class="flex flex-col justify-center">
 			<Button color="light" class="mx-auto flex items-center">
-				{(displayPeriodOverride.period ?? currentPeriod).name}
+				{(periodOverrideState.new?.period ?? currentPeriod).name}
 
 				{#if dropdownOpen}
 					<ChevronUpOutline size="sm" class="ml-2 focus:outline-none" />
@@ -93,7 +88,7 @@
 			</Dropdown>
 		</div>
 
-		{#if $gradebook.Courses.Course.map((course) => course.Marks.Mark._CalculatedScoreString).every((score) => score === 'N/A') && !displayPeriodOverride.period}
+		{#if $gradebook.Courses.Course.map((course) => course.Marks.Mark._CalculatedScoreString).every((score) => score === 'N/A') && !periodOverrideState.new}
 			<Alert class="mx-auto flex w-fit items-center" color="dark">
 				<CloseCircleOutline />
 				It looks like you don't have any grades yet in this reporting period.

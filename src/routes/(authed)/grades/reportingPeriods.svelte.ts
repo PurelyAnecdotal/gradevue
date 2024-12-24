@@ -7,20 +7,21 @@ export interface Period {
 	endDate: Date;
 }
 
-export const periodState: {
+export interface PeriodOverrideState {
 	original?: {
 		period: Period;
 		index: number;
 	};
-	new?: Period;
-} = $state({});
+	new?: {
+		period: Period;
+		index: number;
+	};
+}
 
-export const displayPeriodOverride: { period?: Period } = $state({});
+export const periodOverrideState: PeriodOverrideState = $state({});
 
 export async function changeReportPeriod(newPeriod: Period, index: number) {
-	displayPeriodOverride.period = newPeriod;
-
-	periodState.new = undefined;
+	periodOverrideState.new = undefined;
 
 	gradebookLoaded.set(false);
 
@@ -37,16 +38,20 @@ export async function changeReportPeriod(newPeriod: Period, index: number) {
 		console.warn(
 			`Synergy returned reporting period ${newGradebook.ReportingPeriod._GradePeriod} when asked for ${newPeriod.name}`
 		);
-
-		if (newGradebook.ReportingPeriod._GradePeriod === periodState.original?.period.name) {
-			periodState.new = undefined;
-			periodState.original = undefined;
-			displayPeriodOverride.period = undefined;
-
-			return;
-		}
 	}
 
-	periodState.new = newPeriod;
-	displayPeriodOverride.period = undefined;
+	if (newGradebook.ReportingPeriod._GradePeriod === periodOverrideState.original?.period.name) {
+		resetPeriodOverride();
+		return;
+	}
+
+	periodOverrideState.new = { period: newPeriod, index: index };
+
+	localStorage.setItem('periodOverrideState', JSON.stringify(periodOverrideState));
+}
+
+export function resetPeriodOverride() {
+	periodOverrideState.new = undefined;
+	periodOverrideState.original = undefined;
+	localStorage.removeItem('periodOverrideState');
 }

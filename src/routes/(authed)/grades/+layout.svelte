@@ -4,7 +4,7 @@
 	import LoadingBanner from '$lib/components/LoadingBanner.svelte';
 	import { gradebook, gradebookLoaded } from '$lib/stores';
 	import { Alert, Button } from 'flowbite-svelte';
-	import { changeReportPeriod, periodState } from './reportingPeriods.svelte';
+	import { periodOverrideState, resetPeriodOverride } from './reportingPeriods.svelte';
 
 	let { children } = $props();
 
@@ -13,19 +13,22 @@
 
 <LoadingBanner show={!$gradebookLoaded} loadingMsg="Loading grades..." />
 
-{#if periodState.new && periodState.original}
+{#if periodOverrideState.new}
 	<Alert class="m-4 flex items-center justify-between" color="light" border>
-		Temporarily viewing reporting period {periodState.new.name}
+		<span class="text-white">Viewing reporting period {periodOverrideState.new.period.name}</span>
 
-		<Button
-			onclick={async () => {
-				if (!periodState.original) return;
+		{#if periodOverrideState.original}
+			<Button
+				onclick={async () => {
+					if (!periodOverrideState.original) return;
 
-				await changeReportPeriod(periodState.original.period, periodState.original.index);
-				periodState.new = undefined;
-			}}
-			color="light">Return to {periodState.original.period.name}</Button
-		>
+					resetPeriodOverride();
+
+					loadGradebook();
+				}}
+				color="light">Return to {periodOverrideState.original.period.name}</Button
+			>
+		{/if}
 	</Alert>
 {/if}
 
