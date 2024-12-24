@@ -1,4 +1,3 @@
-import { get, type Writable } from 'svelte/store';
 import {
 	attendance,
 	attendanceLoaded,
@@ -16,6 +15,11 @@ import {
 	studentInfo,
 	studentInfoLoaded
 } from '$lib/stores';
+import { get, type Writable } from 'svelte/store';
+import {
+	periodOverrideState,
+	type PeriodOverrideState
+} from '../routes/(authed)/grades/reportingPeriods.svelte';
 
 const writeCacheToStore = (key: string, store: Writable<unknown>) => {
 	const cache = localStorage.getItem(key);
@@ -33,6 +37,23 @@ export const loadGradebook = async () => {
 	gradebookLoaded.set(false);
 
 	writeCacheToStore('gradebook', gradebook);
+
+	const override = localStorage.getItem('periodOverrideState');
+
+	if (override) {
+		const restoredState: PeriodOverrideState = JSON.parse(override);
+
+		periodOverrideState.new = restoredState.new;
+		periodOverrideState.original = restoredState.original;
+
+		const grades = await get(studentAccount)?.grades(periodOverrideState.new?.index);
+
+		gradebook.set(grades);
+
+		gradebookLoaded.set(true);
+
+		return;
+	}
 
 	const grades = await get(studentAccount)?.grades();
 
