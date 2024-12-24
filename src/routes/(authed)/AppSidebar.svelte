@@ -5,6 +5,7 @@
 	import { loadStudentInfo } from '$lib/cache';
 	import { gradebook, studentInfo } from '$lib/stores';
 	import {
+		Badge,
 		Sidebar,
 		SidebarBrand,
 		SidebarGroup,
@@ -18,11 +19,13 @@
 		BellOutline,
 		ChevronDownOutline,
 		ChevronUpOutline,
+		DownloadOutline,
 		FolderOpenOutline,
 		MailBoxOutline,
 		MapPinAltOutline,
 		UserCircleOutline
 	} from 'flowbite-svelte-icons';
+	import { installPrompt } from '../../hooks.client';
 
 	function logOut() {
 		localStorage.clear();
@@ -107,6 +110,17 @@
 		</SidebarGroup>
 
 		<SidebarGroup>
+			{#if $installPrompt.prompt}
+				<SidebarItem label="Install Web App" onclick={() => $installPrompt.prompt?.()}>
+					<svelte:fragment slot="icon">
+						<DownloadOutline class="focus:outline-none" />
+					</svelte:fragment>
+					<svelte:fragment slot="subtext">
+						<Badge rounded color="green" class="ml-auto">new</Badge>
+					</svelte:fragment>
+				</SidebarItem>
+			{/if}
+
 			<SidebarItem label="Feedback" href="/feedback">
 				<svelte:fragment slot="icon">
 					<AnnotationOutline class="focus:outline-none" />
