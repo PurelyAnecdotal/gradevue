@@ -4,26 +4,22 @@
 	import { loadAttendance } from '$lib/cache';
 	import LoadingBanner from '$lib/components/LoadingBanner.svelte';
 	import { attendance, attendanceLoaded } from '$lib/stores';
-	import type { PeriodEntity } from '$lib/types/Attendance';
+	import type { Period } from '$lib/types/Attendance';
 	import { Accordion, AccordionItem, Badge } from 'flowbite-svelte';
 
 	if (!$attendance && browser) loadAttendance();
 
-	function getAbsenceType(periods: PeriodEntity[]) {
-		const reasons = periods.map((period: PeriodEntity) => period._Name);
+	const excusedReasonRegex =
+		/Field Trip|School Pass|Excused|Medical\/Dent|Comp Ed\/Court-Religi|Illness or Sickness|SB14 Wellness\/Illnes/;
+
+	function getAbsenceType(periods: Period[]) {
+		const reasons = periods.map((period: Period) => period._Name);
 
 		if (reasons.some((reason) => reason === 'Absent' || reason === 'Non ADA')) return 'Absent';
 
-		if (reasons.some((reason) => reason.match(/Tardy/))) return 'Tardy';
+		if (reasons.some((reason) => /Tardy/.test(reason))) return 'Tardy';
 
-		if (
-			reasons.some((reason) =>
-				reason.match(
-					/Field Trip|School Pass|Excused|Medical\/Dent|Comp Ed\/Court-Religi|Illness or Sickness|SB14 Wellness\/Illnes/
-				)
-			)
-		)
-			return 'Excused';
+		if (reasons.some((reason) => excusedReasonRegex.test(reason))) return 'Excused';
 
 		if (reasons.some((reason) => reason === 'Present')) return 'Present';
 

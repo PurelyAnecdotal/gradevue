@@ -29,7 +29,7 @@ export async function changeReportPeriod(newPeriod: Period, index: number) {
 
 	if (!studentAccount) return;
 
-	const newGradebook = await studentAccount.grades(index);
+	const newGradebook = await studentAccount.gradebook(index);
 
 	gradebook.set(newGradebook);
 	gradebookLoaded.set(true);

@@ -1,16 +1,12 @@
 import {
 	attendance,
 	attendanceLoaded,
-	documentsList,
-	documentsListLoaded,
+	documents,
+	documentsLoaded,
 	gradebook,
 	gradebookLoaded,
-	mail,
-	mailLoaded,
-	messages,
-	messagesLoaded,
-	reportCardList,
-	reportCardListLoaded,
+	mailData,
+	mailDataLoaded,
 	studentAccount,
 	studentInfo,
 	studentInfoLoaded
@@ -46,7 +42,7 @@ export const loadGradebook = async () => {
 		periodOverrideState.new = restoredState.new;
 		periodOverrideState.original = restoredState.original;
 
-		const grades = await get(studentAccount)?.grades(periodOverrideState.new?.index);
+		const grades = await get(studentAccount)?.gradebook(periodOverrideState.new?.index);
 
 		gradebook.set(grades);
 
@@ -55,7 +51,7 @@ export const loadGradebook = async () => {
 		return;
 	}
 
-	const grades = await get(studentAccount)?.grades();
+	const grades = await get(studentAccount)?.gradebook();
 
 	gradebook.set(grades);
 	localStorage.setItem('gradebook', JSON.stringify(grades));
@@ -69,6 +65,8 @@ export const loadAttendance = async () => {
 	writeCacheToStore('attendance', attendance);
 
 	const attendanceRecord = await get(studentAccount)?.attendance();
+
+	console.log(attendanceRecord);
 
 	attendance.set(attendanceRecord);
 	localStorage.setItem('attendance', JSON.stringify(attendanceRecord));
@@ -89,54 +87,28 @@ export const loadStudentInfo = async () => {
 	studentInfoLoaded.set(true);
 };
 
-export const loadReportCardList = async () => {
-	reportCardListLoaded.set(false);
+export const loadDocuments = async () => {
+	documentsLoaded.set(false);
 
-	writeCacheToStore('reportCardList', reportCardList);
+	writeCacheToStore('documents', documents);
 
-	const reportCardListRecord = await get(studentAccount)?.reportCardList();
+	const documentsRecord = await get(studentAccount)?.documents();
 
-	reportCardList.set(reportCardListRecord);
-	localStorage.setItem('reportCardList', JSON.stringify(reportCardListRecord));
+	documents.set(documentsRecord);
+	localStorage.setItem('documents', JSON.stringify(documentsRecord));
 
-	reportCardListLoaded.set(true);
+	documentsLoaded.set(true);
 };
 
-export const loadDocumentsList = async () => {
-	documentsListLoaded.set(false);
+export const loadMailData = async () => {
+	mailDataLoaded.set(false);
 
-	writeCacheToStore('documentsList', documentsList);
+	writeCacheToStore('mailData', mailData);
 
-	const documentsListRecord = await get(studentAccount)?.documentsList();
+	const mailDataRecord = await get(studentAccount)?.mailData();
 
-	documentsList.set(documentsListRecord);
-	localStorage.setItem('documentsList', JSON.stringify(documentsListRecord));
+	mailData.set(mailDataRecord);
+	localStorage.setItem('mailData', JSON.stringify(mailDataRecord));
 
-	documentsListLoaded.set(true);
-};
-
-export const loadMessages = async () => {
-	messagesLoaded.set(false);
-
-	writeCacheToStore('messages', messages);
-
-	const messagesRecord = await get(studentAccount)?.messages();
-
-	messages.set(messagesRecord);
-	localStorage.setItem('messages', JSON.stringify(messagesRecord));
-
-	messagesLoaded.set(true);
-};
-
-export const loadMail = async () => {
-	mailLoaded.set(false);
-
-	writeCacheToStore('mail', mail);
-
-	const mailRecord = await get(studentAccount)?.mail();
-
-	mail.set(mailRecord);
-	localStorage.setItem('mail', JSON.stringify(mailRecord));
-
-	mailLoaded.set(true);
+	mailDataLoaded.set(true);
 };

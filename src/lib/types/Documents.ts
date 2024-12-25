@@ -1,4 +1,4 @@
-export interface DocumentsList {
+export interface Documents {
 	StudentDocumentDatas: StudentDocumentDatas;
 	'_xmlns:xsd': string;
 	'_xmlns:xsi': string;
@@ -8,10 +8,12 @@ export interface DocumentsList {
 	_StudentGU: string;
 	_StudentSSY: string;
 }
+
 export interface StudentDocumentDatas {
-	StudentDocumentData?: StudentDocumentDataEntity[] | null;
+	StudentDocumentData?: StudentDocumentData[] | null;
 }
-export interface StudentDocumentDataEntity {
+
+export interface StudentDocumentData {
 	_DocumentGU: string;
 	_DocumentFileName: string;
 	_DocumentDate: string;

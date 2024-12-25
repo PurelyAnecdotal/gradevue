@@ -16,7 +16,7 @@
 
 	if (!$studentInfo && browser) loadStudentInfo();
 
-	const dataSources = ['gradebook', 'attendance', 'studentInfo', 'documentsList', 'mail'];
+	const dataSources = ['gradebook', 'attendance', 'studentInfo', 'documents', 'mailData'];
 
 	function copy(key: string) {
 		const data = localStorage.getItem(key);
