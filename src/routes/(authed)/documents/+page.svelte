@@ -54,7 +54,7 @@
 				{#each documentDatas as documentData}
 					<li>
 						<Card
-							href="/documents/{documentData._DocumentGU}"
+							href="/documents/document?documentGU={documentData._DocumentGU}"
 							target="_blank"
 							class="flex max-w-none flex-row flex-wrap items-center gap-2 dark:text-white"
 						>
@@ -74,7 +74,7 @@
 					{#each documentDatas.filter((documentData) => documentData._DocumentType === category) as documentData}
 						<li>
 							<Card
-								href="/documents/{documentData._DocumentGU}"
+								href="/documents/document?documentGU={documentData._DocumentGU}"
 								target="_blank"
 								class="flex max-w-none flex-row flex-wrap items-center gap-2 dark:text-white"
 							>
