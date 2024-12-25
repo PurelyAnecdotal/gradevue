@@ -70,8 +70,6 @@
 		calculateAssignmentGPCs(synergyAssignments.map(parseSynergyAssignment), gradeCategories)
 	);
 
-	$inspect(synergyAssignments);
-
 	const hiddenAssignments = $derived(
 		categories
 			? getHiddenAssignmentsFromCategories(

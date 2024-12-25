@@ -66,8 +66,6 @@ export const loadAttendance = async () => {
 
 	const attendanceRecord = await get(studentAccount)?.attendance();
 
-	console.log(attendanceRecord);
-
 	attendance.set(attendanceRecord);
 	localStorage.setItem('attendance', JSON.stringify(attendanceRecord));
 
