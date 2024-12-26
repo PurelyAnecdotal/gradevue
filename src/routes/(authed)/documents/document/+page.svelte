@@ -3,18 +3,18 @@
 	import { getBlobURLFromBase64String } from '$lib';
 	import LoadingBanner from '$lib/components/LoadingBanner.svelte';
 	import { studentAccount } from '$lib/stores';
-	import type { Attachment } from '$lib/types/Attachment';
+	import type { ReportCard } from '$lib/types/ReportCard';
 	import { Button, Card } from 'flowbite-svelte';
 	import { onMount } from 'svelte';
 
-	const attachmentGU = page.url.searchParams.get('attachmentGU');
+	const documentGU = page.url.searchParams.get('documentGU');
 
-	let attachmentURLPromise: Promise<string> | undefined = $state();
+	let reportCardURLPromise: Promise<string> | undefined = $state();
 
 	onMount(async () => {
-		attachmentURLPromise = new Promise(async (resolve, reject) => {
-			if (!attachmentGU) {
-				reject(new Error('AttachmentGU not provided'));
+		reportCardURLPromise = new Promise(async (resolve, reject) => {
+			if (!documentGU) {
+				reject(new Error('DocumentGU not provided'));
 				return;
 			}
 
@@ -23,33 +23,33 @@
 				return;
 			}
 
-			let attachment: Attachment;
+			let reportCard: ReportCard;
 
 			try {
-				attachment = await $studentAccount.attachment(attachmentGU);
+				reportCard = await $studentAccount.reportCard(documentGU);
 			} catch {
-				reject(new Error('Attachment not found'));
+				reject(new Error('Document not found'));
 				return;
 			}
 
 			try {
-				resolve(getBlobURLFromBase64String(attachment.Base64Code));
+				resolve(getBlobURLFromBase64String(reportCard.Base64Code));
 			} catch (error) {
 				reject(error);
 			}
 		});
 
-		location.assign(await attachmentURLPromise);
+		location.assign(await reportCardURLPromise);
 	});
 </script>
 
 <svelte:head>
-	<title>Attachment - GradeVue</title>
+	<title>Document - GradeVue</title>
 </svelte:head>
 
-{#if attachmentURLPromise}
-	{#await attachmentURLPromise}
-		<LoadingBanner loadingMsg="Loading attachment..." />
+{#if reportCardURLPromise}
+	{#await reportCardURLPromise}
+		<LoadingBanner loadingMsg="Loading document..." />
 	{:then}
 		<LoadingBanner loadingMsg="Redirecting..." />
 	{:catch error}
@@ -57,7 +57,7 @@
 			<Card class="space-y-4 text-sm leading-relaxed dark:text-gray-200">
 				<h1 class="text-2xl dark:text-white">{error}</h1>
 
-				<Button href="/mail" class="w-full">Return to Mail</Button>
+				<Button href="/documents" class="w-full">Return to Documents</Button>
 			</Card>
 		</div>
 	{/await}

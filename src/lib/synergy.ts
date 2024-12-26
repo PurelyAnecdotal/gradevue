@@ -1,12 +1,10 @@
 import type { Attachment } from '$lib/types/Attachment';
 import type { Attendance } from '$lib/types/Attendance';
 import type { AuthToken } from '$lib/types/AuthToken';
-import type { DocumentsList } from '$lib/types/DocumentsList';
+import type { Documents } from '$lib/types/Documents';
 import type { Gradebook } from '$lib/types/Gradebook';
 import type { MailData } from '$lib/types/MailData';
-import type { Message } from '$lib/types/Message';
-import type { ReportCardDocument } from '$lib/types/ReportCardDocument';
-import type { ReportCardListEntity } from '$lib/types/ReportCardListEntity';
+import type { ReportCard, ReportCardNotFound } from '$lib/types/ReportCard';
 import type { StudentInfo } from '$lib/types/StudentInfo';
 import { XMLBuilder, XMLParser } from 'fast-xml-parser';
 
@@ -101,7 +99,7 @@ export class StudentAccount {
 		).AuthToken;
 	}
 
-	async grades(reportPeriod?: number): Promise<Gradebook> {
+	async gradebook(reportPeriod?: number): Promise<Gradebook> {
 		if (reportPeriod) {
 			// May return current reporting period instead of the one requested if the one requested cannot be found
 
@@ -119,29 +117,20 @@ export class StudentAccount {
 		return (await this.request('StudentInfo')).StudentInfo;
 	}
 
-	async reportCardList(): Promise<ReportCardListEntity[]> {
-		return (await this.request('GetReportCardInitialData')).RCReportingPeriodData.RCReportingPeriods
-			.RCReportingPeriod;
+	async documents(): Promise<Documents> {
+		return (await this.request('GetStudentDocumentInitialData')).StudentDocuments;
 	}
 
-	async reportCard(documentGU: string): Promise<ReportCardDocument> {
+	async reportCard(documentGU: string): Promise<ReportCard> {
 		return (await this.request('GetReportCardDocumentData', { DocumentGU: documentGU }))
 			.DocumentData;
 	}
 
-	async documentsList(): Promise<DocumentsList> {
-		return (await this.request('GetStudentDocumentInitialData')).StudentDocuments;
-	}
-
-	async messages(): Promise<Message[]> {
-		return (await this.request('GetPXPMessages')).PXPMessagesData.MessageListings.MessageListing;
-	}
-
-	async mail(): Promise<MailData> {
+	async mailData(): Promise<MailData> {
 		return (await this.request('SynergyMailGetData')).SynergyMailDataXML;
 	}
 
-	async attachmentBase64(attachmentGU: string): Promise<Attachment> {
+	async attachment(attachmentGU: string): Promise<Attachment> {
 		return (await this.request('SynergyMailGetAttachment', { SmAttachmentGU: attachmentGU }))
 			.AttachmentXML;
 	}

@@ -1,10 +1,10 @@
 export interface Attendance {
 	Absences: Absences;
-	TotalExcused: TotalAttendanceEvents;
-	TotalTardies: TotalAttendanceEvents;
-	TotalUnexcused: TotalAttendanceEvents;
-	TotalActivities: TotalAttendanceEvents;
-	TotalUnexcusedTardies: TotalAttendanceEvents;
+	TotalExcused: AttendanceEventTotal;
+	TotalTardies: AttendanceEventTotal;
+	TotalUnexcused: AttendanceEventTotal;
+	TotalActivities: AttendanceEventTotal;
+	TotalUnexcusedTardies: AttendanceEventTotal;
 	ConcurrentSchoolsLists: string;
 	'_xmlns:xsd': string;
 	'_xmlns:xsi': string;
@@ -14,10 +14,12 @@ export interface Attendance {
 	_PeriodCount: string;
 	_SchoolName: string;
 }
+
 export interface Absences {
-	Absence?: AbsenceEntity[] | null;
+	Absence?: Absence[] | null;
 }
-export interface AbsenceEntity {
+
+export interface Absence {
 	Periods: Periods;
 	_AbsenceDate: string;
 	_Reason: string;
@@ -26,10 +28,12 @@ export interface AbsenceEntity {
 	_CodeAllDayReasonType: string;
 	_CodeAllDayDescription: string;
 }
+
 export interface Periods {
-	Period?: PeriodEntity[] | null;
+	Period?: Period[] | null;
 }
-export interface PeriodEntity {
+
+export interface Period {
 	_Number: string;
 	_Name: string;
 	_Reason: string;
@@ -41,10 +45,12 @@ export interface PeriodEntity {
 	_StaffGU: string;
 	_OrgYearGU: string;
 }
-export interface TotalAttendanceEvents {
-	PeriodTotal?: PeriodTotalEntity[] | null;
+
+export interface AttendanceEventTotal {
+	PeriodTotal?: PeriodTotal[] | null;
 }
-export interface PeriodTotalEntity {
+
+export interface PeriodTotal {
 	_Number: string;
 	_Total: string;
 }

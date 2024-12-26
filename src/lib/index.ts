@@ -1,3 +1,6 @@
+import { fileTypeFromBuffer } from 'file-type';
+import { Buffer } from 'buffer';
+
 export function getColorForGrade(grade: string | number) {
 	if (typeof grade == 'number') {
 		if (grade > 100) return 'blue';
@@ -47,3 +50,15 @@ export const shortDateFormatter = new Intl.DateTimeFormat('en-US', {
 export const fullDateFormatter = new Intl.DateTimeFormat('en-US', {
 	dateStyle: 'full'
 });
+
+export async function getBlobURLFromBase64String(base64: string) {
+	const byteArray = new Uint8Array(Buffer.from(base64, 'base64'));
+
+	const mimeType = (await fileTypeFromBuffer(byteArray))?.mime;
+
+	if (!mimeType) throw new Error('Could not determine MIME type');
+
+	const blob = new Blob([byteArray], { type: mimeType });
+
+	return URL.createObjectURL(blob);
+}
