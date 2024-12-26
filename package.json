@@ -38,6 +38,7 @@
 		"vite": "^6.0.5"
 	},
 	"dependencies": {
+		"buffer": "^6.0.3",
 		"fast-xml-parser": "^4.5.1",
 		"file-type": "^19.6.0"
 	},

@@ -1,19 +1,18 @@
 <script lang="ts">
 	import { page } from '$app/state';
+	import { getBlobURLFromBase64String } from '$lib';
 	import LoadingBanner from '$lib/components/LoadingBanner.svelte';
 	import { studentAccount } from '$lib/stores';
 	import type { Attachment } from '$lib/types/Attachment';
-	import { Buffer } from 'buffer';
-	import { fileTypeFromBuffer } from 'file-type';
 	import { Button, Card } from 'flowbite-svelte';
 	import { onMount } from 'svelte';
 
 	const attachmentGU = page.url.searchParams.get('attachmentGU');
 
-	let attachmentPromise: Promise<{ attachment: Attachment; mimeType: string }>;
+	let attachmentURLPromise: Promise<string> | undefined = $state();
 
 	onMount(async () => {
-		attachmentPromise = new Promise(async (resolve, reject) => {
+		attachmentURLPromise = new Promise(async (resolve, reject) => {
 			if (!attachmentGU) {
 				reject(new Error('AttachmentGU not provided'));
 				return;
@@ -33,21 +32,14 @@
 				return;
 			}
 
-			const mimeType = (
-				await fileTypeFromBuffer(new Uint8Array(Buffer.from(attachment.Base64Code, 'base64')))
-			)?.mime;
-
-			if (!mimeType) {
-				reject(new Error('Could not determine MIME type of attachment'));
-				return;
+			try {
+				resolve(getBlobURLFromBase64String(attachment.Base64Code));
+			} catch (error) {
+				reject(error);
 			}
-
-			resolve({ attachment, mimeType });
 		});
 
-		const { attachment, mimeType } = await attachmentPromise;
-
-		location.assign(`data:${mimeType};base64,${attachment.Base64Code}`);
+		location.assign(await attachmentURLPromise);
 	});
 </script>
 
@@ -55,8 +47,8 @@
 	<title>Attachment - GradeVue</title>
 </svelte:head>
 
-{#if $studentAccount}
-	{#await attachmentPromise}
+{#if attachmentURLPromise}
+	{#await attachmentURLPromise}
 		<LoadingBanner loadingMsg="Loading attachment..." />
 	{:then}
 		<LoadingBanner loadingMsg="Redirecting..." />

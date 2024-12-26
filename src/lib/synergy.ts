@@ -4,7 +4,7 @@ import type { AuthToken } from '$lib/types/AuthToken';
 import type { Documents } from '$lib/types/Documents';
 import type { Gradebook } from '$lib/types/Gradebook';
 import type { MailData } from '$lib/types/MailData';
-import type { ReportCard } from '$lib/types/ReportCard';
+import type { ReportCard, ReportCardNotFound } from '$lib/types/ReportCard';
 import type { StudentInfo } from '$lib/types/StudentInfo';
 import { XMLBuilder, XMLParser } from 'fast-xml-parser';
 
@@ -122,13 +122,8 @@ export class StudentAccount {
 	}
 
 	async reportCard(documentGU: string): Promise<ReportCard> {
-		const documentData: ReportCard = (
-			await this.request('GetReportCardDocumentData', { DocumentGU: documentGU })
-		).DocumentData;
-
-		if ('Base64Code' in documentData) return documentData;
-
-		throw new Error('Document not found');
+		return (await this.request('GetReportCardDocumentData', { DocumentGU: documentGU }))
+			.DocumentData;
 	}
 
 	async mailData(): Promise<MailData> {
