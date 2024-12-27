@@ -59,54 +59,43 @@ export const loadGradebook = async () => {
 	gradebookLoaded.set(true);
 };
 
+const loadUsingCache = async <T>(key: string, store: Writable<T>, indicator: Writable<boolean>, retrievalFunc: () => Promise<T>) => {
+	indicator.set(false);
+
+	writeCacheToStore(key, store);
+
+	const record = await retrievalFunc();
+
+	store.set(record);
+	localStorage.setItem(key, JSON.stringify(record));
+
+	indicator.set(true);
+}
+
 export const loadAttendance = async () => {
-	attendanceLoaded.set(false);
+	const acc = get(studentAccount);
+	if (!acc) return;
 
-	writeCacheToStore('attendance', attendance);
-
-	const attendanceRecord = await get(studentAccount)?.attendance();
-
-	attendance.set(attendanceRecord);
-	localStorage.setItem('attendance', JSON.stringify(attendanceRecord));
-
-	attendanceLoaded.set(true);
+	loadUsingCache('attendance', attendance, attendanceLoaded, acc.attendance.bind(acc));
 };
 
 export const loadStudentInfo = async () => {
-	studentInfoLoaded.set(false);
+	const acc = get(studentAccount);
+	if (!acc) return;
 
-	writeCacheToStore('studentInfo', studentInfo);
-
-	const studentInfoRecord = await get(studentAccount)?.studentInfo();
-
-	studentInfo.set(studentInfoRecord);
-	localStorage.setItem('studentInfo', JSON.stringify(studentInfoRecord));
-
-	studentInfoLoaded.set(true);
+	loadUsingCache('studentInfo', studentInfo, studentInfoLoaded, acc.studentInfo.bind(acc));
 };
 
 export const loadDocuments = async () => {
-	documentsLoaded.set(false);
+	const acc = get(studentAccount);
+	if (!acc) return;
 
-	writeCacheToStore('documents', documents);
-
-	const documentsRecord = await get(studentAccount)?.documents();
-
-	documents.set(documentsRecord);
-	localStorage.setItem('documents', JSON.stringify(documentsRecord));
-
-	documentsLoaded.set(true);
+	loadUsingCache('documents', documents, documentsLoaded, acc.documents.bind(acc));
 };
 
 export const loadMailData = async () => {
-	mailDataLoaded.set(false);
+	const acc = get(studentAccount);
+	if (!acc) return;
 
-	writeCacheToStore('mailData', mailData);
-
-	const mailDataRecord = await get(studentAccount)?.mailData();
-
-	mailData.set(mailDataRecord);
-	localStorage.setItem('mailData', JSON.stringify(mailDataRecord));
-
-	mailDataLoaded.set(true);
+	loadUsingCache('mailData', mailData, mailDataLoaded, acc.mailData.bind(acc));
 };
