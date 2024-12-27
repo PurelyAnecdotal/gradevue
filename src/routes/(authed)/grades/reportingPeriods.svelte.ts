@@ -1,5 +1,6 @@
-import { gradebook, gradebookLoaded, studentAccount as studentAccountStore } from '$lib/stores';
-import { get } from 'svelte/store';
+import { localStorageKey } from '$lib';
+import { acc } from '$lib/account.svelte';
+import { gradebook, gradebookLoaded } from '$lib/stores';
 
 export interface Period {
 	name: string;
@@ -21,15 +22,13 @@ export interface PeriodOverrideState {
 export const periodOverrideState: PeriodOverrideState = $state({});
 
 export async function changeReportPeriod(newPeriod: Period, index: number) {
+	if (!acc.studentAccount) return;
+
 	periodOverrideState.new = undefined;
 
 	gradebookLoaded.set(false);
 
-	const studentAccount = get(studentAccountStore);
-
-	if (!studentAccount) return;
-
-	const newGradebook = await studentAccount.gradebook(index);
+	const newGradebook = await acc.studentAccount.gradebook(index);
 
 	gradebook.set(newGradebook);
 	gradebookLoaded.set(true);
@@ -47,11 +46,11 @@ export async function changeReportPeriod(newPeriod: Period, index: number) {
 
 	periodOverrideState.new = { period: newPeriod, index: index };
 
-	localStorage.setItem('periodOverrideState', JSON.stringify(periodOverrideState));
+	localStorage.setItem(localStorageKey.periodOverrideState, JSON.stringify(periodOverrideState));
 }
 
 export function resetPeriodOverride() {
 	periodOverrideState.new = undefined;
 	periodOverrideState.original = undefined;
-	localStorage.removeItem('periodOverrideState');
+	localStorage.removeItem(localStorageKey.periodOverrideState);
 }

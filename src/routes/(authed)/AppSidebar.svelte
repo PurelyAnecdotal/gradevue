@@ -1,9 +1,7 @@
 <script lang="ts">
-	import { browser } from '$app/environment';
 	import { page } from '$app/state';
 	import { removeClassID } from '$lib';
-	import { loadStudentInfo } from '$lib/cache';
-	import { gradebook, studentInfo } from '$lib/stores';
+	import { gradebook } from '$lib/stores';
 	import {
 		Badge,
 		Sidebar,
@@ -24,13 +22,14 @@
 	import MapPinAltOutline from 'flowbite-svelte-icons/MapPinAltOutline.svelte';
 	import UserCircleOutline from 'flowbite-svelte-icons/UserCircleOutline.svelte';
 	import { installPrompt } from '../../hooks.client';
+	import { loadStudentInfo, studentInfoState } from './studentinfo/studentInfo.svelte';
 
 	function logOut() {
 		localStorage.clear();
 		location.assign('/login');
 	}
 
-	if (!$studentInfo && browser) loadStudentInfo();
+	loadStudentInfo();
 </script>
 
 <Sidebar activeUrl={page.url.pathname} class="h-screen">
@@ -125,7 +124,7 @@
 				</svelte:fragment>
 			</SidebarItem>
 
-			<SidebarItem label={$studentInfo?.FormattedName ?? ''} href="/studentinfo">
+			<SidebarItem label={studentInfoState.studentInfo?.FormattedName ?? ''} href="/studentinfo">
 				<svelte:fragment slot="icon">
 					<UserCircleOutline class="focus:outline-none" />
 				</svelte:fragment>

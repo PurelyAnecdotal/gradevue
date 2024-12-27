@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { page } from '$app/state';
 	import { getBlobURLFromBase64String } from '$lib';
+	import { acc } from '$lib/account.svelte';
 	import LoadingBanner from '$lib/components/LoadingBanner.svelte';
-	import { studentAccount } from '$lib/stores';
 	import type { Attachment } from '$lib/types/Attachment';
 	import { Button, Card } from 'flowbite-svelte';
 	import { onMount } from 'svelte';
@@ -18,7 +18,7 @@
 				return;
 			}
 
-			if (!$studentAccount) {
+			if (!acc.studentAccount) {
 				reject(new Error('Student account not loaded'));
 				return;
 			}
@@ -26,7 +26,7 @@
 			let attachment: Attachment;
 
 			try {
-				attachment = await $studentAccount.attachment(attachmentGU);
+				attachment = await acc.studentAccount.attachment(attachmentGU);
 			} catch {
 				reject(new Error('Attachment not found'));
 				return;

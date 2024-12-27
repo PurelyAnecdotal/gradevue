@@ -1,14 +1,13 @@
 <script lang="ts">
 	import { browser } from '$app/environment';
-	import { loadMailData } from '$lib/cache';
 	import LoadingBanner from '$lib/components/LoadingBanner.svelte';
-	import { mailData, mailDataLoaded } from '$lib/stores';
 	import type { InboxItemListingsMessageXML } from '$lib/types/MailData';
 	import { Modal } from 'flowbite-svelte';
 	import MessageCard from './MessageCard.svelte';
 	import MessageView from './MessageView.svelte';
+	import { loadMailData, mailDataState } from './mailData.svelte';
 
-	if (!$mailData && browser) loadMailData();
+	loadMailData();
 
 	let domParser: DOMParser;
 	if (browser) domParser = new DOMParser();
@@ -45,13 +44,13 @@
 	<title>Mail - GradeVue</title>
 </svelte:head>
 
-<LoadingBanner show={!$mailDataLoaded} loadingMsg="Loading mail..." />
+<LoadingBanner show={!mailDataState.loaded} loadingMsg="Loading mail..." />
 
 <h1 class="p-4 pb-0 text-2xl font-bold">Inbox</h1>
 
-{#if $mailData}
+{#if mailDataState.mailData}
 	<ol class="space-y-4 p-4">
-		{#each $mailData.InboxItemListings.MessageXML as message}
+		{#each mailDataState.mailData.InboxItemListings.MessageXML as message}
 			<li
 				ontouchend={() => {
 					touchscreen = true;

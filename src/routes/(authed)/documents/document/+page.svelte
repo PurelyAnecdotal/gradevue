@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { page } from '$app/state';
 	import { getBlobURLFromBase64String } from '$lib';
+	import { acc } from '$lib/account.svelte';
 	import LoadingBanner from '$lib/components/LoadingBanner.svelte';
-	import { studentAccount } from '$lib/stores';
 	import type { ReportCard } from '$lib/types/ReportCard';
 	import { Button, Card } from 'flowbite-svelte';
 	import { onMount } from 'svelte';
@@ -18,7 +18,7 @@
 				return;
 			}
 
-			if (!$studentAccount) {
+			if (!acc.studentAccount) {
 				reject(new Error('Student account not loaded'));
 				return;
 			}
@@ -26,7 +26,7 @@
 			let reportCard: ReportCard;
 
 			try {
-				reportCard = await $studentAccount.reportCard(documentGU);
+				reportCard = await acc.studentAccount.reportCard(documentGU);
 			} catch {
 				reject(new Error('Document not found'));
 				return;

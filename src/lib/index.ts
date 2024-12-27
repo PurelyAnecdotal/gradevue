@@ -62,3 +62,13 @@ export async function getBlobURLFromBase64String(base64: string) {
 
 	return URL.createObjectURL(blob);
 }
+
+export enum localStorageKey {
+	token = 'token',
+	gradebook = 'gradebook',
+	periodOverrideState = 'periodOverrideState',
+	attendance = 'attendance',
+	documents = 'documents',
+	mailData = 'mailData',
+	studentInfo = 'studentInfo',
+}

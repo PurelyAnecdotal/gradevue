@@ -1,8 +1,6 @@
 <script lang="ts">
-	import { browser } from '$app/environment';
-	import { loadStudentInfo } from '$lib/cache';
+	import { localStorageKey } from '$lib';
 	import LoadingBanner from '$lib/components/LoadingBanner.svelte';
-	import { studentInfo, studentInfoLoaded } from '$lib/stores';
 	import {
 		Accordion,
 		AccordionItem,
@@ -13,10 +11,11 @@
 		TableBodyCell,
 		TableBodyRow
 	} from 'flowbite-svelte';
+	import { loadStudentInfo, studentInfoState } from './studentInfo.svelte';
 
-	if (!$studentInfo && browser) loadStudentInfo();
+	loadStudentInfo();
 
-	const dataSources = ['gradebook', 'attendance', 'studentInfo', 'documents', 'mailData'];
+	const dataSources = Object.values(localStorageKey);
 
 	function copy(key: string) {
 		const data = localStorage.getItem(key);
@@ -51,25 +50,25 @@
 	<title>Student Info - GradeVue</title>
 </svelte:head>
 
-<LoadingBanner show={!$studentInfoLoaded} loadingMsg="Loading student info..." />
+<LoadingBanner show={!studentInfoState.loaded} loadingMsg="Loading student info..." />
 
 <div class="flex flex-col justify-center gap-4 p-4">
-	{#if $studentInfo}
+	{#if studentInfoState.studentInfo}
 		<Card class="flex max-w-none flex-row gap-4 dark:text-white">
 			<img
 				class="h-xl rounded"
-				src="data:image/png;base64,{$studentInfo.Photo}"
+				src="data:image/png;base64,{studentInfoState.studentInfo.Photo}"
 				alt="Student Portrait"
 			/>
 			<div class="flex w-full flex-col">
 				<h1 class="w-full text-2xl">
-					{$studentInfo.FormattedName}
+					{studentInfoState.studentInfo.FormattedName}
 				</h1>
 				<span class="text-xl">
-					{$studentInfo.PermID}
+					{studentInfoState.studentInfo.PermID}
 				</span>
-				<span>Grade {$studentInfo.Grade}</span>
-				<span>{$studentInfo.Gender}</span>
+				<span>Grade {studentInfoState.studentInfo.Grade}</span>
+				<span>{studentInfoState.studentInfo.Gender}</span>
 			</div>
 		</Card>
 	{/if}
