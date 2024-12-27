@@ -4,13 +4,11 @@
 	import { studentAccount } from '$lib/stores';
 	import { StudentAccount } from '$lib/synergy';
 	import { Button, Card } from 'flowbite-svelte';
-	import {
-		ChartOutline,
-		ClockOutline,
-		EyeSlashOutline,
-		GithubSolid,
-		GridPlusOutline
-	} from 'flowbite-svelte-icons';
+	import ChartOutline from 'flowbite-svelte-icons/ChartOutline.svelte';
+	import ClockOutline from 'flowbite-svelte-icons/ClockOutline.svelte';
+	import EyeSlashOutline from 'flowbite-svelte-icons/EyeSlashOutline.svelte';
+	import GithubSolid from 'flowbite-svelte-icons/GithubSolid.svelte';
+	import GridPlusOutline from 'flowbite-svelte-icons/GridPlusOutline.svelte';
 
 	if (browser && localStorage.getItem('token')) {
 		if (!$studentAccount) {

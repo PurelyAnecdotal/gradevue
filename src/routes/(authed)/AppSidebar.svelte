@@ -12,19 +12,17 @@
 		SidebarItem,
 		SidebarWrapper
 	} from 'flowbite-svelte';
-	import {
-		AddressBookOutline,
-		AnnotationOutline,
-		ArrowRightToBracketOutline,
-		BellOutline,
-		ChevronDownOutline,
-		ChevronUpOutline,
-		DownloadOutline,
-		FolderOpenOutline,
-		MailBoxOutline,
-		MapPinAltOutline,
-		UserCircleOutline
-	} from 'flowbite-svelte-icons';
+	import AddressBookOutline from 'flowbite-svelte-icons/AddressBookOutline.svelte';
+	import AnnotationOutline from 'flowbite-svelte-icons/AnnotationOutline.svelte';
+	import ArrowRightToBracketOutline from 'flowbite-svelte-icons/ArrowRightToBracketOutline.svelte';
+	import BellOutline from 'flowbite-svelte-icons/BellOutline.svelte';
+	import ChevronDownOutline from 'flowbite-svelte-icons/ChevronDownOutline.svelte';
+	import ChevronUpOutline from 'flowbite-svelte-icons/ChevronUpOutline.svelte';
+	import DownloadOutline from 'flowbite-svelte-icons/DownloadOutline.svelte';
+	import FolderOpenOutline from 'flowbite-svelte-icons/FolderOpenOutline.svelte';
+	import MailBoxOutline from 'flowbite-svelte-icons/MailBoxOutline.svelte';
+	import MapPinAltOutline from 'flowbite-svelte-icons/MapPinAltOutline.svelte';
+	import UserCircleOutline from 'flowbite-svelte-icons/UserCircleOutline.svelte';
 	import { installPrompt } from '../../hooks.client';
 
 	function logOut() {

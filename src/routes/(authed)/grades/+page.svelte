@@ -2,12 +2,10 @@
 	import { getColorForGrade, removeClassID } from '$lib';
 	import { gradebook } from '$lib/stores';
 	import { Alert, Button, Card, Dropdown, DropdownItem, Progressbar } from 'flowbite-svelte';
-	import {
-		ChevronDownOutline,
-		ChevronUpOutline,
-		CloseCircleOutline,
-		MapPinAltOutline
-	} from 'flowbite-svelte-icons';
+	import ChevronDownOutline from 'flowbite-svelte-icons/ChevronDownOutline.svelte';
+	import ChevronUpOutline from 'flowbite-svelte-icons/ChevronUpOutline.svelte';
+	import CloseCircleOutline from 'flowbite-svelte-icons/CloseCircleOutline.svelte';
+	import MapPinAltOutline from 'flowbite-svelte-icons/MapPinAltOutline.svelte';
 	import { changeReportPeriod, periodOverrideState, type Period } from './reportingPeriods.svelte';
 
 	let dropdownOpen = $state(false);

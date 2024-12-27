@@ -14,7 +14,8 @@
 		Popover,
 		Progressbar
 	} from 'flowbite-svelte';
-	import { ChevronDownOutline, InfoCircleOutline } from 'flowbite-svelte-icons';
+	import ChevronDownOutline from 'flowbite-svelte-icons/ChevronDownOutline.svelte';
+	import InfoCircleOutline from 'flowbite-svelte-icons/InfoCircleOutline.svelte';
 
 	interface Props {
 		name: string;
