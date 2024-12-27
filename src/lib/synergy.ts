@@ -4,7 +4,7 @@ import type { AuthToken } from '$lib/types/AuthToken';
 import type { Documents } from '$lib/types/Documents';
 import type { Gradebook } from '$lib/types/Gradebook';
 import type { MailData } from '$lib/types/MailData';
-import type { ReportCard, ReportCardNotFound } from '$lib/types/ReportCard';
+import type { ReportCard } from '$lib/types/ReportCard';
 import type { StudentInfo } from '$lib/types/StudentInfo';
 import { XMLBuilder, XMLParser } from 'fast-xml-parser';
 
