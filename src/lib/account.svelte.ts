@@ -1,10 +1,10 @@
-import { localStorageKey } from '$lib';
+import { LocalStorageKey } from '$lib';
 import { StudentAccount } from '$lib/synergy';
 
 export const acc: { studentAccount?: StudentAccount } = $state({});
 
 export const loadStudentAccount = () => {
-	const token = localStorage.getItem(localStorageKey.token);
+	const token = localStorage.getItem(LocalStorageKey.token);
 
 	if (!token) return;
 

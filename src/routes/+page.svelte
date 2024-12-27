@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { browser } from '$app/environment';
 	import { goto } from '$app/navigation';
-	import { localStorageKey } from '$lib';
+	import { LocalStorageKey } from '$lib';
 	import { acc, loadStudentAccount } from '$lib/account.svelte';
 	import { Button, Card } from 'flowbite-svelte';
 	import ChartOutline from 'flowbite-svelte-icons/ChartOutline.svelte';
@@ -10,7 +10,7 @@
 	import GithubSolid from 'flowbite-svelte-icons/GithubSolid.svelte';
 	import GridPlusOutline from 'flowbite-svelte-icons/GridPlusOutline.svelte';
 
-	if (browser && localStorage.getItem(localStorageKey.token)) {
+	if (browser && localStorage.getItem(LocalStorageKey.token)) {
 		if (!acc.studentAccount) loadStudentAccount();
 
 		goto('/grades');

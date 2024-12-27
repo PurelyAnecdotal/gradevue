@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { localStorageKey } from '$lib';
+	import { LocalStorageKey } from '$lib';
 	import LoadingBanner from '$lib/components/LoadingBanner.svelte';
 	import {
 		Accordion,
@@ -15,7 +15,7 @@
 
 	loadStudentInfo();
 
-	const dataSources = Object.values(localStorageKey);
+	const dataSources = Object.values(LocalStorageKey);
 
 	function copy(key: string) {
 		const data = localStorage.getItem(key);

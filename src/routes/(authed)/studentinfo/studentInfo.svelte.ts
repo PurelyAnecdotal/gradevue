@@ -1,4 +1,4 @@
-import { localStorageKey } from '$lib';
+import { LocalStorageKey } from '$lib';
 import { acc } from '$lib/account.svelte';
 import type { StudentInfo } from '$lib/types/StudentInfo';
 
@@ -12,18 +12,18 @@ export async function loadStudentInfo() {
 
 	studentInfoState.loaded = false;
 
-	const cache = localStorage.getItem(localStorageKey.studentInfo);
+	const cache = localStorage.getItem(LocalStorageKey.studentInfo);
 	if (cache) {
 		try {
 			studentInfoState.studentInfo = JSON.parse(cache);
 		} catch (e) {
 			console.error(e);
-			localStorage.removeItem(localStorageKey.studentInfo);
+			localStorage.removeItem(LocalStorageKey.studentInfo);
 		}
 	}
 
 	studentInfoState.studentInfo = await acc.studentAccount.studentInfo();
 	studentInfoState.loaded = true;
 
-	localStorage.setItem(localStorageKey.studentInfo, JSON.stringify(studentInfoState.studentInfo));
+	localStorage.setItem(LocalStorageKey.studentInfo, JSON.stringify(studentInfoState.studentInfo));
 }

@@ -1,4 +1,4 @@
-import { localStorageKey } from '$lib';
+import { LocalStorageKey } from '$lib';
 import { acc } from '$lib/account.svelte';
 import type { MailData } from '$lib/types/MailData';
 
@@ -12,18 +12,18 @@ export async function loadMailData() {
 
 	mailDataState.loaded = false;
 
-	const cache = localStorage.getItem(localStorageKey.mailData);
+	const cache = localStorage.getItem(LocalStorageKey.mailData);
 	if (cache) {
 		try {
 			mailDataState.mailData = JSON.parse(cache);
 		} catch (e) {
 			console.error(e);
-			localStorage.removeItem(localStorageKey.mailData);
+			localStorage.removeItem(LocalStorageKey.mailData);
 		}
 	}
 
 	mailDataState.mailData = await acc.studentAccount.mailData();
 	mailDataState.loaded = true;
 
-	localStorage.setItem(localStorageKey.mailData, JSON.stringify(mailDataState.mailData));
+	localStorage.setItem(LocalStorageKey.mailData, JSON.stringify(mailDataState.mailData));
 }

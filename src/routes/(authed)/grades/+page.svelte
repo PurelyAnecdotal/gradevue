@@ -1,17 +1,17 @@
 <script lang="ts">
 	import { getColorForGrade, removeClassID } from '$lib';
-	import { gradebook } from '$lib/stores';
 	import { Alert, Button, Card, Dropdown, DropdownItem, Progressbar } from 'flowbite-svelte';
 	import ChevronDownOutline from 'flowbite-svelte-icons/ChevronDownOutline.svelte';
 	import ChevronUpOutline from 'flowbite-svelte-icons/ChevronUpOutline.svelte';
 	import CloseCircleOutline from 'flowbite-svelte-icons/CloseCircleOutline.svelte';
 	import MapPinAltOutline from 'flowbite-svelte-icons/MapPinAltOutline.svelte';
+	import { gradebookState } from './gradebook.svelte';
 	import { changeReportPeriod, periodOverrideState, type Period } from './reportingPeriods.svelte';
 
 	let dropdownOpen = $state(false);
 
 	const allPeriods: Period[] | undefined = $derived(
-		$gradebook?.ReportingPeriods.ReportPeriod.map((synergyReportPeriod) => {
+		gradebookState.gradebook?.ReportingPeriods.ReportPeriod.map((synergyReportPeriod) => {
 			return {
 				name: synergyReportPeriod._GradePeriod,
 				startDate: new Date(synergyReportPeriod._StartDate),
@@ -23,15 +23,15 @@
 	const currentPeriodIndex = $derived(
 		(allPeriods ?? [])
 			.map((period) => period.name)
-			.findIndex((name) => name === $gradebook?.ReportingPeriod._GradePeriod)
+			.findIndex((name) => name === gradebookState.gradebook?.ReportingPeriod._GradePeriod)
 	);
 
 	const currentPeriod: Period | undefined = $derived(
-		$gradebook?.ReportingPeriod
+		gradebookState.gradebook?.ReportingPeriod
 			? {
-					name: $gradebook.ReportingPeriod._GradePeriod,
-					startDate: new Date($gradebook.ReportingPeriod._StartDate),
-					endDate: new Date($gradebook.ReportingPeriod._EndDate)
+					name: gradebookState.gradebook.ReportingPeriod._GradePeriod,
+					startDate: new Date(gradebookState.gradebook.ReportingPeriod._StartDate),
+					endDate: new Date(gradebookState.gradebook.ReportingPeriod._EndDate)
 				}
 			: undefined
 	);
@@ -54,7 +54,7 @@
 	<title>Grades - GradeVue</title>
 </svelte:head>
 
-{#if $gradebook && allPeriods && currentPeriod}
+{#if gradebookState.gradebook && allPeriods && currentPeriod}
 	<main class="m-4 space-y-4">
 		<div class="flex flex-col justify-center">
 			<Button color="light" class="mx-auto flex items-center">
@@ -86,7 +86,7 @@
 			</Dropdown>
 		</div>
 
-		{#if $gradebook.Courses.Course.map((course) => course.Marks.Mark._CalculatedScoreString).every((score) => score === 'N/A') && !periodOverrideState.new}
+		{#if gradebookState.gradebook.Courses.Course.map((course) => course.Marks.Mark._CalculatedScoreString).every((score) => score === 'N/A') && !periodOverrideState.new}
 			<Alert class="mx-auto flex w-fit items-center" color="dark">
 				<CloseCircleOutline />
 				It looks like you don't have any grades yet in this reporting period.
@@ -104,7 +104,7 @@
 		{/if}
 
 		<ol class="space-y-4">
-			{#each $gradebook.Courses.Course ?? [] as { _Title: title, Marks: { Mark: { _CalculatedScoreString: grade, _CalculatedScoreRaw: percent } } }, index}
+			{#each gradebookState.gradebook.Courses.Course ?? [] as { _Title: title, Marks: { Mark: { _CalculatedScoreString: grade, _CalculatedScoreRaw: percent } } }, index}
 				<li>
 					<Card
 						class="flex max-w-none flex-row items-center justify-between text-xl dark:text-white"

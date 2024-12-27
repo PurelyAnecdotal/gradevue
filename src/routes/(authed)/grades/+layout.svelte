@@ -1,17 +1,15 @@
 <script lang="ts">
-	import { browser } from '$app/environment';
-	import { loadGradebook } from '$lib/cache';
 	import LoadingBanner from '$lib/components/LoadingBanner.svelte';
-	import { gradebook, gradebookLoaded } from '$lib/stores';
 	import { Alert, Button } from 'flowbite-svelte';
+	import { gradebookState, loadGradebook } from './gradebook.svelte';
 	import { periodOverrideState, resetPeriodOverride } from './reportingPeriods.svelte';
 
 	let { children } = $props();
 
-	if (!$gradebook && browser) loadGradebook();
+	loadGradebook();
 </script>
 
-<LoadingBanner show={!$gradebookLoaded} loadingMsg="Loading grades..." />
+<LoadingBanner show={!gradebookState.loaded} loadingMsg="Loading grades..." />
 
 {#if periodOverrideState.new}
 	<Alert class="m-4 flex items-center justify-between" color="light" border>

@@ -21,7 +21,6 @@
 		type ReactiveAssignment,
 		type RealAssignment
 	} from '$lib/assignments';
-	import { gradebook } from '$lib/stores';
 	import {
 		Alert,
 		Button,
@@ -44,9 +43,10 @@
 	import InfoCircleOutline from 'flowbite-svelte-icons/InfoCircleOutline.svelte';
 	import { untrack } from 'svelte';
 	import { fade } from 'svelte/transition';
+	import { gradebookState } from '../gradebook.svelte';
 	import AssignmentCard from './AssignmentCard.svelte';
 
-	const synergyCourse = $derived($gradebook?.Courses.Course?.[parseInt(page.params.index)]);
+	const synergyCourse = $derived(gradebookState.gradebook?.Courses.Course?.[parseInt(page.params.index)]);
 
 	const courseName = $derived(synergyCourse ? removeClassID(synergyCourse._Title) : '');
 

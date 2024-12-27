@@ -7,11 +7,11 @@
 	import { Button, Card } from 'flowbite-svelte';
 	import { onMount } from 'svelte';
 
-	const attachmentGU = page.url.searchParams.get('attachmentGU');
-
 	let attachmentURLPromise: Promise<string> | undefined = $state();
 
 	onMount(async () => {
+		const attachmentGU = page.url.searchParams.get('attachmentGU');
+
 		attachmentURLPromise = new Promise(async (resolve, reject) => {
 			if (!attachmentGU) {
 				reject(new Error('AttachmentGU not provided'));

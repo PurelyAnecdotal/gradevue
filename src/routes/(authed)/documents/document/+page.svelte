@@ -7,11 +7,11 @@
 	import { Button, Card } from 'flowbite-svelte';
 	import { onMount } from 'svelte';
 
-	const documentGU = page.url.searchParams.get('documentGU');
-
 	let reportCardURLPromise: Promise<string> | undefined = $state();
 
 	onMount(async () => {
+		const documentGU = page.url.searchParams.get('documentGU');
+
 		reportCardURLPromise = new Promise(async (resolve, reject) => {
 			if (!documentGU) {
 				reject(new Error('DocumentGU not provided'));

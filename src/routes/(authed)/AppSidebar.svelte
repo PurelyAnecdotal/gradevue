@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { page } from '$app/state';
 	import { removeClassID } from '$lib';
-	import { gradebook } from '$lib/stores';
 	import {
 		Badge,
 		Sidebar,
@@ -22,6 +21,7 @@
 	import MapPinAltOutline from 'flowbite-svelte-icons/MapPinAltOutline.svelte';
 	import UserCircleOutline from 'flowbite-svelte-icons/UserCircleOutline.svelte';
 	import { installPrompt } from '../../hooks.client';
+	import { gradebookState } from './grades/gradebook.svelte';
 	import { loadStudentInfo, studentInfoState } from './studentinfo/studentInfo.svelte';
 
 	function logOut() {
@@ -57,9 +57,9 @@
 							<ChevronDownOutline />
 						{/if}
 					</a>
-					{#if page.params.index}
+					{#if page.params.index && gradebookState.gradebook}
 						<ul>
-							{#each $gradebook?.Courses.Course ?? [] as { _Title: title }, index}
+							{#each gradebookState.gradebook.Courses.Course as { _Title: title }, index}
 								<li>
 									<a
 										href={`/grades/${index.toString()}`}

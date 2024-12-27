@@ -2,7 +2,7 @@
 	import { browser } from '$app/environment';
 	import { goto } from '$app/navigation';
 	import { navigating } from '$app/state';
-	import { localStorageKey } from '$lib';
+	import { LocalStorageKey } from '$lib';
 	import { acc, loadStudentAccount } from '$lib/account.svelte';
 	import { Drawer, NavHamburger } from 'flowbite-svelte';
 	import { sineIn } from 'svelte/easing';
@@ -24,7 +24,7 @@
 	});
 
 	if (browser && !acc.studentAccount) {
-		if (localStorage.getItem(localStorageKey.token)) loadStudentAccount();
+		if (localStorage.getItem(LocalStorageKey.token)) loadStudentAccount();
 		else goto('/login');
 	}
 </script>

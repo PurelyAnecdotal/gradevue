@@ -1,4 +1,4 @@
-import { localStorageKey } from '$lib';
+import { LocalStorageKey } from '$lib';
 import { acc } from '$lib/account.svelte';
 import type { Attendance } from '$lib/types/Attendance';
 
@@ -12,18 +12,18 @@ export async function loadAttendance() {
 
 	attendanceState.loaded = false;
 
-	const cache = localStorage.getItem(localStorageKey.attendance);
+	const cache = localStorage.getItem(LocalStorageKey.attendance);
 	if (cache) {
 		try {
 			attendanceState.attendance = JSON.parse(cache);
 		} catch (e) {
 			console.error(e);
-			localStorage.removeItem(localStorageKey.attendance);
+			localStorage.removeItem(LocalStorageKey.attendance);
 		}
 	}
 
 	attendanceState.attendance = await acc.studentAccount.attendance();
 	attendanceState.loaded = true;
 
-	localStorage.setItem(localStorageKey.attendance, JSON.stringify(attendanceState.attendance));
+	localStorage.setItem(LocalStorageKey.attendance, JSON.stringify(attendanceState.attendance));
 }

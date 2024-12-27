@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { browser } from '$app/environment';
 	import { goto } from '$app/navigation';
-	import { localStorageKey } from '$lib';
+	import { LocalStorageKey } from '$lib';
 	import { acc, loadStudentAccount } from '$lib/account.svelte';
 	import LoadingBanner from '$lib/components/LoadingBanner.svelte';
 	import { StudentAccount } from '$lib/synergy';
@@ -20,7 +20,7 @@
 	import InfoCircleOutline from 'flowbite-svelte-icons/InfoCircleOutline.svelte';
 	import { fly } from 'svelte/transition';
 
-	if (browser && localStorage.getItem(localStorageKey.token)) {
+	if (browser && localStorage.getItem(LocalStorageKey.token)) {
 		if (!acc.studentAccount) loadStudentAccount();
 
 		goto('/grades');
@@ -53,7 +53,7 @@
 
 		acc.studentAccount = loginAccount;
 
-		localStorage.setItem(localStorageKey.token, JSON.stringify({ username, password, domain }));
+		localStorage.setItem(LocalStorageKey.token, JSON.stringify({ username, password, domain }));
 
 		loggingIn = false;
 
