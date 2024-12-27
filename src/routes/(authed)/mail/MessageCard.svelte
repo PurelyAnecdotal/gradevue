@@ -2,7 +2,7 @@
 	import DateBadge from '$lib/components/DateBadge.svelte';
 	import type { InboxItemListingsMessageXML } from '$lib/types/MailData';
 	import { Badge, Card } from 'flowbite-svelte';
-	import { UserOutline } from 'flowbite-svelte-icons';
+	import UserOutline from 'flowbite-svelte-icons/UserOutline.svelte';
 
 	interface Props {
 		message: InboxItemListingsMessageXML;

@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { Alert, Button } from 'flowbite-svelte';
-	import { InfoCircleOutline } from 'flowbite-svelte-icons';
+	import InfoCircleOutline from 'flowbite-svelte-icons/InfoCircleOutline.svelte';
 </script>
 
 <p>

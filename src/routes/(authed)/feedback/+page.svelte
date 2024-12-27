@@ -1,6 +1,6 @@
 <script>
 	import { Card } from 'flowbite-svelte';
-	import { GithubSolid } from 'flowbite-svelte-icons';
+	import GithubSolid from 'flowbite-svelte-icons/GithubSolid.svelte';
 </script>
 
 <svelte:head>

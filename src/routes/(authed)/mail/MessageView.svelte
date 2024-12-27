@@ -1,12 +1,10 @@
 <script lang="ts">
 	import type { InboxItemListingsMessageXML } from '$lib/types/MailData';
 	import { Badge, Card } from 'flowbite-svelte';
-	import {
-		ChevronDownOutline,
-		ChevronRightOutline,
-		LinkOutline,
-		PaperClipOutline
-	} from 'flowbite-svelte-icons';
+	import ChevronDownOutline from 'flowbite-svelte-icons/ChevronDownOutline.svelte';
+	import ChevronRightOutline from 'flowbite-svelte-icons/ChevronRightOutline.svelte';
+	import LinkOutline from 'flowbite-svelte-icons/LinkOutline.svelte';
+	import PaperClipOutline from 'flowbite-svelte-icons/PaperClipOutline.svelte';
 
 	interface Props {
 		touchscreen?: boolean;

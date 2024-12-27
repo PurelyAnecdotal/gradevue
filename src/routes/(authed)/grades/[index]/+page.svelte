@@ -36,14 +36,12 @@
 		TableHeadCell,
 		Tabs
 	} from 'flowbite-svelte';
-	import {
-		ChevronDownOutline,
-		ChevronUpOutline,
-		CloseCircleOutline,
-		ExclamationCircleSolid,
-		GridPlusOutline,
-		InfoCircleOutline
-	} from 'flowbite-svelte-icons';
+	import ChevronDownOutline from 'flowbite-svelte-icons/ChevronDownOutline.svelte';
+	import ChevronUpOutline from 'flowbite-svelte-icons/ChevronUpOutline.svelte';
+	import CloseCircleOutline from 'flowbite-svelte-icons/CloseCircleOutline.svelte';
+	import ExclamationCircleSolid from 'flowbite-svelte-icons/ExclamationCircleSolid.svelte';
+	import GridPlusOutline from 'flowbite-svelte-icons/GridPlusOutline.svelte';
+	import InfoCircleOutline from 'flowbite-svelte-icons/InfoCircleOutline.svelte';
 	import { untrack } from 'svelte';
 	import { fade } from 'svelte/transition';
 	import AssignmentCard from './AssignmentCard.svelte';

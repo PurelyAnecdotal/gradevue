@@ -14,11 +14,9 @@
 		Input,
 		Label
 	} from 'flowbite-svelte';
-	import {
-		ExclamationCircleSolid,
-		EyeSlashOutline,
-		InfoCircleOutline
-	} from 'flowbite-svelte-icons';
+	import ExclamationCircleSolid from 'flowbite-svelte-icons/ExclamationCircleSolid.svelte';
+	import EyeSlashOutline from 'flowbite-svelte-icons/EyeSlashOutline.svelte';
+	import InfoCircleOutline from 'flowbite-svelte-icons/InfoCircleOutline.svelte';
 	import { fly } from 'svelte/transition';
 
 	if (browser && localStorage.getItem('token')) {
