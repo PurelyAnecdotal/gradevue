@@ -8,7 +8,7 @@
 	<title>Feedback - GradeVue</title>
 </svelte:head>
 
-<div class="flex min-h-screen flex-col items-center justify-center p-4 gap-4">
+<div class="flex min-h-screen flex-col items-center justify-center gap-4 p-4">
 	<Card
 		href="https://github.com/Nonexistent-Name/gradevue/issues"
 		class="flex flex-row items-center gap-4"

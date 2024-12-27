@@ -29,8 +29,8 @@ export const loadGradebook = async () => {
 
 		gradebookState.gradebook = await acc.studentAccount.gradebook(periodOverrideState.new?.index);
 	} else {
-        gradebookState.gradebook = await acc.studentAccount.gradebook();
-    }
+		gradebookState.gradebook = await acc.studentAccount.gradebook();
+	}
 
 	gradebookState.loaded = true;
 };

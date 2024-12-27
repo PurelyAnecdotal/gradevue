@@ -46,7 +46,9 @@
 	import { gradebookState } from '../gradebook.svelte';
 	import AssignmentCard from './AssignmentCard.svelte';
 
-	const synergyCourse = $derived(gradebookState.gradebook?.Courses.Course?.[parseInt(page.params.index)]);
+	const synergyCourse = $derived(
+		gradebookState.gradebook?.Courses.Course?.[parseInt(page.params.index)]
+	);
 
 	const courseName = $derived(synergyCourse ? removeClassID(synergyCourse._Title) : '');
 

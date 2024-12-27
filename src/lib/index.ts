@@ -1,5 +1,5 @@
-import { fileTypeFromBuffer } from 'file-type';
 import { Buffer } from 'buffer';
+import { fileTypeFromBuffer } from 'file-type';
 
 export function getColorForGrade(grade: string | number) {
 	if (typeof grade == 'number') {
