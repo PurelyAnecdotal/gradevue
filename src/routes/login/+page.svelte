@@ -1,8 +1,9 @@
 <script lang="ts">
 	import { browser } from '$app/environment';
 	import { goto } from '$app/navigation';
+	import { LocalStorageKey } from '$lib';
+	import { acc, loadStudentAccount } from '$lib/account.svelte';
 	import LoadingBanner from '$lib/components/LoadingBanner.svelte';
-	import { studentAccount } from '$lib/stores';
 	import { StudentAccount } from '$lib/synergy';
 	import {
 		Accordion,
@@ -19,11 +20,8 @@
 	import InfoCircleOutline from 'flowbite-svelte-icons/InfoCircleOutline.svelte';
 	import { fly } from 'svelte/transition';
 
-	if (browser && localStorage.getItem('token')) {
-		if (!$studentAccount) {
-			const { username, password, domain } = JSON.parse(localStorage.getItem('token') ?? '{}');
-			$studentAccount = new StudentAccount(domain, username, password);
-		}
+	if (browser && localStorage.getItem(LocalStorageKey.token)) {
+		if (!acc.studentAccount) loadStudentAccount();
 
 		goto('/grades');
 	}
@@ -53,9 +51,9 @@
 			return;
 		}
 
-		$studentAccount = loginAccount;
+		acc.studentAccount = loginAccount;
 
-		localStorage.setItem('token', JSON.stringify({ username, password, domain }));
+		localStorage.setItem(LocalStorageKey.token, JSON.stringify({ username, password, domain }));
 
 		loggingIn = false;
 

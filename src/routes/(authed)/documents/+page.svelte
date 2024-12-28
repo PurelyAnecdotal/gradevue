@@ -1,12 +1,10 @@
 <script lang="ts">
-	import { browser } from '$app/environment';
-	import { loadDocuments } from '$lib/cache';
 	import DateBadge from '$lib/components/DateBadge.svelte';
 	import LoadingBanner from '$lib/components/LoadingBanner.svelte';
-	import { documents, documentsLoaded } from '$lib/stores';
 	import { Badge, Card, TabItem, Tabs } from 'flowbite-svelte';
+	import { documentsState, loadDocuments } from './documents.svelte';
 
-	if (!$documents && browser) loadDocuments();
+	loadDocuments();
 
 	function getDocumentColor(documentType: string) {
 		switch (documentType) {
@@ -21,7 +19,9 @@
 		}
 	}
 
-	let documentDatas = $derived($documents?.StudentDocumentDatas?.StudentDocumentData ?? []);
+	let documentDatas = $derived(
+		documentsState.documents?.StudentDocumentDatas?.StudentDocumentData ?? []
+	);
 
 	const sortPriority = ['Transcript', 'Report Card'];
 
@@ -45,9 +45,9 @@
 	<title>Documents - GradeVue</title>
 </svelte:head>
 
-<LoadingBanner show={!$documentsLoaded} loadingMsg="Loading documents..." />
+<LoadingBanner show={!documentsState.loaded} loadingMsg="Loading documents..." />
 
-{#if $documents}
+{#if documentsState.documents}
 	<Tabs class="m-4 mb-0" contentClass="p-4">
 		<TabItem title="All" open>
 			<ol class="space-y-4">

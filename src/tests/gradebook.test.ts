@@ -1,5 +1,5 @@
 import { parseSynergyAssignment, type RealAssignment } from '$lib/assignments';
-import { type AssignmentEntity } from '$lib/types/Gradebook';
+import type { AssignmentEntity } from '$lib/types/Gradebook';
 import { expect, test } from 'bun:test';
 
 test('Normal Assignment', () => {

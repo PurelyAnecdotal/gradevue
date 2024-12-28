@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { browser } from '$app/environment';
 	import { goto } from '$app/navigation';
-	import { studentAccount } from '$lib/stores';
-	import { StudentAccount } from '$lib/synergy';
+	import { LocalStorageKey } from '$lib';
+	import { acc, loadStudentAccount } from '$lib/account.svelte';
 	import { Button, Card } from 'flowbite-svelte';
 	import ChartOutline from 'flowbite-svelte-icons/ChartOutline.svelte';
 	import ClockOutline from 'flowbite-svelte-icons/ClockOutline.svelte';
@@ -10,11 +10,8 @@
 	import GithubSolid from 'flowbite-svelte-icons/GithubSolid.svelte';
 	import GridPlusOutline from 'flowbite-svelte-icons/GridPlusOutline.svelte';
 
-	if (browser && localStorage.getItem('token')) {
-		if (!$studentAccount) {
-			const { username, password, domain } = JSON.parse(localStorage.getItem('token') ?? '{}');
-			$studentAccount = new StudentAccount(domain, username, password);
-		}
+	if (browser && localStorage.getItem(LocalStorageKey.token)) {
+		if (!acc.studentAccount) loadStudentAccount();
 
 		goto('/grades');
 	}

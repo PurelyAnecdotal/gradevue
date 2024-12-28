@@ -1,13 +1,11 @@
 <script lang="ts">
-	import { browser } from '$app/environment';
 	import { fullDateFormatter, removeClassID } from '$lib';
-	import { loadAttendance } from '$lib/cache';
 	import LoadingBanner from '$lib/components/LoadingBanner.svelte';
-	import { attendance, attendanceLoaded } from '$lib/stores';
 	import type { Period } from '$lib/types/Attendance';
 	import { Accordion, AccordionItem, Badge } from 'flowbite-svelte';
+	import { attendanceState, loadAttendance } from './attendance.svelte';
 
-	if (!$attendance && browser) loadAttendance();
+	loadAttendance();
 
 	const excusedReasonRegex =
 		/Field Trip|School Pass|Excused|Medical\/Dent|Comp Ed\/Court-Religi|Illness or Sickness|SB14 Wellness\/Illnes/;
@@ -45,11 +43,11 @@
 	<title>Attendance - GradeVue</title>
 </svelte:head>
 
-<LoadingBanner show={!$attendanceLoaded} loadingMsg="Loading attendance..." />
+<LoadingBanner show={!attendanceState.loaded} loadingMsg="Loading attendance..." />
 
-{#if $attendance}
+{#if attendanceState.attendance}
 	<Accordion class="p-4">
-		{#each $attendance.Absences.Absence ?? [] as absence}
+		{#each attendanceState.attendance.Absences.Absence ?? [] as absence}
 			<AccordionItem>
 				<div slot="header">
 					{fullDateFormatter.format(new Date(absence._AbsenceDate))}

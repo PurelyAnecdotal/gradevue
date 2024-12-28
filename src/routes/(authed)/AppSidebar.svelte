@@ -1,9 +1,6 @@
 <script lang="ts">
-	import { browser } from '$app/environment';
 	import { page } from '$app/state';
 	import { removeClassID } from '$lib';
-	import { loadStudentInfo } from '$lib/cache';
-	import { gradebook, studentInfo } from '$lib/stores';
 	import {
 		Badge,
 		Sidebar,
@@ -24,13 +21,15 @@
 	import MapPinAltOutline from 'flowbite-svelte-icons/MapPinAltOutline.svelte';
 	import UserCircleOutline from 'flowbite-svelte-icons/UserCircleOutline.svelte';
 	import { installPrompt } from '../../hooks.client';
+	import { gradebookState } from './grades/gradebook.svelte';
+	import { loadStudentInfo, studentInfoState } from './studentinfo/studentInfo.svelte';
 
 	function logOut() {
 		localStorage.clear();
 		location.assign('/login');
 	}
 
-	if (!$studentInfo && browser) loadStudentInfo();
+	loadStudentInfo();
 </script>
 
 <Sidebar activeUrl={page.url.pathname} class="h-screen">
@@ -58,9 +57,9 @@
 							<ChevronDownOutline />
 						{/if}
 					</a>
-					{#if page.params.index}
+					{#if page.params.index && gradebookState.gradebook}
 						<ul>
-							{#each $gradebook?.Courses.Course ?? [] as { _Title: title }, index}
+							{#each gradebookState.gradebook.Courses.Course as { _Title: title }, index}
 								<li>
 									<a
 										href={`/grades/${index.toString()}`}
@@ -125,7 +124,7 @@
 				</svelte:fragment>
 			</SidebarItem>
 
-			<SidebarItem label={$studentInfo?.FormattedName ?? ''} href="/studentinfo">
+			<SidebarItem label={studentInfoState.studentInfo?.FormattedName ?? ''} href="/studentinfo">
 				<svelte:fragment slot="icon">
 					<UserCircleOutline class="focus:outline-none" />
 				</svelte:fragment>

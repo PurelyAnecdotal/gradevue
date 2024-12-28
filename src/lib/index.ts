@@ -1,5 +1,5 @@
-import { fileTypeFromBuffer } from 'file-type';
 import { Buffer } from 'buffer';
+import { fileTypeFromBuffer } from 'file-type';
 
 export function getColorForGrade(grade: string | number) {
 	if (typeof grade == 'number') {
@@ -61,4 +61,14 @@ export async function getBlobURLFromBase64String(base64: string) {
 	const blob = new Blob([byteArray], { type: mimeType });
 
 	return URL.createObjectURL(blob);
+}
+
+export enum LocalStorageKey {
+	token = 'token',
+	gradebook = 'gradebook',
+	periodOverrideState = 'periodOverrideState',
+	attendance = 'attendance',
+	documents = 'documents',
+	mailData = 'mailData',
+	studentInfo = 'studentInfo'
 }
