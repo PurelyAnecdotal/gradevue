@@ -6,7 +6,7 @@ import { periodOverrideState, type PeriodOverrideState } from './reportingPeriod
 export const gradebookState: { gradebook?: Gradebook; loaded: boolean } = $state({ loaded: false });
 
 export const loadGradebook = async () => {
-	if (!acc.studentAccount) return;
+	if (gradebookState.gradebook || !acc.studentAccount) return;
 
 	gradebookState.loaded = false;
 
