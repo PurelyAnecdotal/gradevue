@@ -9,35 +9,24 @@
 
 	let reportCardURLPromise: Promise<string> | undefined = $state();
 
+	const getReportCardURL = async (documentGU: string | null) => {
+		if (!documentGU) throw new Error('DocumentGU not provided');
+
+		if (!acc.studentAccount) throw new Error('Student account not loaded');
+
+		let reportCard: ReportCard;
+
+		try {
+			reportCard = await acc.studentAccount.reportCard(documentGU);
+		} catch {
+			throw new Error('Document not found');
+		}
+
+		return getBlobURLFromBase64String(reportCard.Base64Code);
+	};
+
 	onMount(async () => {
-		const documentGU = page.url.searchParams.get('documentGU');
-
-		reportCardURLPromise = new Promise(async (resolve, reject) => {
-			if (!documentGU) {
-				reject(new Error('DocumentGU not provided'));
-				return;
-			}
-
-			if (!acc.studentAccount) {
-				reject(new Error('Student account not loaded'));
-				return;
-			}
-
-			let reportCard: ReportCard;
-
-			try {
-				reportCard = await acc.studentAccount.reportCard(documentGU);
-			} catch {
-				reject(new Error('Document not found'));
-				return;
-			}
-
-			try {
-				resolve(getBlobURLFromBase64String(reportCard.Base64Code));
-			} catch (error) {
-				reject(error);
-			}
-		});
+		reportCardURLPromise = getReportCardURL(page.url.searchParams.get('documentGU'));
 
 		location.assign(await reportCardURLPromise);
 	});

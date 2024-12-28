@@ -9,35 +9,24 @@
 
 	let attachmentURLPromise: Promise<string> | undefined = $state();
 
+	const getAttachmentURL = async (attachmentGU: string | null) => {
+		if (!attachmentGU) throw new Error('AttachmentGU not provided');
+
+		if (!acc.studentAccount) throw new Error('Student account not loaded');
+
+		let attachment: Attachment;
+
+		try {
+			attachment = await acc.studentAccount.attachment(attachmentGU);
+		} catch {
+			throw new Error('Attachment not found');
+		}
+
+		return getBlobURLFromBase64String(attachment.Base64Code);
+	};
+
 	onMount(async () => {
-		const attachmentGU = page.url.searchParams.get('attachmentGU');
-
-		attachmentURLPromise = new Promise(async (resolve, reject) => {
-			if (!attachmentGU) {
-				reject(new Error('AttachmentGU not provided'));
-				return;
-			}
-
-			if (!acc.studentAccount) {
-				reject(new Error('Student account not loaded'));
-				return;
-			}
-
-			let attachment: Attachment;
-
-			try {
-				attachment = await acc.studentAccount.attachment(attachmentGU);
-			} catch {
-				reject(new Error('Attachment not found'));
-				return;
-			}
-
-			try {
-				resolve(getBlobURLFromBase64String(attachment.Base64Code));
-			} catch (error) {
-				reject(error);
-			}
-		});
+		attachmentURLPromise = getAttachmentURL(page.url.searchParams.get('attachmentGU'));
 
 		location.assign(await attachmentURLPromise);
 	});
