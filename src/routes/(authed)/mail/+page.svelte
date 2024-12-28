@@ -6,6 +6,7 @@
 	import MessageCard from './MessageCard.svelte';
 	import MessageView from './MessageView.svelte';
 	import { loadMailData, mailDataState } from './mailData.svelte';
+	import RefreshIndicator from '$lib/components/RefreshIndicator.svelte';
 
 	loadMailData();
 
@@ -46,11 +47,19 @@
 
 <LoadingBanner show={!mailDataState.loaded} loadingMsg="Loading mail..." />
 
-<h1 class="p-4 pb-0 text-2xl font-bold">Inbox</h1>
+{#if mailDataState.lastRefresh !== undefined}
+	<RefreshIndicator
+		loaded={mailDataState.loaded}
+		lastRefresh={mailDataState.lastRefresh}
+		refresh={() => loadMailData(true)}
+	/>
+{/if}
 
-{#if mailDataState.mailData}
+<h1 class="mx-4 text-2xl font-bold">Inbox</h1>
+
+{#if mailDataState.data}
 	<ol class="space-y-4 p-4">
-		{#each mailDataState.mailData.InboxItemListings.MessageXML as message}
+		{#each mailDataState.data.InboxItemListings.MessageXML as message}
 			<li
 				ontouchend={() => {
 					touchscreen = true;

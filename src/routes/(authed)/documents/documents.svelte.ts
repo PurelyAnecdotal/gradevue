@@ -1,26 +1,18 @@
-import { LocalStorageKey } from '$lib';
+import { loadRecord, LocalStorageKey, type RecordState } from '$lib';
 import { acc } from '$lib/account.svelte';
 import type { Documents } from '$lib/types/Documents';
 
-export const documentsState: { documents?: Documents; loaded: boolean } = $state({ loaded: false });
+export const documentsState: RecordState<Documents> = $state({ loaded: false });
 
-export async function loadDocuments() {
-	if (documentsState.documents || !acc.studentAccount) return;
+export const loadDocuments = async (forceRefresh = false) => {
+	const { studentAccount } = acc;
+	if (!studentAccount) return;
 
-	documentsState.loaded = false;
-
-	const cache = localStorage.getItem(LocalStorageKey.documents);
-	if (cache) {
-		try {
-			documentsState.documents = JSON.parse(cache);
-		} catch (e) {
-			console.error(e);
-			localStorage.removeItem(LocalStorageKey.documents);
-		}
-	}
-
-	documentsState.documents = await acc.studentAccount.documents();
-	documentsState.loaded = true;
-
-	localStorage.setItem(LocalStorageKey.documents, JSON.stringify(documentsState.documents));
+	await loadRecord(
+		documentsState,
+		() => studentAccount.documents(),
+		LocalStorageKey.documents,
+		1000 * 60 * 60 * 24,
+		forceRefresh
+	);
 }

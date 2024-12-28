@@ -1,6 +1,7 @@
 <script lang="ts">
 	import DateBadge from '$lib/components/DateBadge.svelte';
 	import LoadingBanner from '$lib/components/LoadingBanner.svelte';
+	import RefreshIndicator from '$lib/components/RefreshIndicator.svelte';
 	import { Badge, Card, TabItem, Tabs } from 'flowbite-svelte';
 	import { documentsState, loadDocuments } from './documents.svelte';
 
@@ -20,7 +21,7 @@
 	}
 
 	let documentDatas = $derived(
-		documentsState.documents?.StudentDocumentDatas?.StudentDocumentData ?? []
+		documentsState.data?.StudentDocumentDatas?.StudentDocumentData ?? []
 	);
 
 	const sortPriority = ['Transcript', 'Report Card'];
@@ -32,9 +33,9 @@
 				.toSorted((a, b) => {
 					const aPriority = sortPriority.indexOf(a);
 					const bPriority = sortPriority.indexOf(b);
-					if (aPriority == -1 && bPriority == -1) return a.localeCompare(b);
-					if (aPriority == -1) return 1;
-					if (bPriority == -1) return -1;
+					if (aPriority === -1 && bPriority === -1) return a.localeCompare(b);
+					if (aPriority === -1) return 1;
+					if (bPriority === -1) return -1;
 					return aPriority - bPriority;
 				})
 		)
@@ -47,7 +48,15 @@
 
 <LoadingBanner show={!documentsState.loaded} loadingMsg="Loading documents..." />
 
-{#if documentsState.documents}
+{#if documentsState.lastRefresh !== undefined}
+	<RefreshIndicator
+		loaded={documentsState.loaded}
+		lastRefresh={documentsState.lastRefresh}
+		refresh={() => loadDocuments(true)}
+	/>
+{/if}
+
+{#if documentsState.data}
 	<Tabs class="m-4 mb-0" contentClass="p-4">
 		<TabItem title="All" open>
 			<ol class="space-y-4">

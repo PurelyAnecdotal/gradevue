@@ -187,7 +187,7 @@
 			{pointsPossible}
 		{:else}
 			{pointsEarned}/{pointsPossible}
-			{#if percentage && percentage != Infinity}
+			{#if percentage && percentage !== Infinity}
 				{Math.round(percentage * 100) / 100}%
 			{/if}
 		{/if}

@@ -1,5 +1,6 @@
 import { Buffer } from 'buffer';
 import { fileTypeFromBuffer } from 'file-type';
+import { acc } from './account.svelte';
 
 export function getColorForGrade(grade: string | number) {
 	if (typeof grade == 'number') {
@@ -72,3 +73,58 @@ export enum LocalStorageKey {
 	mailData = 'mailData',
 	studentInfo = 'studentInfo'
 }
+
+export interface RecordState<T> {
+	data?: T;
+	loaded: boolean;
+	lastRefresh?: number;
+}
+
+export interface LocalStorageCache<T> {
+	data: T;
+	lastRefresh: number;
+}
+
+export const loadRecord = async <T>(
+	recordState: RecordState<T>,
+	loadFunc: () => Promise<T>,
+	localStorageKey: string,
+	cacheExpirationTime: number | undefined,
+	forceRefresh = false
+) => {
+	if ((recordState.data && !forceRefresh) || !acc.studentAccount) return;
+
+	recordState.loaded = false;
+
+	let refresh = true;
+
+	const cacheStr = localStorage.getItem(localStorageKey);
+	if (cacheStr) {
+		try {
+			const cache: LocalStorageCache<T> = JSON.parse(cacheStr);
+
+			recordState.data = cache.data;
+			recordState.lastRefresh = cache.lastRefresh;
+
+			if (cacheExpirationTime !== undefined && Date.now() - cache.lastRefresh < cacheExpirationTime)
+				refresh = false;
+		} catch (e) {
+			console.error(e);
+			localStorage.removeItem(localStorageKey);
+		}
+	}
+
+	if (refresh || forceRefresh) {
+		recordState.data = await loadFunc();
+		recordState.lastRefresh = Date.now();
+
+		const newCache: LocalStorageCache<T> = {
+			data: recordState.data,
+			lastRefresh: recordState.lastRefresh
+		};
+
+		localStorage.setItem(localStorageKey, JSON.stringify(newCache));
+	}
+	
+	recordState.loaded = true;
+};

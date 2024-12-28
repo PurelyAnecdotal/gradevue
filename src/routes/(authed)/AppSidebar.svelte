@@ -124,7 +124,7 @@
 				</svelte:fragment>
 			</SidebarItem>
 
-			<SidebarItem label={studentInfoState.studentInfo?.FormattedName ?? ''} href="/studentinfo">
+			<SidebarItem label={studentInfoState.data?.FormattedName ?? ''} href="/studentinfo">
 				<svelte:fragment slot="icon">
 					<UserCircleOutline class="focus:outline-none" />
 				</svelte:fragment>

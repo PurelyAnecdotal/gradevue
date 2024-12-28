@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { LocalStorageKey } from '$lib';
 	import LoadingBanner from '$lib/components/LoadingBanner.svelte';
+	import RefreshIndicator from '$lib/components/RefreshIndicator.svelte';
 	import {
 		Accordion,
 		AccordionItem,
@@ -52,23 +53,31 @@
 
 <LoadingBanner show={!studentInfoState.loaded} loadingMsg="Loading student info..." />
 
-<div class="flex flex-col justify-center gap-4 p-4">
-	{#if studentInfoState.studentInfo}
+{#if studentInfoState.lastRefresh !== undefined}
+	<RefreshIndicator
+		loaded={studentInfoState.loaded}
+		lastRefresh={studentInfoState.lastRefresh}
+		refresh={() => loadStudentInfo(true)}
+	/>
+{/if}
+
+<div class="flex flex-col justify-center gap-4 px-4">
+	{#if studentInfoState.data}
 		<Card class="flex max-w-none flex-row gap-4 dark:text-white">
 			<img
 				class="h-xl rounded"
-				src="data:image/png;base64,{studentInfoState.studentInfo.Photo}"
+				src="data:image/png;base64,{studentInfoState.data.Photo}"
 				alt="Student Portrait"
 			/>
 			<div class="flex w-full flex-col">
 				<h1 class="w-full text-2xl">
-					{studentInfoState.studentInfo.FormattedName}
+					{studentInfoState.data.FormattedName}
 				</h1>
 				<span class="text-xl">
-					{studentInfoState.studentInfo.PermID}
+					{studentInfoState.data.PermID}
 				</span>
-				<span>Grade {studentInfoState.studentInfo.Grade}</span>
-				<span>{studentInfoState.studentInfo.Gender}</span>
+				<span>Grade {studentInfoState.data.Grade}</span>
+				<span>{studentInfoState.data.Gender}</span>
 			</div>
 		</Card>
 	{/if}

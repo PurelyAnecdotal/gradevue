@@ -4,6 +4,7 @@
 	import type { Period } from '$lib/types/Attendance';
 	import { Accordion, AccordionItem, Badge } from 'flowbite-svelte';
 	import { attendanceState, loadAttendance } from './attendance.svelte';
+	import RefreshIndicator from '$lib/components/RefreshIndicator.svelte';
 
 	loadAttendance();
 
@@ -45,9 +46,17 @@
 
 <LoadingBanner show={!attendanceState.loaded} loadingMsg="Loading attendance..." />
 
-{#if attendanceState.attendance}
-	<Accordion class="p-4">
-		{#each attendanceState.attendance.Absences.Absence ?? [] as absence}
+{#if attendanceState.lastRefresh !== undefined}
+	<RefreshIndicator
+		loaded={attendanceState.loaded}
+		lastRefresh={attendanceState.lastRefresh}
+		refresh={() => loadAttendance(true)}
+	/>
+{/if}
+
+{#if attendanceState.data}
+	<Accordion class="mx-4">
+		{#each attendanceState.data.Absences.Absence ?? [] as absence}
 			<AccordionItem>
 				<div slot="header">
 					{fullDateFormatter.format(new Date(absence._AbsenceDate))}

@@ -29,6 +29,11 @@ export default ts.config(
 			parserOptions: {
 				parser: ts.parser
 			}
+		},
+
+		rules: {
+			'no-duplicate-imports': 'error',
+			eqeqeq: 'error'
 		}
 	}
 );
