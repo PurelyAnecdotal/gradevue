@@ -125,6 +125,6 @@ export const loadRecord = async <T>(
 
 		localStorage.setItem(localStorageKey, JSON.stringify(newCache));
 	}
-	
+
 	recordState.loaded = true;
 };

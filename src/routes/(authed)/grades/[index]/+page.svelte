@@ -43,11 +43,13 @@
 	import InfoCircleOutline from 'flowbite-svelte-icons/InfoCircleOutline.svelte';
 	import { untrack } from 'svelte';
 	import { fade } from 'svelte/transition';
-	import { gradebookState } from '../gradebook.svelte';
+	import { getCurrentGradebookState, gradebooksState } from '../gradebook.svelte';
 	import AssignmentCard from './AssignmentCard.svelte';
 
+	const gradebookState = $derived(getCurrentGradebookState(gradebooksState));
+
 	const synergyCourse = $derived(
-		gradebookState.gradebook?.Courses.Course?.[parseInt(page.params.index)]
+		gradebookState?.data?.Courses.Course?.[parseInt(page.params.index)]
 	);
 
 	const courseName = $derived(synergyCourse ? removeClassID(synergyCourse._Title) : '');
@@ -94,6 +96,7 @@
 
 	// Initialize reactive assignments and re-initialize them when assignments change
 	$effect(() => {
+		// eslint-disable-next-line @typescript-eslint/no-unused-expressions
 		assignments;
 
 		untrack(() => {

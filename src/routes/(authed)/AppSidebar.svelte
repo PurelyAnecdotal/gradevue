@@ -21,13 +21,15 @@
 	import MapPinAltOutline from 'flowbite-svelte-icons/MapPinAltOutline.svelte';
 	import UserCircleOutline from 'flowbite-svelte-icons/UserCircleOutline.svelte';
 	import { installPrompt } from '../../hooks.client';
-	import { gradebookState } from './grades/gradebook.svelte';
+	import { getCurrentGradebookState, gradebooksState } from './grades/gradebook.svelte';
 	import { loadStudentInfo, studentInfoState } from './studentinfo/studentInfo.svelte';
 
 	function logOut() {
 		localStorage.clear();
 		location.assign('/login');
 	}
+
+	const currentGradebookState = $derived(getCurrentGradebookState(gradebooksState));
 
 	loadStudentInfo();
 </script>
@@ -57,9 +59,9 @@
 							<ChevronDownOutline />
 						{/if}
 					</a>
-					{#if page.params.index && gradebookState.gradebook}
+					{#if page.params.index && currentGradebookState?.data}
 						<ul>
-							{#each gradebookState.gradebook.Courses.Course as { _Title: title }, index}
+							{#each currentGradebookState.data.Courses.Course as { _Title: title }, index}
 								<li>
 									<a
 										href={`/grades/${index.toString()}`}
