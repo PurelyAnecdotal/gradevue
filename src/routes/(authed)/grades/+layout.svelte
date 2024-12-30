@@ -13,9 +13,7 @@
 
 	const currentGradebookState = $derived(getCurrentGradebookState(gradebooksState));
 
-	loadGradebooks().then(() => {
-		showGradebook(gradebooksState.overrideIndex ?? gradebooksState.activeIndex);
-	});
+	loadGradebooks();
 </script>
 
 <LoadingBanner show={!currentGradebookState?.loaded} loadingMsg="Loading grades..." />

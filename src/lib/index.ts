@@ -66,7 +66,7 @@ export async function getBlobURLFromBase64String(base64: string) {
 
 export enum LocalStorageKey {
 	token = 'token',
-	gradebook = 'gradebook',
+	gradebook = 'gradebook2',
 	periodOverrideState = 'periodOverrideState',
 	attendance = 'attendance',
 	documents = 'documents',

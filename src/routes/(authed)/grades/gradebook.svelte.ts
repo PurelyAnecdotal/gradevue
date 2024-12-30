@@ -45,12 +45,9 @@ const saveGradebooksState = () => {
 
 export const loadGradebooks = async () => {
 	const { studentAccount } = acc;
-
 	if (!studentAccount || gradebooksState.records || gradebooksState.activeIndex) return;
 
-	console.log('Initializing gradebook');
-
-	// Try to load from cache first
+	// Try to load the state from the localStorage cache
 	const cacheStr = localStorage.getItem(LocalStorageKey.gradebook);
 	if (cacheStr) {
 		try {
@@ -75,62 +72,55 @@ export const loadGradebooks = async () => {
 		}
 	}
 
-	// If the cache hasn't been initalized yet
+	// If the state hasn't been initalized yet (e.g. if localStorage was cleared)
 	if (gradebooksState.activeIndex === undefined || gradebooksState.records === undefined) {
+		// Request the active gradebook to get the active index
 		const activeGradebook = await studentAccount.gradebook();
 
 		const activeIndex = getPeriodIndex(
 			activeGradebook.ReportingPeriod,
 			activeGradebook.ReportingPeriods.ReportPeriod
 		);
+		gradebooksState.activeIndex = activeIndex;
 
+		// Initialize the records array (will be undefined at first)
 		gradebooksState.records ??= Array(activeGradebook.ReportingPeriods.ReportPeriod.length);
 
-		gradebooksState.records[activeIndex] = { data: activeGradebook, loaded: true };
-
-		gradebooksState.activeIndex = activeIndex;
+		// Save the active gradebook to the records array
+		gradebooksState.records[activeIndex] = {
+			data: activeGradebook,
+			loaded: true,
+			lastRefresh: Date.now()
+		};
 	}
 
-	if (gradebooksState.overrideIndex && !gradebooksState?.records[gradebooksState.overrideIndex]) {
-		await showGradebook(gradebooksState.overrideIndex);
-	}
+	// Load the gradebook currently being viewed
+	await showGradebook(gradebooksState.overrideIndex);
 
-	if (!cacheStr) saveGradebooksState();
+	// Save the state to localStorage
+	saveGradebooksState();
 };
 
 export const showGradebook = async (overrideIndex?: number, forceRefresh = false) => {
 	const { studentAccount } = acc;
 	if (!studentAccount) return;
 
-	console.log(overrideIndex);
+	if (gradebooksState.records === undefined || gradebooksState.activeIndex === undefined)
+		throw new Error('Gradebooks state is not initialized');
 
+	// If the override index is the same as the active index, override isn't needed
 	if (overrideIndex === gradebooksState.activeIndex) gradebooksState.overrideIndex = undefined;
-	else if (overrideIndex !== undefined) gradebooksState.overrideIndex = overrideIndex;
-
-	// if state is undefined, init
-
-	if (gradebooksState.records === undefined || gradebooksState.activeIndex === undefined) {
-		await loadGradebooks();
-
-		if (gradebooksState.records === undefined || gradebooksState.activeIndex === undefined)
-			throw new Error('Gradebook failed to init');
-	}
+	else gradebooksState.overrideIndex = overrideIndex;
 
 	const index = overrideIndex ?? gradebooksState.activeIndex;
 
-	console.log(`Loading gradebook ${index}`);
-
-	// set loaded to false
-
-	gradebooksState.records[index] ??= {
-		loaded: false
-	};
+	// Set the state of the requested gradebook to loading in preparation for possible cache refresh
+	gradebooksState.records[index] ??= { loaded: false };
 
 	if (gradebooksState.records[index].loaded !== false)
 		gradebooksState.records[index].loaded = false;
 
-	// get from cache, check if expired
-
+	// Check if cache is expired
 	let refresh = true;
 
 	if (Date.now() - (gradebooksState.records[index].lastRefresh ?? 0) < cacheExpirationTime) {
@@ -138,21 +128,28 @@ export const showGradebook = async (overrideIndex?: number, forceRefresh = false
 		refresh = false;
 	}
 
-	// if expired, get real
+	// If expired or refreshing manually, refresh
 	if (refresh || forceRefresh) {
-		console.log('Refreshing gradebook');
-
 		const newGradebook = await studentAccount.gradebook(overrideIndex);
 
 		gradebooksState.records[index].data = newGradebook;
 		gradebooksState.records[index].lastRefresh = Date.now();
-		// save to cache
 
+		// If it retrieved the active gradebook
+		if (overrideIndex === undefined) {
+			// Check if the active index has changed since the last time it was set
+			const newIndex = getPeriodIndex(
+				newGradebook.ReportingPeriod,
+				newGradebook.ReportingPeriods.ReportPeriod
+			);
+
+			// If it has, update the active index
+			if (newIndex !== index) gradebooksState.activeIndex = newIndex;
+		}
+
+		// Save refreshed data to localStorage
 		saveGradebooksState();
 	}
 
-	console.log(`Gradebook ${index} finished loading`);
-
-	// set loaded to true
 	gradebooksState.records[index].loaded = true;
 };
