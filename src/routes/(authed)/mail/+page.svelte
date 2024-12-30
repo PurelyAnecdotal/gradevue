@@ -1,12 +1,12 @@
 <script lang="ts">
 	import { browser } from '$app/environment';
 	import LoadingBanner from '$lib/components/LoadingBanner.svelte';
+	import RefreshIndicator from '$lib/components/RefreshIndicator.svelte';
 	import type { InboxItemListingsMessageXML } from '$lib/types/MailData';
 	import { Modal } from 'flowbite-svelte';
 	import MessageCard from './MessageCard.svelte';
 	import MessageView from './MessageView.svelte';
 	import { loadMailData, mailDataState } from './mailData.svelte';
-	import RefreshIndicator from '$lib/components/RefreshIndicator.svelte';
 
 	loadMailData();
 

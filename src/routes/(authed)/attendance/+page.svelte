@@ -1,10 +1,10 @@
 <script lang="ts">
 	import { fullDateFormatter, removeClassID } from '$lib';
 	import LoadingBanner from '$lib/components/LoadingBanner.svelte';
+	import RefreshIndicator from '$lib/components/RefreshIndicator.svelte';
 	import type { Period } from '$lib/types/Attendance';
 	import { Accordion, AccordionItem, Badge } from 'flowbite-svelte';
 	import { attendanceState, loadAttendance } from './attendance.svelte';
-	import RefreshIndicator from '$lib/components/RefreshIndicator.svelte';
 
 	loadAttendance();
 

@@ -45,7 +45,7 @@ const saveGradebooksState = () => {
 
 export const loadGradebooks = async () => {
 	const { studentAccount } = acc;
-	if (!studentAccount || gradebooksState.records || gradebooksState.activeIndex) return;
+	if (!studentAccount || gradebooksState.records || gradebooksState.activeIndex !== undefined) return;
 
 	// Try to load the state from the localStorage cache
 	const cacheStr = localStorage.getItem(LocalStorageKey.gradebook);
