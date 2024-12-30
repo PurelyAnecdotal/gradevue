@@ -85,12 +85,12 @@ export function calculateCourseGradePercentageFromCategories(
 	gradeCategories: Category[]
 ) {
 	let gradePercentage = 0;
-	if (Object.entries(pointsByCategory).length == 0) return 0;
+	if (Object.entries(pointsByCategory).length === 0) return 0;
 
 	let totalWeight = 0;
 
 	Object.entries(pointsByCategory).forEach(([categoryName, categoryPoints]) => {
-		const category = gradeCategories.find((category) => category.name == categoryName);
+		const category = gradeCategories.find((category) => category.name === categoryName);
 		if (!category) return;
 
 		gradePercentage +=
@@ -368,7 +368,7 @@ function getAssignmentPointTotals<T extends Assignment>(assignments: Calculable<
 export function getSynergyCourseAssignmentCategories(course: Course) {
 	const gradeCalcSummary = course?.Marks.Mark.GradeCalculationSummary;
 
-	if (typeof gradeCalcSummary == 'string' || !gradeCalcSummary?.AssignmentGradeCalc)
+	if (typeof gradeCalcSummary === 'string' || !gradeCalcSummary?.AssignmentGradeCalc)
 		return undefined;
 
 	const categories: Category[] = gradeCalcSummary.AssignmentGradeCalc.map((category) => ({
