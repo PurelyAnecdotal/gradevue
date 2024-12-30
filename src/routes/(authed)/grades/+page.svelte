@@ -28,12 +28,6 @@
 		if (currentPeriodIndex === -1)
 			throw new Error('Could not find index of current reporting period');
 	});
-
-	async function setReportPeriodIndex(index: number) {
-		if (!allPeriods || !currentPeriod || currentPeriodIndex === undefined) return;
-
-		await showGradebook(index);
-	}
 </script>
 
 <svelte:head>
@@ -56,10 +50,10 @@
 			<Dropdown bind:open={dropdownOpen}>
 				{#each allPeriods ?? [] as period, index}
 					<DropdownItem
-						onclick={async () => {
+						onclick={() => {
 							dropdownOpen = false;
 
-							await setReportPeriodIndex(index);
+							showGradebook(index);
 						}}
 						class="flex items-center"
 					>
@@ -78,11 +72,7 @@
 				It looks like you don't have any grades yet in this reporting period.
 
 				{#if currentPeriodIndex > 0}
-					<Button
-						onclick={async () => await setReportPeriodIndex(currentPeriodIndex - 1)}
-						color="alternative"
-						outline
-					>
+					<Button onclick={() => showGradebook(currentPeriodIndex - 1)} color="alternative" outline>
 						<span class="text-gray-300">View {allPeriods[currentPeriodIndex - 1]._GradePeriod}</span
 						>
 					</Button>
