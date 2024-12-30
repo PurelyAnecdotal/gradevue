@@ -117,19 +117,20 @@ export const showGradebook = async (overrideIndex?: number, forceRefresh = false
 	// Set the state of the requested gradebook to loading in preparation for possible cache refresh
 	gradebooksState.records[index] ??= { loaded: false };
 
-	if (gradebooksState.records[index].loaded !== false)
-		gradebooksState.records[index].loaded = false;
+	if (gradebooksState.records[index].loaded) gradebooksState.records[index].loaded = false;
 
 	// Check if cache is expired
 	let refresh = true;
-
-	if (Date.now() - (gradebooksState.records[index].lastRefresh ?? 0) < cacheExpirationTime) {
+	if (
+		!forceRefresh &&
+		Date.now() - (gradebooksState.records[index].lastRefresh ?? 0) < cacheExpirationTime
+	) {
 		gradebooksState.records[index].loaded = true;
 		refresh = false;
 	}
 
 	// If expired or refreshing manually, refresh
-	if (refresh || forceRefresh) {
+	if (refresh) {
 		const newGradebook = await studentAccount.gradebook(overrideIndex);
 
 		gradebooksState.records[index].data = newGradebook;

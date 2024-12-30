@@ -13,6 +13,12 @@
 
 	const currentGradebookState = $derived(getCurrentGradebookState(gradebooksState));
 
+	const activeReportingPeriodName = $derived(
+		gradebooksState.records && gradebooksState.activeIndex
+			? gradebooksState.records[gradebooksState.activeIndex]?.data?.ReportingPeriod._GradePeriod
+			: undefined
+	);
+
 	loadGradebooks();
 </script>
 
@@ -27,21 +33,13 @@
 	/>
 {/if}
 
-{#if gradebooksState.overrideIndex && gradebooksState.records && gradebooksState.activeIndex}
+{#if gradebooksState.overrideIndex && gradebooksState.records && gradebooksState.activeIndex && currentGradebookState?.data}
 	<Alert class="mx-4 flex items-center justify-between" color="light" border>
 		<span class="text-white">
-			Viewing reporting period {currentGradebookState?.data?.ReportingPeriod._GradePeriod}
+			Viewing reporting period {currentGradebookState.data.ReportingPeriod._GradePeriod}
 		</span>
 
-		<Button
-			onclick={async () => {
-				gradebooksState.overrideIndex = undefined;
-				showGradebook();
-			}}
-			color="light"
-			>Return to {gradebooksState.records[gradebooksState.activeIndex]?.data?.ReportingPeriod
-				._GradePeriod}</Button
-		>
+		<Button onclick={() => showGradebook()} color="light">Return to {activeReportingPeriodName}</Button>
 	</Alert>
 {/if}
 
