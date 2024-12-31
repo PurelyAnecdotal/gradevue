@@ -21,6 +21,7 @@
 		type ReactiveAssignment,
 		type RealAssignment
 	} from '$lib/assignments';
+	import NumberFlow from '@number-flow/svelte';
 	import {
 		Alert,
 		Button,
@@ -164,6 +165,22 @@
 	}
 
 	let calcWarningOpen = $state(false);
+
+	const prefix = $derived(
+		hypotheticalMode ? '' : synergyCourse?.Marks.Mark._CalculatedScoreString + ' '
+	);
+
+	const value = $derived(
+		hypotheticalMode
+			? hypotheticalGrade / 100
+			: synergyCourse
+				? parseFloat(synergyCourse.Marks.Mark._CalculatedScoreRaw) / 100
+				: undefined
+	);
+
+	// https://github.com/barvian/number-flow/blob/e9fc6999417df7cb7e7b290f7f2019f570c18cc7/packages/number-flow/src/index.ts#L73
+	const easing =
+		'linear(0,.005,.019,.039,.066,.096,.129,.165,.202,.24,.278,.316,.354,.39,.426,.461,.494,.526,.557,.586,.614,.64,.665,.689,.711,.731,.751,.769,.786,.802,.817,.831,.844,.856,.867,.877,.887,.896,.904,.912,.919,.925,.931,.937,.942,.947,.951,.955,.959,.962,.965,.968,.971,.973,.976,.978,.98,.981,.983,.984,.986,.987,.988,.989,.99,.991,.992,.992,.993,.994,.994,.995,.995,.996,.996,.9963,.9967,.9969,.9972,.9975,.9977,.9979,.9981,.9982,.9984,.9985,.9987,.9988,.9989,1)';
 </script>
 
 <svelte:head>
@@ -176,14 +193,16 @@
 			{courseName}
 		</span>
 		<span class="flex shrink-0 items-center text-2xl">
-			{#if hypotheticalMode}
-				{#if !categories && !rawGradeCalcMatches}
-					<ExclamationCircleSolid class="mr-2 focus:outline-none" />
-				{/if}
-				{Math.round(hypotheticalGrade * 1000) / 1000}%
-			{:else}
-				{synergyCourse.Marks.Mark._CalculatedScoreString}
-				{synergyCourse.Marks.Mark._CalculatedScoreRaw}%
+			{#if hypotheticalMode && !categories && !rawGradeCalcMatches}
+				<ExclamationCircleSolid class="mr-2 focus:outline-none" />
+			{/if}
+			{#if value}
+				<NumberFlow
+					{prefix}
+					{value}
+					format={{ style: 'percent', maximumFractionDigits: 3 }}
+					spinTiming={{ duration: 400, easing }}
+				/>
 			{/if}
 		</span>
 	</div>
