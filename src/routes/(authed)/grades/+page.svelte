@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { getColorForGrade, removeClassID } from '$lib';
+	import NumberFlow from '@number-flow/svelte';
 	import { Alert, Button, Card, Dropdown, DropdownItem, Progressbar } from 'flowbite-svelte';
 	import ChevronDownOutline from 'flowbite-svelte-icons/ChevronDownOutline.svelte';
 	import ChevronUpOutline from 'flowbite-svelte-icons/ChevronUpOutline.svelte';
@@ -89,8 +90,11 @@
 					>
 						<span class="mr-2 line-clamp-1">{removeClassID(title)}</span>
 						<span class="ml-auto mr-2 shrink-0">
-							{grade}
-							{parseFloat(percent)}%
+							<NumberFlow
+								prefix={grade + ' '}
+								value={parseFloat(percent) / 100}
+								format={{ style: 'percent', maximumFractionDigits: 3 }}
+							/>
 						</span>
 
 						<Progressbar
