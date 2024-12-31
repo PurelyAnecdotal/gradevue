@@ -15,4 +15,4 @@ export const loadMailData = async (forceRefresh = false) => {
 		1000 * 60 * 60,
 		forceRefresh
 	);
-}
+};

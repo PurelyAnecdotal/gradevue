@@ -1,6 +1,7 @@
 import { LocalStorageKey, type LocalStorageCache, type RecordState } from '$lib';
 import { acc } from '$lib/account.svelte';
 import type { Gradebook, ReportPeriod } from '$lib/types/Gradebook';
+import { SvelteSet } from 'svelte/reactivity';
 
 interface GradebooksLocalStorageCache {
 	records: (undefined | LocalStorageCache<Gradebook>)[];
@@ -20,6 +21,8 @@ export const getCurrentGradebookState = (gradebooksState: GradebooksState) =>
 	gradebooksState.records && gradebooksState.activeIndex
 		? gradebooksState.records[gradebooksState.overrideIndex ?? gradebooksState.activeIndex]
 		: undefined;
+
+export const seenAssignmentIDs = new SvelteSet<string>();
 
 const cacheExpirationTime = 1000 * 60;
 
@@ -45,7 +48,8 @@ const saveGradebooksState = () => {
 
 export const loadGradebooks = async () => {
 	const { studentAccount } = acc;
-	if (!studentAccount || gradebooksState.records || gradebooksState.activeIndex !== undefined) return;
+	if (!studentAccount || gradebooksState.records || gradebooksState.activeIndex !== undefined)
+		return;
 
 	// Try to load the state from the localStorage cache
 	const cacheStr = localStorage.getItem(LocalStorageKey.gradebook);
@@ -99,6 +103,18 @@ export const loadGradebooks = async () => {
 
 	// Save the state to localStorage
 	saveGradebooksState();
+
+	// Load seen assignment ids from localStorage
+	const seenIDsStr = localStorage.getItem(LocalStorageKey.seenAssignmentIDs);
+	if (seenIDsStr) {
+		try {
+			const seenIDs: string[] = JSON.parse(seenIDsStr);
+			seenIDs.forEach((id) => seenAssignmentIDs.add(id));
+		} catch (e) {
+			console.error(e);
+			localStorage.removeItem(LocalStorageKey.seenAssignmentIDs);
+		}
+	}
 };
 
 export const showGradebook = async (overrideIndex?: number, forceRefresh = false) => {
@@ -131,26 +147,32 @@ export const showGradebook = async (overrideIndex?: number, forceRefresh = false
 
 	// If expired or refreshing manually, refresh
 	if (refresh) {
-		const newGradebook = await studentAccount.gradebook(overrideIndex);
+		try {
+			const newGradebook = await studentAccount.gradebook(overrideIndex);
 
-		gradebooksState.records[index].data = newGradebook;
-		gradebooksState.records[index].lastRefresh = Date.now();
+			gradebooksState.records[index].data = newGradebook;
+			gradebooksState.records[index].lastRefresh = Date.now();
 
-		// If it retrieved the active gradebook
-		if (overrideIndex === undefined) {
-			// Check if the active index has changed since the last time it was set
-			const newIndex = getPeriodIndex(
-				newGradebook.ReportingPeriod,
-				newGradebook.ReportingPeriods.ReportPeriod
-			);
+			// If it retrieved the active gradebook
+			if (overrideIndex === undefined) {
+				// Check if the active index has changed since the last time it was set
+				const newIndex = getPeriodIndex(
+					newGradebook.ReportingPeriod,
+					newGradebook.ReportingPeriods.ReportPeriod
+				);
 
-			// If it has, update the active index
-			if (newIndex !== index) gradebooksState.activeIndex = newIndex;
+				// If it has, update the active index
+				if (newIndex !== index) gradebooksState.activeIndex = newIndex;
+			}
+		} catch (err) {
+			console.error(err);
 		}
-
-		// Save refreshed data to localStorage
-		saveGradebooksState();
 	}
 
 	gradebooksState.records[index].loaded = true;
+
+	saveGradebooksState();
 };
+
+export const saveSeenAssignments = () =>
+	localStorage.setItem(LocalStorageKey.seenAssignmentIDs, JSON.stringify([...seenAssignmentIDs]));

@@ -31,6 +31,7 @@
 		categoryDropdownOptions?: string[];
 		date?: Date | undefined;
 		editable?: boolean;
+		unseen?: boolean;
 		recalculateGradePercentage?: () => void;
 	}
 
@@ -48,6 +49,7 @@
 		categoryDropdownOptions = [],
 		date = undefined,
 		editable = false,
+		unseen = false,
 		recalculateGradePercentage = () => {}
 	}: Props = $props();
 
@@ -66,9 +68,13 @@
 	);
 
 	let percentageChange = $derived(Math.round((gradePercentageChange ?? 0) * 100) / 100);
+
+	const border = $derived(unseen ? 'dark:border-t-green-600 border-t-4' : '');
 </script>
 
-<Card class="flex max-w-none flex-row items-center dark:text-white sm:p-4">
+<Card
+	class="flex max-w-none flex-row items-center transition duration-500 dark:text-white sm:p-4 {border}"
+>
 	<div class="mr-2">
 		{#if editable}
 			<Input bind:value={name} class="inline w-48" />

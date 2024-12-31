@@ -39,7 +39,9 @@
 			Viewing reporting period {currentGradebookState.data.ReportingPeriod._GradePeriod}
 		</span>
 
-		<Button onclick={() => showGradebook()} color="light">Return to {activeReportingPeriodName}</Button>
+		<Button onclick={() => showGradebook()} color="light">
+			Return to {activeReportingPeriodName}
+		</Button>
 	</Alert>
 {/if}
 

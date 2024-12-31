@@ -31,6 +31,7 @@ test('Normal Assignment', () => {
 
 	expect(parseSynergyAssignment(synergyAssignment)).toEqual({
 		name: 'Ch. 3 Quiz',
+		id: '123456',
 		pointsEarned: 3,
 		pointsPossible: 4,
 		unscaledPoints: undefined,
@@ -73,6 +74,7 @@ test('Normal Assignment - _Point is empty string', () => {
 
 	expect(parseSynergyAssignment(synergyAssignment)).toEqual({
 		name: 'Ch. 3 Quiz',
+		id: '123456',
 		pointsEarned: 0,
 		pointsPossible: 4,
 		unscaledPoints: undefined,
@@ -112,6 +114,7 @@ test('Not Graded Assignment - Points Possible', () => {
 
 	const match: RealAssignment = {
 		name: 'Ch. 3 Quiz',
+		id: '123456',
 		pointsEarned: undefined,
 		pointsPossible: 4,
 		unscaledPoints: undefined,
@@ -156,6 +159,7 @@ test('Not Graded Assignment - No Points Possible', () => {
 
 	expect(parseSynergyAssignment(synergyAssignment)).toEqual({
 		name: 'Ch. 3 Quiz',
+		id: '123456',
 		pointsEarned: undefined,
 		pointsPossible: undefined,
 		unscaledPoints: undefined,
@@ -198,6 +202,7 @@ test('Extra Credit Assignment', () => {
 
 	expect(parseSynergyAssignment(synergyAssignment)).toEqual({
 		name: 'Ch. 3 Quiz',
+		id: '123456',
 		pointsEarned: 3,
 		pointsPossible: 4,
 		unscaledPoints: undefined,
@@ -240,6 +245,7 @@ test('Not For Grading Assignment', () => {
 
 	expect(parseSynergyAssignment(synergyAssignment)).toEqual({
 		name: 'Ch. 3 Quiz',
+		id: '123456',
 		pointsEarned: 3,
 		pointsPossible: 4,
 		unscaledPoints: undefined,
@@ -282,6 +288,7 @@ test('Scaled Assignment', () => {
 
 	expect(parseSynergyAssignment(synergyAssignment)).toEqual({
 		name: 'Ch. 3 Quiz',
+		id: '123456',
 		pointsEarned: 6,
 		pointsPossible: 8,
 		unscaledPoints: {

@@ -11,6 +11,7 @@ export interface Category {
 
 interface Assignment {
 	name: string;
+	id: string;
 	pointsEarned: number | undefined;
 	pointsPossible: number | undefined;
 	unscaledPoints: { pointsEarned: number; pointsPossible: number } | undefined;
@@ -286,6 +287,7 @@ export function getHiddenAssignmentsFromCategories(
 
 			const hiddenAssignment: Flowed<HiddenAssignment> = {
 				name: `Hidden ${category.name} Assignments`,
+				id: `hidden-${category.name}`,
 				pointsEarned: hiddenPointsEarned,
 				pointsPossible: hiddenPointsPossible,
 				unscaledPoints: undefined,
@@ -515,6 +517,7 @@ export function parseSynergyAssignment(synergyAssignment: AssignmentEntity) {
 
 	const assignment: RealAssignment = {
 		name: _Measure,
+		id: synergyAssignment._GradebookID,
 		pointsEarned,
 		pointsPossible,
 		unscaledPoints,
