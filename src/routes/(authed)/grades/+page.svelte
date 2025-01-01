@@ -1,7 +1,9 @@
 <script lang="ts">
 	import { getColorForGrade, removeClassID } from '$lib';
+	import { parseSynergyAssignment } from '$lib/assignments';
+	import type { AssignmentEntity } from '$lib/types/Gradebook';
 	import NumberFlow from '@number-flow/svelte';
-	import { Alert, Button, Card, Dropdown, DropdownItem, Progressbar } from 'flowbite-svelte';
+	import { Alert, Badge, Button, Card, Dropdown, DropdownItem, Progressbar } from 'flowbite-svelte';
 	import ChevronDownOutline from 'flowbite-svelte-icons/ChevronDownOutline.svelte';
 	import ChevronUpOutline from 'flowbite-svelte-icons/ChevronUpOutline.svelte';
 	import CloseCircleOutline from 'flowbite-svelte-icons/CloseCircleOutline.svelte';
@@ -10,6 +12,7 @@
 		getCurrentGradebookState,
 		getPeriodIndex,
 		gradebooksState,
+		seenAssignmentIDs,
 		showGradebook
 	} from './gradebook.svelte';
 
@@ -29,6 +32,9 @@
 		if (currentPeriodIndex === -1)
 			throw new Error('Could not find index of current reporting period');
 	});
+
+	const getUnseenAssignmentsCount = (assignments: AssignmentEntity[]) =>
+		assignments.map(parseSynergyAssignment).filter(({ id }) => !seenAssignmentIDs.has(id)).length;
 </script>
 
 <svelte:head>
@@ -82,20 +88,25 @@
 		{/if}
 
 		<ol class="space-y-4">
-			{#each currentGradebookState.data.Courses.Course ?? [] as { _Title: title, Marks: { Mark: { _CalculatedScoreString: grade, _CalculatedScoreRaw: percent } } }, index}
+			{#each currentGradebookState.data.Courses.Course ?? [] as { _Title: title, Marks: { Mark: { _CalculatedScoreString: grade, _CalculatedScoreRaw: percent, Assignments } } }, index}
 				<li>
 					<Card
-						class="flex max-w-none flex-row items-center justify-between text-xl dark:text-white"
+						class="flex max-w-none flex-row items-center gap-2 text-xl dark:text-white"
 						href="/grades/{index.toString()}"
 					>
-						<span class="mr-2 line-clamp-1">{removeClassID(title)}</span>
-						<span class="ml-auto mr-2 shrink-0">
-							<NumberFlow
-								prefix={grade + ' '}
-								value={parseFloat(percent) / 100}
-								format={{ style: 'percent', maximumFractionDigits: 3 }}
-							/>
-						</span>
+						<span class="mr-auto line-clamp-1">{removeClassID(title)}</span>
+
+						{#if Assignments.Assignment && getUnseenAssignmentsCount(Assignments.Assignment) > 0}
+							<Badge color="green" class="text-center shrink-0">
+								{getUnseenAssignmentsCount(Assignments.Assignment)} new
+							</Badge>
+						{/if}
+
+						<NumberFlow
+							prefix={grade + ' '}
+							value={parseFloat(percent) / 100}
+							format={{ style: 'percent', maximumFractionDigits: 3 }}
+						/>
 
 						<Progressbar
 							color={getColorForGrade(grade)}

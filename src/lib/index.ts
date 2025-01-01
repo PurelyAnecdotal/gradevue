@@ -67,7 +67,7 @@ export async function getBlobURLFromBase64String(base64: string) {
 export enum LocalStorageKey {
 	token = 'token',
 	gradebook = 'gradebook2',
-	periodOverrideState = 'periodOverrideState',
+	seenAssignmentIDs = 'seenAssignmentIDs',
 	attendance = 'attendance',
 	documents = 'documents',
 	mailData = 'mailData',
@@ -115,15 +115,19 @@ export const loadRecord = async <T>(
 	}
 
 	if (refresh || forceRefresh) {
-		recordState.data = await loadFunc();
-		recordState.lastRefresh = Date.now();
+		try {
+			recordState.data = await loadFunc();
+			recordState.lastRefresh = Date.now();
 
-		const newCache: LocalStorageCache<T> = {
-			data: recordState.data,
-			lastRefresh: recordState.lastRefresh
-		};
+			const newCache: LocalStorageCache<T> = {
+				data: recordState.data,
+				lastRefresh: recordState.lastRefresh
+			};
 
-		localStorage.setItem(localStorageKey, JSON.stringify(newCache));
+			localStorage.setItem(localStorageKey, JSON.stringify(newCache));
+		} catch (err) {
+			console.error(err);
+		}
 	}
 
 	recordState.loaded = true;

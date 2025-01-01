@@ -46,7 +46,7 @@
 			class="ml-0 text-white"
 		/>
 		<a href="/grades" class="mr-auto text-xl text-white">GradeVue</a>
-		<div>{studentInfoState.studentInfo?.FormattedName}</div>
+		<div>{studentInfoState.data?.FormattedName}</div>
 	</div>
 
 	<div class="overflow-y-auto">

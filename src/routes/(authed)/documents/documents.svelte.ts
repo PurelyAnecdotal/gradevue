@@ -15,4 +15,4 @@ export const loadDocuments = async (forceRefresh = false) => {
 		1000 * 60 * 60 * 24,
 		forceRefresh
 	);
-}
+};

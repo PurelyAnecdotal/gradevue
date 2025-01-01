@@ -16,4 +16,3 @@ export const loadStudentInfo = async (forceRefresh = false) => {
 		forceRefresh
 	);
 };
-

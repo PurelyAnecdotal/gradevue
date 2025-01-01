@@ -44,7 +44,12 @@
 	import InfoCircleOutline from 'flowbite-svelte-icons/InfoCircleOutline.svelte';
 	import { untrack } from 'svelte';
 	import { fade } from 'svelte/transition';
-	import { getCurrentGradebookState, gradebooksState } from '../gradebook.svelte';
+	import {
+		getCurrentGradebookState,
+		gradebooksState,
+		saveSeenAssignments,
+		seenAssignmentIDs
+	} from '../gradebook.svelte';
 	import AssignmentCard from './AssignmentCard.svelte';
 
 	const gradebookState = $derived(getCurrentGradebookState(gradebooksState));
@@ -148,6 +153,7 @@
 	function addHypotheticalAssignment() {
 		const newHypotheticalAssignment: NewHypotheticalAssignment = $state({
 			name: 'Hypothetical Assignment',
+			id: undefined,
 			pointsEarned: undefined,
 			pointsPossible: undefined,
 			unscaledPoints: undefined,
@@ -181,6 +187,10 @@
 	// https://github.com/barvian/number-flow/blob/e9fc6999417df7cb7e7b290f7f2019f570c18cc7/packages/number-flow/src/index.ts#L73
 	const easing =
 		'linear(0,.005,.019,.039,.066,.096,.129,.165,.202,.24,.278,.316,.354,.39,.426,.461,.494,.526,.557,.586,.614,.64,.665,.689,.711,.731,.751,.769,.786,.802,.817,.831,.844,.856,.867,.877,.887,.896,.904,.912,.919,.925,.931,.937,.942,.947,.951,.955,.959,.962,.965,.968,.971,.973,.976,.978,.98,.981,.983,.984,.986,.987,.988,.989,.99,.991,.992,.992,.993,.994,.994,.995,.995,.996,.996,.9963,.9967,.9969,.9972,.9975,.9977,.9979,.9981,.9982,.9984,.9985,.9987,.9988,.9989,1)';
+
+	const unseenAssignments = $derived(
+		realAssignments.filter(({ id }) => !seenAssignmentIDs.has(id))
+	);
 </script>
 
 <svelte:head>
@@ -297,6 +307,24 @@
 		</Alert>
 	{/if}
 
+	{#if unseenAssignments.length > 0 && !hypotheticalMode}
+		<div transition:fade={{ duration: 200 }} class="mt-4">
+			<Alert color="green" border class="mx-4 flex items-center justify-between p-2 text-base">
+				{unseenAssignments.length} new assignments
+				<Button
+					color="green"
+					size="sm"
+					onclick={() => {
+						unseenAssignments.forEach(({ id }) => seenAssignmentIDs.add(id));
+						saveSeenAssignments();
+					}}
+				>
+					Mark as seen
+				</Button>
+			</Alert>
+		</div>
+	{/if}
+
 	<div class="flex flex-wrap items-center justify-between">
 		<Checkbox bind:checked={hypotheticalMode} class="m-4">
 			<div id="hypothetical-toggle" class="mr-2 flex items-center">
@@ -345,7 +373,7 @@
 								</li>
 							{/each}
 						{:else}
-							{#each assignments as { name, pointsEarned, pointsPossible, unscaledPoints, extraCredit, gradePercentageChange, notForGrade, hidden, category, date }}
+							{#each assignments as { name, id, pointsEarned, pointsPossible, unscaledPoints, extraCredit, gradePercentageChange, notForGrade, hidden, category, date }}
 								<li>
 									<AssignmentCard
 										{name}
@@ -358,6 +386,7 @@
 										{hidden}
 										{category}
 										{date}
+										unseen={id ? !seenAssignmentIDs.has(id) : false}
 									/>
 								</li>
 							{/each}
@@ -395,7 +424,7 @@
 									{/if}
 								{/each}
 							{:else}
-								{#each assignments as { name, pointsEarned, pointsPossible, unscaledPoints, extraCredit, gradePercentageChange, notForGrade, hidden, category, date }}
+								{#each assignments as { name, id, pointsEarned, pointsPossible, unscaledPoints, extraCredit, gradePercentageChange, notForGrade, hidden, category, date }}
 									{#if category === categoryName}
 										<li>
 											<AssignmentCard
@@ -410,6 +439,7 @@
 												{notForGrade}
 												{hidden}
 												{date}
+												unseen={id ? !seenAssignmentIDs.has(id) : false}
 											/>
 										</li>
 									{/if}

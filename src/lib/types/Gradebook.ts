@@ -49,7 +49,7 @@ export interface Mark {
 }
 
 export interface Assignments {
-	Assignment: AssignmentEntity[];
+	Assignment?: AssignmentEntity[];
 }
 
 export interface AssignmentEntity {
