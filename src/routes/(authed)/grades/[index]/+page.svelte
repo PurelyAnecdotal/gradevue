@@ -153,7 +153,7 @@
 	function addHypotheticalAssignment() {
 		const newHypotheticalAssignment: NewHypotheticalAssignment = $state({
 			name: 'Hypothetical Assignment',
-			id: `hypothetical-${Math.random().toString()}`,
+			id: undefined,
 			pointsEarned: undefined,
 			pointsPossible: undefined,
 			unscaledPoints: undefined,
@@ -386,7 +386,7 @@
 										{hidden}
 										{category}
 										{date}
-										unseen={!seenAssignmentIDs.has(id)}
+										unseen={id ? !seenAssignmentIDs.has(id) : false}
 									/>
 								</li>
 							{/each}
@@ -439,7 +439,7 @@
 												{notForGrade}
 												{hidden}
 												{date}
-												unseen={!seenAssignmentIDs.has(id)}
+												unseen={id ? !seenAssignmentIDs.has(id) : false}
 											/>
 										</li>
 									{/if}

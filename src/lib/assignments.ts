@@ -11,7 +11,7 @@ export interface Category {
 
 interface Assignment {
 	name: string;
-	id: string;
+	id: string | undefined;
 	pointsEarned: number | undefined;
 	pointsPossible: number | undefined;
 	unscaledPoints: { pointsEarned: number; pointsPossible: number } | undefined;
@@ -25,6 +25,7 @@ interface Assignment {
 }
 
 export interface RealAssignment extends Assignment {
+	id: string;
 	hidden: false;
 	category: string;
 	date: Date;
@@ -32,6 +33,7 @@ export interface RealAssignment extends Assignment {
 }
 
 export interface HiddenAssignment extends Assignment {
+	id: undefined;
 	pointsEarned: number;
 	pointsPossible: number;
 	unscaledPoints: undefined;
@@ -48,6 +50,7 @@ export interface ReactiveAssignment extends Assignment {
 }
 
 export interface NewHypotheticalAssignment extends ReactiveAssignment {
+	id: undefined;
 	newHypothetical: true;
 	unscaledPoints: undefined;
 	extraCredit: false;
@@ -287,7 +290,7 @@ export function getHiddenAssignmentsFromCategories(
 
 			const hiddenAssignment: Flowed<HiddenAssignment> = {
 				name: `Hidden ${category.name} Assignments`,
-				id: `hidden-${category.name}`,
+				id: undefined,
 				pointsEarned: hiddenPointsEarned,
 				pointsPossible: hiddenPointsPossible,
 				unscaledPoints: undefined,
