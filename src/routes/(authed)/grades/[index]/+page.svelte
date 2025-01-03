@@ -267,12 +267,25 @@
 		maximumFractionDigits: 3
 	});
 
+	const ticks = {
+		color: '#9ca3af' // gray-400
+	};
+
 	const chartOptions: ChartOptions<'line'> = {
 		scales: {
 			x: {
 				// @ts-expect-error timestack is provided by chartjs-scale-timestack
 				type: 'timestack',
-				time: { unit: 'day' }
+				time: { unit: 'day' },
+				grid: { display: false },
+				ticks
+			},
+			y: {
+				grid: {
+					color: '#374151' // gray-700
+				},
+				ticks,
+				border: { display: false }
 			}
 		},
 		plugins: {
@@ -281,7 +294,8 @@
 				callbacks: {
 					title: (context) => dayFormatter.format(context[0].parsed.x),
 					label: (context) => percentFormatter.format(context.parsed.y / 100)
-				}
+				},
+				displayColors: false
 			}
 		},
 		maintainAspectRatio: false,
