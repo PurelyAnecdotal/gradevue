@@ -97,7 +97,7 @@
 						<span class="mr-auto line-clamp-1">{removeClassID(title)}</span>
 
 						{#if Assignments.Assignment && getUnseenAssignmentsCount(Assignments.Assignment) > 0}
-							<Badge color="green" class="text-center shrink-0">
+							<Badge color="green" class="shrink-0 text-center">
 								{getUnseenAssignmentsCount(Assignments.Assignment)} new
 							</Badge>
 						{/if}

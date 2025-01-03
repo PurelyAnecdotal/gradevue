@@ -51,6 +51,18 @@ export const loadGradebooks = async () => {
 	if (!studentAccount || gradebooksState.records || gradebooksState.activeIndex !== undefined)
 		return;
 
+	// Load seen assignment ids from localStorage
+	const seenIDsStr = localStorage.getItem(LocalStorageKey.seenAssignmentIDs);
+	if (seenIDsStr) {
+		try {
+			const seenIDs: string[] = JSON.parse(seenIDsStr);
+			seenIDs.forEach((id) => seenAssignmentIDs.add(id));
+		} catch (e) {
+			console.error(e);
+			localStorage.removeItem(LocalStorageKey.seenAssignmentIDs);
+		}
+	}
+
 	// Try to load the state from the localStorage cache
 	const cacheStr = localStorage.getItem(LocalStorageKey.gradebook);
 	if (cacheStr) {
@@ -103,18 +115,6 @@ export const loadGradebooks = async () => {
 
 	// Save the state to localStorage
 	saveGradebooksState();
-
-	// Load seen assignment ids from localStorage
-	const seenIDsStr = localStorage.getItem(LocalStorageKey.seenAssignmentIDs);
-	if (seenIDsStr) {
-		try {
-			const seenIDs: string[] = JSON.parse(seenIDsStr);
-			seenIDs.forEach((id) => seenAssignmentIDs.add(id));
-		} catch (e) {
-			console.error(e);
-			localStorage.removeItem(LocalStorageKey.seenAssignmentIDs);
-		}
-	}
 };
 
 export const showGradebook = async (overrideIndex?: number, forceRefresh = false) => {
