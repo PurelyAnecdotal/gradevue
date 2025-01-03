@@ -41,6 +41,10 @@
 	},
 	"dependencies": {
 		"buffer": "^6.0.3",
+		"chart.js": "^4.4.7",
+		"chartjs-adapter-date-fns": "^3.0.0",
+		"chartjs-plugin-gradient": "^0.6.1",
+		"chartjs-scale-timestack": "^1.0.1",
 		"fast-xml-parser": "^4.5.1",
 		"file-type": "^19.6.0"
 	},

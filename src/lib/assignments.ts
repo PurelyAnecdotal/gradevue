@@ -58,7 +58,7 @@ export interface NewHypotheticalAssignment extends ReactiveAssignment {
 	date: undefined;
 }
 
-type Calculable<T extends Assignment> = T & {
+export type Calculable<T extends Assignment> = T & {
 	pointsEarned: number;
 	pointsPossible: number;
 	notForGrade: false;
