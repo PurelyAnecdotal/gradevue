@@ -110,13 +110,7 @@
 
 		untrack(() => {
 			reactiveAssignments = assignments.map((assignment) => {
-				const reactiveAssignment: ReactiveAssignment = $state({
-					...assignment,
-					pointsEarned: assignment.pointsEarned,
-					gradePercentageChange: assignment.gradePercentageChange,
-					newHypothetical: false,
-					reactive: true
-				});
+				const reactiveAssignment: ReactiveAssignment = $state({ ...assignment, reactive: true });
 
 				return reactiveAssignment;
 			});
@@ -166,7 +160,7 @@
 			hidden: false,
 			category: 'Select category',
 			newHypothetical: true,
-			date: undefined,
+			date: new Date(),
 			reactive: true
 		});
 
@@ -196,9 +190,13 @@
 	);
 
 	const assignmentsByDate = $derived.by(() => {
-		const map: Map<number, Calculable<RealAssignment>[]> = new Map();
+		const map: Map<number, Calculable<RealAssignment | ReactiveAssignment>[]> = new Map();
 
-		getCalculableAssignments(realAssignments).forEach((assignment) => {
+		const assignments = hypotheticalMode
+			? getCalculableAssignments(reactiveAssignments)
+			: getCalculableAssignments(realAssignments);
+
+		assignments.forEach((assignment) => {
 			const ms = assignment.date.getTime();
 			const assignments = map.get(ms) ?? [];
 			map.set(ms, [...assignments, assignment]);
@@ -271,7 +269,7 @@
 		color: '#9ca3af' // gray-400
 	};
 
-	const chartOptions: ChartOptions<'line'> = {
+	const chartOptions: ChartOptions<'line'> = $derived({
 		scales: {
 			x: {
 				// @ts-expect-error timestack is provided by chartjs-scale-timestack
@@ -300,8 +298,11 @@
 		},
 		maintainAspectRatio: false,
 		parsing: false,
-		normalized: true
-	};
+		normalized: true,
+		animation: hypotheticalMode ? false : undefined
+	});
+
+	let pinChart = $state(false);
 </script>
 
 <svelte:head>
@@ -309,30 +310,41 @@
 </svelte:head>
 
 {#if synergyCourse}
-	<div class="sticky top-0 flex justify-between rounded-b-lg bg-gray-900 p-4">
-		<span class="line-clamp-1 text-2xl">
-			{courseName}
-		</span>
-		<span class="flex shrink-0 items-center text-2xl">
-			{#if hypotheticalMode && !categories && !rawGradeCalcMatches}
-				<ExclamationCircleSolid class="mr-2 focus:outline-none" />
-			{/if}
-			{#if value}
-				<NumberFlow
-					{prefix}
-					{value}
-					format={{ style: 'percent', maximumFractionDigits: 3 }}
-					spinTiming={{ duration: 400, easing }}
-				/>
-			{/if}
-		</span>
+	<div class="sticky top-0">
+		<div class="flex justify-between rounded-b-lg bg-gray-900 p-4">
+			<span class="line-clamp-1 text-2xl">
+				{courseName}
+			</span>
+			<span class="flex shrink-0 items-center text-2xl">
+				{#if hypotheticalMode && !categories && !rawGradeCalcMatches}
+					<ExclamationCircleSolid class="mr-2 focus:outline-none" />
+				{/if}
+				{#if value}
+					<NumberFlow
+						{prefix}
+						{value}
+						format={{ style: 'percent', maximumFractionDigits: 3 }}
+						spinTiming={{ duration: 400, easing }}
+					/>
+				{/if}
+			</span>
+		</div>
+		{#if pinChart}
+			{@render chart()}
+		{/if}
 	</div>
 
-	{#if rawGradeCalcMatches}
-		<div class="h-64">
-			<Line data={chartData} options={chartOptions} class="h-64" />
-		</div>
+	{#if !pinChart}
+		{@render chart()}
 	{/if}
+
+	{#snippet chart()}
+		{#if rawGradeCalcMatches}
+			<div class="h-64 bg-gray-900">
+				<Line data={chartData} options={chartOptions} class="h-64" />
+			</div>
+		{/if}
+	{/snippet}
 
 	{#if categories && gradeCategories && totalCategory}
 		<div class="sm:mx-4">
@@ -442,8 +454,8 @@
 		</div>
 	{/if}
 
-	<div class="flex flex-wrap items-center justify-between">
-		<Checkbox bind:checked={hypotheticalMode} class="m-4">
+	<div class="m-4 flex flex-wrap items-center gap-2">
+		<Checkbox bind:checked={hypotheticalMode}>
 			<div id="hypothetical-toggle" class="mr-2 flex items-center">
 				Hypothetical Mode
 				<InfoCircleOutline size="sm" class="ml-2 focus:outline-none" />
@@ -454,8 +466,12 @@
 			assignment.
 		</Popover>
 
+		{#if hypotheticalMode && rawGradeCalcMatches}
+			<Checkbox bind:checked={pinChart}>Pin chart when scrolling</Checkbox>
+		{/if}
+
 		{#if hypotheticalMode}
-			<div transition:fade={{ duration: 200 }}>
+			<div transition:fade={{ duration: 200 }} class="ml-auto">
 				<Button color="light" class="mx-4" onclick={addHypotheticalAssignment}>
 					<GridPlusOutline size="sm" class="mr-2 focus:outline-none" />
 					Add Hypothetical Assignment

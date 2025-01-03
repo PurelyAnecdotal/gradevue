@@ -20,7 +20,7 @@ interface Assignment {
 	notForGrade: boolean;
 	hidden: boolean;
 	category: string | undefined;
-	date: Date | undefined;
+	date: Date;
 	newHypothetical: boolean;
 }
 
@@ -28,7 +28,6 @@ export interface RealAssignment extends Assignment {
 	id: string;
 	hidden: false;
 	category: string;
-	date: Date;
 	newHypothetical: false;
 }
 
@@ -41,7 +40,6 @@ export interface HiddenAssignment extends Assignment {
 	notForGrade: false;
 	hidden: true;
 	category: string;
-	date: undefined;
 	newHypothetical: false;
 }
 
@@ -55,7 +53,6 @@ export interface NewHypotheticalAssignment extends ReactiveAssignment {
 	unscaledPoints: undefined;
 	extraCredit: false;
 	hidden: false;
-	date: undefined;
 }
 
 export type Calculable<T extends Assignment> = T & {
@@ -299,7 +296,7 @@ export function getHiddenAssignmentsFromCategories(
 				notForGrade: false,
 				hidden: true,
 				category: category.name,
-				date: undefined,
+				date: new Date(),
 				newHypothetical: false
 			};
 
