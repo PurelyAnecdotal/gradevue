@@ -2,6 +2,7 @@
 	import { getColorForGrade } from '$lib';
 	import { calculateGradePercentage } from '$lib/assignments';
 	import DateBadge from '$lib/components/DateBadge.svelte';
+	import NumberInput from '$lib/components/NumberInput.svelte';
 	import {
 		Badge,
 		Button,
@@ -10,7 +11,6 @@
 		Dropdown,
 		DropdownItem,
 		Input,
-		NumberInput,
 		Popover,
 		Progressbar
 	} from 'flowbite-svelte';
