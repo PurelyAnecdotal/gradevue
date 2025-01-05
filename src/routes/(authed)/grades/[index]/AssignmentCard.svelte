@@ -63,11 +63,16 @@
 		return 'primary';
 	};
 
-	let percentage = $derived(
-		pointsEarned && pointsPossible ? calculateGradePercentage(pointsEarned, pointsPossible) : 0
+	// For assignments with a zero, show the progress bar as full to allow you to see the red color
+	const isZero = $derived(pointsEarned === 0 && pointsPossible !== undefined && pointsPossible > 0);
+
+	const percentage = $derived(
+		pointsEarned !== undefined && pointsPossible !== undefined
+			? calculateGradePercentage(pointsEarned, pointsPossible)
+			: 0
 	);
 
-	let percentageChange = $derived(Math.round((gradePercentageChange ?? 0) * 100) / 100);
+	const percentageChange = $derived(Math.round((gradePercentageChange ?? 0) * 100) / 100);
 
 	const border = $derived(unseen ? 'dark:border-t-green-600 border-t-4' : '');
 </script>
@@ -202,7 +207,7 @@
 	{#if pointsEarned !== undefined || editable}
 		<Progressbar
 			color={extraCredit ? 'blue' : getColorForGrade(percentage)}
-			progress={Math.min(isNaN(percentage) ? 0 : percentage, 100)}
+			progress={isZero ? 100 : Math.min(percentage, 100)}
 			animate={true}
 			class="hidden w-1/3 shrink-0 sm:block"
 		/>
