@@ -20,6 +20,7 @@
 	import MailBoxOutline from 'flowbite-svelte-icons/MailBoxOutline.svelte';
 	import MapPinAltOutline from 'flowbite-svelte-icons/MapPinAltOutline.svelte';
 	import UserCircleOutline from 'flowbite-svelte-icons/UserCircleOutline.svelte';
+	import type { Component, Snippet } from 'svelte';
 	import { installPrompt } from '../../hooks.client';
 	import { getCurrentGradebookState, gradebooksState } from './grades/gradebook.svelte';
 	import { loadStudentInfo, studentInfoState } from './studentinfo/studentInfo.svelte';
@@ -33,6 +34,25 @@
 
 	loadStudentInfo();
 </script>
+
+{#snippet sidebarLink(
+	label: string,
+	href: string,
+	Icon: Component,
+	onclick?: () => void,
+	subtext?: Snippet
+)}
+	<SidebarItem {label} {href} {onclick}>
+		<svelte:fragment slot="icon">
+			<Icon />
+		</svelte:fragment>
+		<svelte:fragment slot="subtext">
+			{#if subtext}
+				{@render subtext()}
+			{/if}
+		</svelte:fragment>
+	</SidebarItem>
+{/snippet}
 
 <Sidebar activeUrl={page.url.pathname} class="h-screen">
 	<SidebarWrapper class="flex h-screen flex-col justify-between gap-2">
@@ -82,61 +102,40 @@
 					{/if}
 				</li>
 			{:else}
-				<SidebarItem label="Grades" href="/grades">
-					<svelte:fragment slot="icon">
-						<AddressBookOutline class="focus:outline-none" />
-					</svelte:fragment>
-				</SidebarItem>
+				{@render sidebarLink('Grades', '/grades', AddressBookOutline)}
 			{/if}
 
-			<SidebarItem label="Attendance" href="/attendance">
-				<svelte:fragment slot="icon">
-					<BellOutline class="focus:outline-none" />
-				</svelte:fragment>
-			</SidebarItem>
+			{@render sidebarLink('Attendance', '/attendance', BellOutline)}
 
-			<SidebarItem label="Documents" href="/documents">
-				<svelte:fragment slot="icon">
-					<FolderOpenOutline class="focus:outline-none" />
-				</svelte:fragment>
-			</SidebarItem>
+			{@render sidebarLink('Documents', '/documents', FolderOpenOutline)}
 
-			<SidebarItem label="Mail" href="/mail">
-				<svelte:fragment slot="icon">
-					<MailBoxOutline class="focus:outline-none" />
-				</svelte:fragment>
-			</SidebarItem>
+			{@render sidebarLink('Mail', '/mail', MailBoxOutline)}
 		</SidebarGroup>
 
 		<SidebarGroup>
 			{#if $installPrompt.prompt}
-				<SidebarItem label="Install Web App" onclick={() => $installPrompt.prompt?.()}>
-					<svelte:fragment slot="icon">
-						<DownloadOutline class="focus:outline-none" />
-					</svelte:fragment>
-					<svelte:fragment slot="subtext">
-						<Badge rounded color="green" class="ml-auto">new</Badge>
-					</svelte:fragment>
-				</SidebarItem>
+				{#snippet newBadge()}
+					<Badge rounded color="green" class="ml-auto">new</Badge>
+				{/snippet}
+
+				{@render sidebarLink(
+					'Install Web App',
+					'/install',
+					DownloadOutline,
+					() => $installPrompt.prompt?.(),
+					newBadge
+				)}
 			{/if}
 
-			<SidebarItem label="Feedback" href="/feedback">
-				<svelte:fragment slot="icon">
-					<AnnotationOutline class="focus:outline-none" />
-				</svelte:fragment>
-			</SidebarItem>
+			{@render sidebarLink('Feedback', '/feedback', AnnotationOutline)}
 
-			<SidebarItem label={studentInfoState.data?.FormattedName ?? ''} href="/studentinfo">
-				<svelte:fragment slot="icon">
-					<UserCircleOutline class="focus:outline-none" />
-				</svelte:fragment>
-			</SidebarItem>
+			{@render sidebarLink(
+				studentInfoState.data?.FormattedName ?? '',
+				'/studentinfo',
+				UserCircleOutline
+			)}
 
-			<SidebarItem onclick={logOut} label="Log Out" href="/login">
-				<svelte:fragment slot="icon">
-					<ArrowRightToBracketOutline class="focus:outline-none" />
-				</svelte:fragment>
-			</SidebarItem>
+			{@render sidebarLink('Log Out', '/login', ArrowRightToBracketOutline, logOut)}
 		</SidebarGroup>
 	</SidebarWrapper>
 </Sidebar>

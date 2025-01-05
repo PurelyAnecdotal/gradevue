@@ -2,6 +2,7 @@
 	import { page } from '$app/state';
 	import { removeClassID } from '$lib';
 	import {
+		type Assignment,
 		type Calculable,
 		calculateAssignmentGPCs,
 		calculateAssignmentGPCsFromCategories,
@@ -484,101 +485,14 @@
 		<div transition:fade={{ duration: 200 }}>
 			<Tabs class="m-4 mb-0" contentClass="p-4">
 				<TabItem open title="All">
-					<ol class="space-y-4">
-						{#if hypotheticalMode}
-							{#each reactiveAssignments as { gradePercentageChange, hidden, newHypothetical, date }, i}
-								<li>
-									<AssignmentCard
-										bind:name={reactiveAssignments[i].name}
-										bind:pointsEarned={reactiveAssignments[i].pointsEarned}
-										bind:pointsPossible={reactiveAssignments[i].pointsPossible}
-										bind:extraCredit={reactiveAssignments[i].extraCredit}
-										gradePercentageChange={rawGradeCalcMatches ? gradePercentageChange : undefined}
-										bind:notForGrade={reactiveAssignments[i].notForGrade}
-										{hidden}
-										showHypotheticalLabel={newHypothetical}
-										bind:category={reactiveAssignments[i].category}
-										categoryDropdownOptions={gradeCategories?.map((category) => category.name)}
-										{date}
-										editable={true}
-										{recalculateGradePercentage}
-									/>
-								</li>
-							{/each}
-						{:else}
-							{#each assignments as { name, id, pointsEarned, pointsPossible, unscaledPoints, extraCredit, gradePercentageChange, notForGrade, hidden, category, date }}
-								<li>
-									<AssignmentCard
-										{name}
-										{pointsEarned}
-										{pointsPossible}
-										{unscaledPoints}
-										{extraCredit}
-										gradePercentageChange={rawGradeCalcMatches ? gradePercentageChange : undefined}
-										{notForGrade}
-										{hidden}
-										{category}
-										{date}
-										unseen={id ? !seenAssignmentIDs.has(id) : false}
-									/>
-								</li>
-							{/each}
-						{/if}
-					</ol>
+					{@render assignmentList()}
 				</TabItem>
 
 				{#each [...new Set(realAssignments
 							.map((assignment) => assignment.category)
 							.toSorted())] as categoryName}
 					<TabItem title={categoryName}>
-						<ol class="space-y-4">
-							{#if hypotheticalMode}
-								{#each reactiveAssignments as { gradePercentageChange, hidden, newHypothetical, date, category: assignmentCategoryName }, i}
-									{#if assignmentCategoryName === categoryName}
-										<li>
-											<AssignmentCard
-												bind:name={reactiveAssignments[i].name}
-												bind:pointsEarned={reactiveAssignments[i].pointsEarned}
-												bind:pointsPossible={reactiveAssignments[i].pointsPossible}
-												bind:extraCredit={reactiveAssignments[i].extraCredit}
-												gradePercentageChange={rawGradeCalcMatches
-													? gradePercentageChange
-													: undefined}
-												bind:notForGrade={reactiveAssignments[i].notForGrade}
-												{hidden}
-												showHypotheticalLabel={newHypothetical}
-												bind:category={reactiveAssignments[i].category}
-												categoryDropdownOptions={gradeCategories?.map((category) => category.name)}
-												{date}
-												editable={true}
-												{recalculateGradePercentage}
-											/>
-										</li>
-									{/if}
-								{/each}
-							{:else}
-								{#each assignments as { name, id, pointsEarned, pointsPossible, unscaledPoints, extraCredit, gradePercentageChange, notForGrade, hidden, category, date }}
-									{#if category === categoryName}
-										<li>
-											<AssignmentCard
-												{name}
-												{pointsEarned}
-												{pointsPossible}
-												{unscaledPoints}
-												{extraCredit}
-												gradePercentageChange={rawGradeCalcMatches
-													? gradePercentageChange
-													: undefined}
-												{notForGrade}
-												{hidden}
-												{date}
-												unseen={id ? !seenAssignmentIDs.has(id) : false}
-											/>
-										</li>
-									{/if}
-								{/each}
-							{/if}
-						</ol>
+						{@render assignmentList((assignment) => assignment.category === categoryName)}
 					</TabItem>
 				{/each}
 			</Tabs>
@@ -593,3 +507,96 @@
 		</div>
 	{/if}
 {/if}
+
+{#snippet assignmentList(filter?: (assignment: Assignment) => boolean)}
+	<ol class="space-y-4">
+		{#if hypotheticalMode}
+			{#each reactiveAssignments as assignment, i}
+				{#if !filter || filter(assignment)}
+					{@render boundAssignmentSnippet(assignment, reactiveAssignments, i)}
+				{/if}
+			{/each}
+		{:else}
+			{#each assignments as assignment}
+				{#if !filter || filter(assignment)}
+					{@render assignmentSnippet(assignment)}
+				{/if}
+			{/each}
+		{/if}
+	</ol>
+{/snippet}
+
+{#snippet assignmentSnippet(
+	{
+		name,
+		id,
+		pointsEarned,
+		pointsPossible,
+		unscaledPoints,
+		extraCredit,
+		gradePercentageChange,
+		notForGrade,
+		hidden,
+		category,
+		date
+	}: RealAssignment | Flowed<RealAssignment | HiddenAssignment>,
+	showCategory = true
+)}
+	<li>
+		<AssignmentCard
+			{name}
+			{pointsEarned}
+			{pointsPossible}
+			{unscaledPoints}
+			{extraCredit}
+			gradePercentageChange={rawGradeCalcMatches ? gradePercentageChange : undefined}
+			{notForGrade}
+			{hidden}
+			category={showCategory ? category : undefined}
+			{date}
+			unseen={id ? !seenAssignmentIDs.has(id) : false}
+		/>
+	</li>
+{/snippet}
+
+{#snippet boundAssignmentSnippet(
+	{ gradePercentageChange, hidden, newHypothetical, date }: ReactiveAssignment,
+	reactiveAssignments: ReactiveAssignment[],
+	i: number,
+	showCategory = true
+)}
+	<li>
+		{#if showCategory}
+			<AssignmentCard
+				bind:name={reactiveAssignments[i].name}
+				bind:pointsEarned={reactiveAssignments[i].pointsEarned}
+				bind:pointsPossible={reactiveAssignments[i].pointsPossible}
+				bind:extraCredit={reactiveAssignments[i].extraCredit}
+				gradePercentageChange={rawGradeCalcMatches ? gradePercentageChange : undefined}
+				bind:notForGrade={reactiveAssignments[i].notForGrade}
+				{hidden}
+				showHypotheticalLabel={newHypothetical}
+				bind:category={reactiveAssignments[i].category}
+				categoryDropdownOptions={gradeCategories?.map((category) => category.name)}
+				{date}
+				editable={true}
+				{recalculateGradePercentage}
+			/>
+		{:else}
+			<AssignmentCard
+				bind:name={reactiveAssignments[i].name}
+				bind:pointsEarned={reactiveAssignments[i].pointsEarned}
+				bind:pointsPossible={reactiveAssignments[i].pointsPossible}
+				bind:extraCredit={reactiveAssignments[i].extraCredit}
+				gradePercentageChange={rawGradeCalcMatches ? gradePercentageChange : undefined}
+				bind:notForGrade={reactiveAssignments[i].notForGrade}
+				{hidden}
+				showHypotheticalLabel={newHypothetical}
+				categoryDropdownOptions={gradeCategories?.map((category) => category.name)}
+				{date}
+				editable={true}
+				{recalculateGradePercentage}
+			/>
+		{/if}
+	</li>
+{/snippet}

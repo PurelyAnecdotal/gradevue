@@ -2,6 +2,7 @@
 	import DateBadge from '$lib/components/DateBadge.svelte';
 	import LoadingBanner from '$lib/components/LoadingBanner.svelte';
 	import RefreshIndicator from '$lib/components/RefreshIndicator.svelte';
+	import type { StudentDocumentData } from '$lib/types/Documents';
 	import { Badge, Card, TabItem, Tabs } from 'flowbite-svelte';
 	import { documentsState, loadDocuments } from './documents.svelte';
 
@@ -59,41 +60,34 @@
 {#if documentsState.data}
 	<Tabs class="m-4 mb-0" contentClass="p-4">
 		<TabItem title="All" open>
-			<ol class="space-y-4">
-				{#each documentDatas as documentData}
-					<li>
-						<Card
-							href="/documents/document?documentGU={documentData._DocumentGU}"
-							target="_blank"
-							class="flex max-w-none flex-row flex-wrap items-center gap-2 dark:text-white"
-						>
-							<h2 class="text-md">{documentData._DocumentComment}</h2>
-							<DateBadge date={new Date(documentData._DocumentDate)} />
-							<Badge color={getDocumentColor(documentData._DocumentType)}>
-								{documentData._DocumentType}
-							</Badge>
-						</Card>
-					</li>
-				{/each}
-			</ol>
+			{@render documentsList(documentDatas)}
 		</TabItem>
 		{#each documentCategories as category}
 			<TabItem title={category}>
-				<ol class="space-y-4">
-					{#each documentDatas.filter((documentData) => documentData._DocumentType === category) as documentData}
-						<li>
-							<Card
-								href="/documents/document?documentGU={documentData._DocumentGU}"
-								target="_blank"
-								class="flex max-w-none flex-row flex-wrap items-center gap-2 dark:text-white"
-							>
-								<h2 class="text-md">{documentData._DocumentComment}</h2>
-								<DateBadge date={new Date(documentData._DocumentDate)} />
-							</Card>
-						</li>
-					{/each}
-				</ol>
+				{@render documentsList(
+					documentDatas.filter((documentData) => documentData._DocumentType === category)
+				)}
 			</TabItem>
 		{/each}
 	</Tabs>
 {/if}
+
+{#snippet documentsList(documents: StudentDocumentData[])}
+	<ol class="space-y-4">
+		{#each documents as documentData}
+			<li>
+				<Card
+					href="/documents/document?documentGU={documentData._DocumentGU}"
+					target="_blank"
+					class="flex max-w-none flex-row flex-wrap items-center gap-2 dark:text-white"
+				>
+					<h2 class="text-md">{documentData._DocumentComment}</h2>
+					<DateBadge date={new Date(documentData._DocumentDate)} />
+					<Badge color={getDocumentColor(documentData._DocumentType)}>
+						{documentData._DocumentType}
+					</Badge>
+				</Card>
+			</li>
+		{/each}
+	</ol>
+{/snippet}
