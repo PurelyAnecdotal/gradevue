@@ -206,11 +206,15 @@
 		return map;
 	});
 
-	const dataPoints: Point[] = $derived.by(() => {
+	interface DataPointMetadata {
+		assignmentsOnDate: Assignment[];
+	}
+
+	const dataPoints = $derived.by(() => {
 		const entries = [...assignmentsByDate.entries()].toSorted(([ms_a], [ms_b]) => ms_a - ms_b);
 
 		return entries
-			.map(([ms], i) => {
+			.map(([ms, assignments], i) => {
 				const assignmentsUntil = entries
 					.map((entry) => entry[1])
 					.slice(0, i + 1)
@@ -223,7 +227,11 @@
 						)
 					: calculateCourseGradePercentageFromTotals(assignmentsUntil);
 
-				return { x: ms, y: grade };
+				const metadata: DataPointMetadata = {
+					assignmentsOnDate: assignments
+				};
+
+				return { x: ms, y: grade, metadata };
 			})
 			.filter((x) => x !== null);
 	});
@@ -292,7 +300,12 @@
 			tooltip: {
 				callbacks: {
 					title: (context) => dayFormatter.format(context[0].parsed.x),
-					label: (context) => percentFormatter.format(context.parsed.y / 100)
+					label: (context) => [
+						percentFormatter.format(context.parsed.y / 100),
+						...(context.raw as { metadata: DataPointMetadata }).metadata.assignmentsOnDate.map(
+							(assignment) => assignment.name
+						)
+					]
 				},
 				displayColors: false
 			}
