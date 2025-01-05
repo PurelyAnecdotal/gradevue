@@ -467,7 +467,7 @@
 			assignment.
 		</Popover>
 
-		{#if hypotheticalMode && rawGradeCalcMatches}
+		{#if rawGradeCalcMatches}
 			<Checkbox bind:checked={pinChart}>Pin chart when scrolling</Checkbox>
 		{/if}
 
