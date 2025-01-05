@@ -126,18 +126,9 @@
 					{#each dataSources as dataSource}
 						<TableBodyRow>
 							<TableBodyCell>{dataSource}</TableBodyCell>
-
-							<TableBodyCell>
-								<Button color="alternative" onclick={() => copy(dataSource)}>Copy</Button>
-							</TableBodyCell>
-
-							<TableBodyCell>
-								<Button color="alternative" onclick={() => paste(dataSource)}>Paste</Button>
-							</TableBodyCell>
-
-							<TableBodyCell>
-								<Button color="alternative" onclick={() => remove(dataSource)}>Delete</Button>
-							</TableBodyCell>
+							{@render toolButton('Copy', () => copy(dataSource))}
+							{@render toolButton('Paste', () => paste(dataSource))}
+							{@render toolButton('Delete', () => remove(dataSource))}
 						</TableBodyRow>
 					{/each}
 				</TableBody>
@@ -145,3 +136,9 @@
 		</AccordionItem>
 	</Accordion>
 </div>
+
+{#snippet toolButton(name: string, func: () => void)}
+	<TableBodyCell>
+		<Button color="alternative" onclick={func}>{name}</Button>
+	</TableBodyCell>
+{/snippet}

@@ -9,7 +9,7 @@ export interface Category {
 	gradeLetter: string;
 }
 
-interface Assignment {
+export interface Assignment {
 	name: string;
 	id: string | undefined;
 	pointsEarned: number | undefined;
