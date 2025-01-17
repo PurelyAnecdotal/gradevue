@@ -23,7 +23,7 @@
 		"@vite-pwa/assets-generator": "^0.2.6",
 		"autoprefixer": "^10.4.20",
 		"eslint": "^9.17.0",
-		"eslint-config-prettier": "^9.1.0",
+		"eslint-config-prettier": "^10.0.0",
 		"eslint-plugin-svelte": "^2.46.1",
 		"flowbite": "^2.5.2",
 		"flowbite-svelte": "^0.47.4",
