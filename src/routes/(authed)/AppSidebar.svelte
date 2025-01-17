@@ -2,7 +2,6 @@
 	import { page } from '$app/state';
 	import { removeClassID } from '$lib';
 	import {
-		Badge,
 		Sidebar,
 		SidebarBrand,
 		SidebarGroup,
@@ -21,6 +20,7 @@
 	import MapPinAltOutline from 'flowbite-svelte-icons/MapPinAltOutline.svelte';
 	import UserCircleOutline from 'flowbite-svelte-icons/UserCircleOutline.svelte';
 	import type { Component, Snippet } from 'svelte';
+	import { fade } from 'svelte/transition';
 	import { installPrompt } from '../../hooks.client';
 	import { getCurrentGradebookState, gradebooksState } from './grades/gradebook.svelte';
 	import { loadStudentInfo, studentInfoState } from './studentinfo/studentInfo.svelte';
@@ -114,17 +114,11 @@
 
 		<SidebarGroup>
 			{#if $installPrompt.prompt}
-				{#snippet newBadge()}
-					<Badge rounded color="green" class="ml-auto">new</Badge>
-				{/snippet}
-
-				{@render sidebarLink(
-					'Install Web App',
-					'/install',
-					DownloadOutline,
-					() => $installPrompt.prompt?.(),
-					newBadge
-				)}
+				<div transition:fade>
+					{@render sidebarLink('Install Web App', '#', DownloadOutline, () =>
+						$installPrompt.prompt?.()
+					)}
+				</div>
 			{/if}
 
 			{@render sidebarLink('Feedback', '/feedback', AnnotationOutline)}
