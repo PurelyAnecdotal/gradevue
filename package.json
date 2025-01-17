@@ -16,6 +16,7 @@
 		"@eslint/compat": "^1.2.4",
 		"@number-flow/svelte": "^0.3.0",
 		"@sveltejs/adapter-auto": "^3.3.1",
+		"@sveltejs/adapter-vercel": "^5.5.3",
 		"@sveltejs/kit": "^2.15.1",
 		"@sveltejs/vite-plugin-svelte": "^5.0.3",
 		"@types/bun": "^1.1.14",
