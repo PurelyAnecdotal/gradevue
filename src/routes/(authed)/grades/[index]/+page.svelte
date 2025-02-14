@@ -102,29 +102,31 @@
 
 	let reactiveAssignments: ReactiveAssignment[] = $state([]);
 
+	function initReactiveAssignments() {
+		reactiveAssignments = assignments.map((assignment) => {
+			const reactiveAssignment: ReactiveAssignment = $state({ ...assignment, reactive: true });
+
+			return reactiveAssignment;
+		});
+
+		const calculable = getCalculableAssignments(assignments);
+
+		calculatedGrade = gradeCategories
+			? calculateCourseGradePercentageFromCategories(
+					getPointsByCategory(calculable),
+					gradeCategories
+				)
+			: calculateCourseGradePercentageFromTotals(calculable);
+
+		hypotheticalGrade = calculatedGrade;
+	}
+
 	// Initialize reactive assignments and re-initialize them when assignments change
 	$effect(() => {
 		// eslint-disable-next-line @typescript-eslint/no-unused-expressions
 		assignments;
 
-		untrack(() => {
-			reactiveAssignments = assignments.map((assignment) => {
-				const reactiveAssignment: ReactiveAssignment = $state({ ...assignment, reactive: true });
-
-				return reactiveAssignment;
-			});
-
-			const calculable = getCalculableAssignments(assignments);
-
-			calculatedGrade = gradeCategories
-				? calculateCourseGradePercentageFromCategories(
-						getPointsByCategory(calculable),
-						gradeCategories
-					)
-				: calculateCourseGradePercentageFromTotals(calculable);
-
-			hypotheticalGrade = calculatedGrade;
-		});
+		untrack(initReactiveAssignments);
 	});
 
 	function recalculateGradePercentage() {
@@ -360,7 +362,12 @@
 
 		{#if hypotheticalMode}
 			<div transition:fade={{ duration: 200 }} class="ml-auto">
-				<Button color="light" class="mx-4" onclick={addHypotheticalAssignment}>
+				<Button color="light" size="sm" onclick={initReactiveAssignments}>
+					<CloseCircleOutline size="sm" class="mr-2 focus:outline-none" />
+					Reset
+				</Button>
+
+				<Button color="light" size="sm" onclick={addHypotheticalAssignment}>
 					<GridPlusOutline size="sm" class="mr-2 focus:outline-none" />
 					Add Hypothetical Assignment
 				</Button>
