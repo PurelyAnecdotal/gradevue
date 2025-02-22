@@ -71,7 +71,7 @@
 						href="/grades"
 						class="flex items-center rounded-lg bg-gray-200 p-2 text-base font-normal text-gray-900 hover:bg-gray-100 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-700"
 					>
-						<AddressBookOutline class="focus:outline-none" />
+						<AddressBookOutline />
 						<span class="ms-3">Grades</span>
 						{#if page.params.index}
 							<ChevronUpOutline />

@@ -12,7 +12,7 @@
 </script>
 
 <div
-	class="mx-auto my-2 flex w-fit items-center gap-1 rounded bg-gray-800 px-2 py-1 text-sm text-gray-400"
+	class="mx-auto my-2 flex w-fit items-center gap-1 rounded-sm bg-gray-800 px-2 py-1 text-sm text-gray-400"
 >
 	<ClockOutline size="sm" />
 	Last updated {getRelativeTime(new Date(lastRefresh))}

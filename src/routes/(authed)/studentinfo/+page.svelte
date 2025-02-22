@@ -65,7 +65,7 @@
 	{#if studentInfoState.data}
 		<Card class="flex max-w-none flex-row gap-4 dark:text-white">
 			<img
-				class="h-xl rounded"
+				class="h-xl rounded-sm"
 				src="data:image/png;base64,{studentInfoState.data.Photo}"
 				alt="Student Portrait"
 			/>

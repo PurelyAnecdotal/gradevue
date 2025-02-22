@@ -205,7 +205,7 @@
 			</span>
 			<span class="flex shrink-0 items-center text-2xl">
 				{#if hypotheticalMode && !categories && !rawGradeCalcMatches}
-					<ExclamationCircleSolid class="mr-2 focus:outline-none" />
+					<ExclamationCircleSolid class="mr-2" />
 				{/if}
 				{#if value}
 					<NumberFlow
@@ -291,7 +291,7 @@
 
 	{#if !rawGradeCalcMatches}
 		<Alert class="m-4" color="red" border>
-			<ExclamationCircleSolid slot="icon" size="sm" class="focus:outline-none" />
+			<ExclamationCircleSolid slot="icon" size="sm" />
 
 			<div class="flex flex-col gap-2">
 				<button
@@ -348,7 +348,7 @@
 		<Checkbox bind:checked={hypotheticalMode}>
 			<div id="hypothetical-toggle" class="mr-2 flex items-center">
 				Hypothetical Mode
-				<InfoCircleOutline size="sm" class="ml-2 focus:outline-none" />
+				<InfoCircleOutline size="sm" class="ml-2" />
 			</div>
 		</Checkbox>
 		<Popover triggeredBy="#hypothetical-toggle" class="max-w-md">
@@ -363,12 +363,12 @@
 		{#if hypotheticalMode}
 			<div transition:fade={{ duration: 200 }} class="ml-auto">
 				<Button color="light" size="sm" onclick={initReactiveAssignments}>
-					<CloseCircleOutline size="sm" class="mr-2 focus:outline-none" />
+					<CloseCircleOutline size="sm" class="mr-2" />
 					Reset
 				</Button>
 
 				<Button color="light" size="sm" onclick={addHypotheticalAssignment}>
-					<GridPlusOutline size="sm" class="mr-2 focus:outline-none" />
+					<GridPlusOutline size="sm" class="mr-2" />
 					Add Hypothetical Assignment
 				</Button>
 			</div>

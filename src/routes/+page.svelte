@@ -37,7 +37,7 @@
 	<div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
 		<Card>
 			<h2 class="mb-2 flex items-center gap-2 text-xl dark:text-white">
-				<ChartOutline class="inline focus:outline-none" />
+				<ChartOutline class="inline" />
 				Grade Calculator
 			</h2>
 			<p>
@@ -47,7 +47,7 @@
 		</Card>
 		<Card>
 			<h2 class="mb-2 flex items-center gap-2 text-xl dark:text-white">
-				<GridPlusOutline class="inline focus:outline-none" />
+				<GridPlusOutline class="inline" />
 				Shows Hidden Assignments
 			</h2>
 			<p>
@@ -57,7 +57,7 @@
 		</Card>
 		<Card>
 			<h2 class="mb-2 flex items-center gap-2 text-xl dark:text-white">
-				<EyeSlashOutline class="inline focus:outline-none" />
+				<EyeSlashOutline class="inline" />
 				Private Login
 			</h2>
 			<p>
@@ -68,7 +68,7 @@
 		</Card>
 		<Card>
 			<h2 class="mb-2 flex items-center gap-2 text-xl dark:text-white">
-				<ClockOutline class="inline focus:outline-none" />
+				<ClockOutline class="inline" />
 				Attendance and more
 			</h2>
 			<p>
@@ -84,7 +84,7 @@
 		color="light"
 		class="gap-2"
 	>
-		<GithubSolid class="inline focus:outline-none" />
+		<GithubSolid class="inline" />
 		Open Source
 	</Button>
 </div>
