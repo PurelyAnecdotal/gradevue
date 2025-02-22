@@ -57,9 +57,9 @@
 						<Badge color="dark">
 							{recipients.length} Recipients
 							{#if showRecipients}
-								<ChevronDownOutline size="sm" class="focus:outline-none" />
+								<ChevronDownOutline size="sm" />
 							{:else}
-								<ChevronRightOutline size="sm" class="focus:outline-none" />
+								<ChevronRightOutline size="sm" />
 							{/if}
 						</Badge>
 					</button>
@@ -146,7 +146,7 @@
 					href={link}
 					target="_blank"
 				>
-					<LinkOutline size="sm" class="focus:outline-none" />
+					<LinkOutline size="sm" />
 					<span class="truncate">{new URL(link).hostname}</span>
 				</Card>
 			</li>
@@ -161,7 +161,7 @@
 					href="/mail/attachment?attachmentGU={attachment._SmAttachmentGU}"
 					target="_blank"
 				>
-					<PaperClipOutline size="sm" class="focus:outline-none" />
+					<PaperClipOutline size="sm" />
 					<span class="truncate">{attachment._DocumentName}</span>
 				</Card>
 			</li>

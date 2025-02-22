@@ -16,7 +16,7 @@
 </Button>
 
 <Alert color="dark" class="p-0">
-	<InfoCircleOutline slot="icon" size="sm" class="focus:outline-none" />
+	<InfoCircleOutline slot="icon" size="sm" />
 	If you've used SynergyPlus before, you can use the same password to
 	<a href="/login" class="text-primary-600 underline">log in to GradeVue</a>.
 </Alert>

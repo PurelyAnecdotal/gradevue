@@ -33,7 +33,7 @@
 
 		<div class="flex flex-row flex-wrap items-center gap-2">
 			<Badge color="blue">
-				<UserOutline size="xs" class="mr-1 focus:outline-none" />
+				<UserOutline size="xs" class="mr-1" />
 				{message.From.RecipientXML._Details1} ({message.From.RecipientXML._Details2})
 			</Badge>
 

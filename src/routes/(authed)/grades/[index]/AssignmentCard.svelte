@@ -87,7 +87,7 @@
 			{#if categoryDropdownOptions.length > 0}
 				<Button color="light">
 					{category ?? 'Category'}
-					<ChevronDownOutline size="xs" class="ml-2 focus:outline-none" />
+					<ChevronDownOutline size="xs" class="ml-2" />
 				</Button>
 
 				<Dropdown bind:open={categoryDropdownOpen}>
@@ -146,7 +146,7 @@
 				toward your grade. GradeVue can reveal these assignments.
 			</Popover>
 			<Badge border color="dark" class="hidden-badge">
-				Hidden Assignments <InfoCircleOutline size="xs" class="ml-1 focus:outline-none" />
+				Hidden Assignments <InfoCircleOutline size="xs" class="ml-1" />
 			</Badge>
 		{/if}
 		{#if showHypotheticalLabel}

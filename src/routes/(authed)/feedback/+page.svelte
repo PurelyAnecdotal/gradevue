@@ -13,14 +13,14 @@
 		href="https://github.com/Nonexistent-Name/gradevue/issues"
 		class="flex flex-row items-center gap-4"
 	>
-		<GithubSolid size="xl" class="text-white focus:outline-none" />
+		<GithubSolid size="xl" class="text-white" />
 		<h1 class="text-xl text-gray-900 dark:text-white">
 			Report an issue or suggest a feature on GitHub
 		</h1>
 	</Card>
 
 	<Card href="mailto:hello@gradevue.org" class="flex flex-row items-center gap-4">
-		<EnvelopeOutline size="xl" class="text-white focus:outline-none" />
+		<EnvelopeOutline size="xl" class="text-white" />
 		<h1 class="text-xl text-gray-900 dark:text-white">Send us an email</h1>
 	</Card>
 </div>

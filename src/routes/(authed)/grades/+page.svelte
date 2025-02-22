@@ -48,9 +48,9 @@
 				{currentGradebookState.data.ReportingPeriod._GradePeriod}
 
 				{#if dropdownOpen}
-					<ChevronUpOutline size="sm" class="ml-2 focus:outline-none" />
+					<ChevronUpOutline size="sm" class="ml-2" />
 				{:else}
-					<ChevronDownOutline size="sm" class="ml-2 focus:outline-none" />
+					<ChevronDownOutline size="sm" class="ml-2" />
 				{/if}
 			</Button>
 
