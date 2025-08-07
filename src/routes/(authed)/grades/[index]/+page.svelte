@@ -246,7 +246,7 @@
 					<TableHeadCell>Points</TableHeadCell>
 				</TableHead>
 				<TableBody>
-					{#each gradeCategories.toSorted() as category}
+					{#each gradeCategories.toSorted() as category (category.name)}
 						<TableBodyRow>
 							<TableBodyCell>{category.name}</TableBodyCell>
 							<TableBodyCell>
@@ -384,7 +384,7 @@
 
 				{#each [...new Set(realAssignments
 							.map((assignment) => assignment.category)
-							.toSorted())] as categoryName}
+							.toSorted())] as categoryName (categoryName)}
 					<TabItem title={categoryName}>
 						{@render assignmentList((assignment) => assignment.category === categoryName)}
 					</TabItem>
@@ -405,13 +405,13 @@
 {#snippet assignmentList(filter?: (assignment: Assignment) => boolean)}
 	<ol class="space-y-4">
 		{#if hypotheticalMode}
-			{#each reactiveAssignments as assignment, i}
+			{#each reactiveAssignments as assignment, i (assignment.id)}
 				{#if !filter || filter(assignment)}
 					{@render boundAssignmentSnippet(assignment, reactiveAssignments, i)}
 				{/if}
 			{/each}
 		{:else}
-			{#each assignments as assignment}
+			{#each assignments as assignment (assignment.id)}
 				{#if !filter || filter(assignment)}
 					{@render assignmentSnippet(assignment)}
 				{/if}

@@ -67,7 +67,7 @@
 
 				{#if showRecipients}
 					<ul>
-						{#each recipients as recipient}
+						{#each recipients as recipient (recipient._GU)}
 							<li>{recipient._Details1} ({recipient._Details2})</li>
 						{/each}
 					</ul>
@@ -137,14 +137,13 @@
 
 {#if attachments || links.length > 0}
 	<ul class="flex flex-wrap gap-2">
-		{#each links as link}
+		{#each links as link (link)}
 			<li class="max-w-full">
 				<Card
 					padding="xs"
 					horizontal={true}
 					class="flex w-fit max-w-full flex-row items-center gap-2 dark:text-white"
 					href={link}
-					target="_blank"
 				>
 					<LinkOutline size="sm" />
 					<span class="truncate">{new URL(link).hostname}</span>
@@ -152,14 +151,13 @@
 			</li>
 		{/each}
 
-		{#each attachments ?? [] as attachment}
+		{#each attachments ?? [] as attachment (attachment._SmAttachmentGU)}
 			<li class="max-w-full">
 				<Card
 					padding="xs"
 					horizontal
 					class="flex w-fit max-w-full flex-row items-center gap-2 dark:text-white"
 					href="/mail/attachment?attachmentGU={attachment._SmAttachmentGU}"
-					target="_blank"
 				>
 					<PaperClipOutline size="sm" />
 					<span class="truncate">{attachment._DocumentName}</span>

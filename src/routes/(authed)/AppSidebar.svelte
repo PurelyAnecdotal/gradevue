@@ -81,7 +81,7 @@
 					</a>
 					{#if page.params.index && currentGradebookState?.data}
 						<ul>
-							{#each currentGradebookState.data.Courses.Course as { _Title: title }, index}
+							{#each currentGradebookState.data.Courses.Course as { _Title: title, _CourseID }, index (_CourseID)}
 								<li>
 									<a
 										href={`/grades/${index.toString()}`}

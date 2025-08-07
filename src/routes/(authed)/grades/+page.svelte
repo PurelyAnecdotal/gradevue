@@ -55,7 +55,7 @@
 			</Button>
 
 			<Dropdown bind:open={dropdownOpen}>
-				{#each allPeriods ?? [] as period, index}
+				{#each allPeriods ?? [] as period, index (period._Index)}
 					<DropdownItem
 						onclick={() => {
 							dropdownOpen = false;
@@ -88,7 +88,7 @@
 		{/if}
 
 		<ol class="space-y-4">
-			{#each currentGradebookState.data.Courses.Course ?? [] as { _Title: title, Marks: { Mark: { _CalculatedScoreString: grade, _CalculatedScoreRaw: percent, Assignments } } }, index}
+			{#each currentGradebookState.data.Courses.Course ?? [] as { _Title: title, Marks: { Mark: { _CalculatedScoreString: grade, _CalculatedScoreRaw: percent, Assignments } }, _CourseID }, index (_CourseID)}
 				<li>
 					<Card
 						class="flex max-w-none flex-row items-center gap-2 text-xl dark:text-white"
