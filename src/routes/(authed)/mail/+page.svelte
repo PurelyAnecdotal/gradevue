@@ -59,7 +59,7 @@
 	<h1 class="mx-4 text-2xl font-bold">Inbox</h1>
 
 	<ol class="space-y-4 p-4">
-		{#each mailDataState.data.InboxItemListings.MessageXML as message}
+		{#each mailDataState.data.InboxItemListings.MessageXML as message (message._SMMessageGU)}
 			<li
 				ontouchend={() => {
 					touchscreen = true;

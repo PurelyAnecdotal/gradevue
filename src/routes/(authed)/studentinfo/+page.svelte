@@ -123,7 +123,7 @@
 
 			<Table>
 				<TableBody>
-					{#each dataSources as dataSource}
+					{#each dataSources as dataSource (dataSource)}
 						<TableBodyRow>
 							<TableBodyCell>{dataSource}</TableBodyCell>
 							{@render toolButton('Copy', () => copy(dataSource))}

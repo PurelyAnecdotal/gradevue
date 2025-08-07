@@ -62,7 +62,7 @@
 		<TabItem title="All" open>
 			{@render documentsList(documentDatas)}
 		</TabItem>
-		{#each documentCategories as category}
+		{#each documentCategories as category (category)}
 			<TabItem title={category}>
 				{@render documentsList(
 					documentDatas.filter((documentData) => documentData._DocumentType === category)
@@ -74,7 +74,7 @@
 
 {#snippet documentsList(documents: StudentDocumentData[])}
 	<ol class="space-y-4">
-		{#each documents as documentData}
+		{#each documents as documentData (documentData._DocumentGU)}
 			<li>
 				<Card
 					href="/documents/document?documentGU={documentData._DocumentGU}"

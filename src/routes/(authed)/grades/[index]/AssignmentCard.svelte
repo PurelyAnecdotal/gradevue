@@ -91,7 +91,7 @@
 				</Button>
 
 				<Dropdown bind:open={categoryDropdownOpen}>
-					{#each categoryDropdownOptions as categoryOption}
+					{#each categoryDropdownOptions as categoryOption (categoryOption)}
 						<DropdownItem
 							onclick={() => {
 								category = categoryOption;

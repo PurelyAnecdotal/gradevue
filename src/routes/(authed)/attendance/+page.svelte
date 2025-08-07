@@ -56,7 +56,7 @@
 
 {#if attendanceState.data}
 	<Accordion class="mx-4">
-		{#each attendanceState.data.Absences.Absence ?? [] as absence}
+		{#each attendanceState.data.Absences.Absence ?? [] as absence (absence._AbsenceDate)}
 			<AccordionItem>
 				<div slot="header">
 					{fullDateFormatter.format(new Date(absence._AbsenceDate))}
@@ -70,7 +70,7 @@
 					{/if}
 				</div>
 				<ol>
-					{#each absence.Periods.Period?.filter((course) => course._Name) ?? [] as period}
+					{#each absence.Periods.Period?.filter((course) => course._Name) ?? [] as period (period._Course)}
 						<li>{removeClassID(period._Course)}: {period._Name}</li>
 					{/each}
 				</ol>
