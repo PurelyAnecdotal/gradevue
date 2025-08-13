@@ -18,7 +18,7 @@ interface GradebooksState {
 export const gradebooksState: GradebooksState = $state({});
 
 export const getCurrentGradebookState = (gradebooksState: GradebooksState) =>
-	gradebooksState.records && gradebooksState.activeIndex
+	gradebooksState.records && gradebooksState.activeIndex !== undefined
 		? gradebooksState.records[gradebooksState.overrideIndex ?? gradebooksState.activeIndex]
 		: undefined;
 
@@ -30,7 +30,7 @@ export const getPeriodIndex = (period: ReportPeriod, periods: ReportPeriod[]) =>
 	periods.map((period) => period._GradePeriod).findIndex((name) => name === period._GradePeriod);
 
 const saveGradebooksState = () => {
-	if (!gradebooksState.records || !gradebooksState.activeIndex)
+	if (!gradebooksState.records || gradebooksState.activeIndex === undefined)
 		throw new Error('Gradebook state not initialized before saving');
 
 	const cache: GradebooksLocalStorageCache = {

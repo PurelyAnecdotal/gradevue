@@ -19,10 +19,17 @@
 			: undefined
 	);
 
-	loadGradebooks();
+	let loadingError: unknown = $state(undefined);
+
+	loadGradebooks().catch((error) => {
+		console.error('Error loading gradebooks:', error);
+		loadingError = error;
+	});
+
+	const loadedOrError = $derived(currentGradebookState?.loaded ?? loadingError !== undefined);
 </script>
 
-<LoadingBanner show={!currentGradebookState?.loaded} loadingMsg="Loading grades..." />
+<LoadingBanner show={!loadedOrError} loadingMsg="Loading grades..." />
 
 {#if currentGradebookState?.lastRefresh !== undefined}
 	<RefreshIndicator
@@ -31,6 +38,14 @@
 		refresh={() =>
 			showGradebook(gradebooksState.overrideIndex ?? gradebooksState.activeIndex, true)}
 	/>
+{/if}
+
+{#if loadingError}
+	<Alert color="red" class="m-4">
+		An error occurred while loading grades: {loadingError instanceof Error
+			? loadingError.message
+			: String(loadingError)}
+	</Alert>
 {/if}
 
 {#if gradebooksState.overrideIndex && gradebooksState.records && gradebooksState.activeIndex && currentGradebookState?.data}
