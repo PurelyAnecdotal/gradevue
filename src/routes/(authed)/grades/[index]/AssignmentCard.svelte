@@ -78,7 +78,7 @@
 </script>
 
 <Card
-	class="flex max-w-none flex-row items-center transition duration-500 dark:text-white sm:p-4 {border}"
+	class="flex max-w-none flex-row items-center transition duration-500 sm:p-4 dark:text-white {border}"
 >
 	<div class="mr-2">
 		{#if editable}
@@ -107,7 +107,7 @@
 		{:else}
 			<span>{name}</span>
 		{/if}
-		{#if category && (!editable || categoryDropdownOptions.length === 0) && !showHypotheticalLabel}
+		{#if category !== undefined && (!editable || categoryDropdownOptions.length === 0) && !showHypotheticalLabel}
 			<Badge color={getCategoryColor(category)}>
 				{category}
 			</Badge>
@@ -157,7 +157,7 @@
 		{/if}
 	</div>
 
-	<div class="ml-auto mr-2 flex shrink-0 items-center gap-2">
+	<div class="mr-2 ml-auto flex shrink-0 items-center gap-2">
 		{#if gradePercentageChange !== undefined}
 			{#if percentageChange < 0}
 				<span class="text-red-500">
@@ -167,7 +167,7 @@
 				<span class="text-green-500">
 					+{percentageChange}%
 				</span>
-			{:else if !notForGrade && pointsEarned && !isNaN(pointsEarned)}
+			{:else if !notForGrade && pointsEarned !== undefined && !isNaN(pointsEarned)}
 				<span class="text-gray-500">+0%</span>
 			{/if}
 		{/if}

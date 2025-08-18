@@ -24,8 +24,11 @@
 	});
 
 	if (browser && !acc.studentAccount) {
-		if (localStorage.getItem(LocalStorageKey.token)) loadStudentAccount();
-		else goto('/login');
+		if (localStorage.getItem(LocalStorageKey.token) !== null) {
+			loadStudentAccount();
+		} else {
+			void goto('/login');
+		}
 	}
 </script>
 
@@ -37,7 +40,7 @@
 	<AppSidebar />
 </Drawer>
 
-<div class="flex h-screen flex-col md:pl-64 md:pt-0">
+<div class="flex h-screen flex-col md:pt-0 md:pl-64">
 	<div class="sticky top-0 flex items-center bg-slate-800 p-2 pr-4 md:hidden">
 		<NavHamburger
 			onClick={() => {

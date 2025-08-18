@@ -4,7 +4,7 @@ import type { Gradebook, ReportPeriod } from '$lib/types/Gradebook';
 import { SvelteSet } from 'svelte/reactivity';
 
 interface GradebooksLocalStorageCache {
-	records: (undefined | LocalStorageCache<Gradebook>)[];
+	records: (null | LocalStorageCache<Gradebook>)[];
 	activeIndex: number;
 	overrideIndex?: number;
 }
@@ -35,7 +35,7 @@ const saveGradebooksState = () => {
 
 	const cache: GradebooksLocalStorageCache = {
 		records: gradebooksState.records.map((record) => {
-			if (!record || !record.data || !record.lastRefresh) return undefined;
+			if (!record || !record.data || record.lastRefresh === undefined) return null;
 
 			return { data: record.data, lastRefresh: record.lastRefresh };
 		}),
@@ -53,7 +53,7 @@ export const loadGradebooks = async () => {
 
 	// Load seen assignment ids from localStorage
 	const seenIDsStr = localStorage.getItem(LocalStorageKey.seenAssignmentIDs);
-	if (seenIDsStr) {
+	if (seenIDsStr !== null) {
 		try {
 			const seenIDs: string[] = JSON.parse(seenIDsStr);
 			seenIDs.forEach((id) => seenAssignmentIDs.add(id));
@@ -65,12 +65,12 @@ export const loadGradebooks = async () => {
 
 	// Try to load the state from the localStorage cache
 	const cacheStr = localStorage.getItem(LocalStorageKey.gradebook);
-	if (cacheStr) {
+	if (cacheStr !== null) {
 		try {
 			const cache: GradebooksLocalStorageCache = JSON.parse(cacheStr);
 
 			gradebooksState.records = cache.records.map((lsCache) => {
-				if (!lsCache) return lsCache;
+				if (lsCache === null) return undefined;
 
 				const record: RecordState<Gradebook> = {
 					data: lsCache.data,
@@ -100,7 +100,9 @@ export const loadGradebooks = async () => {
 		gradebooksState.activeIndex = activeIndex;
 
 		// Initialize the records array (will be undefined at first)
-		gradebooksState.records ??= Array(activeGradebook.ReportingPeriods.ReportPeriod.length);
+		gradebooksState.records ??= Array(activeGradebook.ReportingPeriods.ReportPeriod.length).fill(
+			undefined
+		);
 
 		// Save the active gradebook to the records array
 		gradebooksState.records[activeIndex] = {

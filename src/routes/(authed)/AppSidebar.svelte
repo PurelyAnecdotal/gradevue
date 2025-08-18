@@ -79,7 +79,7 @@
 							<ChevronDownOutline />
 						{/if}
 					</a>
-					{#if page.params.index && currentGradebookState?.data}
+					{#if page.params.index !== undefined && currentGradebookState?.data}
 						<ul>
 							{#each currentGradebookState.data.Courses.Course as { _Title: title, _CourseID }, index (_CourseID)}
 								<li>
@@ -115,8 +115,11 @@
 		<SidebarGroup>
 			{#if $installPrompt.prompt}
 				<div transition:fade>
-					{@render sidebarLink('Install Web App', '#', DownloadOutline, () =>
-						$installPrompt.prompt?.()
+					{@render sidebarLink(
+						'Install Web App',
+						'#',
+						DownloadOutline,
+						() => void $installPrompt.prompt?.()
 					)}
 				</div>
 			{/if}

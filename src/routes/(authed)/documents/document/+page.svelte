@@ -10,7 +10,7 @@
 	let reportCardURLPromise: Promise<string> | undefined = $state();
 
 	const getReportCardURL = async (documentGU: string | null) => {
-		if (!documentGU) throw new Error('DocumentGU not provided');
+		if (documentGU === null) throw new Error('DocumentGU not provided');
 
 		if (!acc.studentAccount) throw new Error('Student account not loaded');
 

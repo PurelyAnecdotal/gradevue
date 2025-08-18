@@ -57,14 +57,16 @@
 	const gradebookState = $derived(getCurrentGradebookState(gradebooksState));
 
 	const synergyCourse = $derived(
-		gradebookState?.data?.Courses.Course?.[parseInt(page.params.index)]
+		page.params.index !== undefined
+			? gradebookState?.data?.Courses.Course?.[parseInt(page.params.index)]
+			: undefined
 	);
+
+	const mark = $derived(synergyCourse?.Marks !== '' ? synergyCourse?.Marks.Mark : undefined);
 
 	const courseName = $derived(synergyCourse ? removeClassID(synergyCourse._Title) : '');
 
-	const synergyGradePercentage = $derived(
-		parseFloat(synergyCourse?.Marks.Mark._CalculatedScoreRaw ?? '')
-	);
+	const synergyGradePercentage = $derived(parseFloat(mark?._CalculatedScoreRaw ?? ''));
 
 	const categories: Category[] | undefined = $derived(
 		synergyCourse ? getSynergyCourseAssignmentCategories(synergyCourse) : undefined
@@ -74,7 +76,7 @@
 
 	const totalCategory = $derived(categories?.find((category) => category.name === 'TOTAL'));
 
-	const synergyAssignments = $derived(synergyCourse?.Marks.Mark.Assignments.Assignment ?? []);
+	const synergyAssignments = $derived(mark?.Assignments.Assignment ?? []);
 
 	const realAssignments = $derived(
 		calculateAssignmentGPCs(synergyAssignments.map(parseSynergyAssignment), gradeCategories)
@@ -170,15 +172,13 @@
 
 	let calcWarningOpen = $state(false);
 
-	const prefix = $derived(
-		hypotheticalMode ? '' : synergyCourse?.Marks.Mark._CalculatedScoreString + ' '
-	);
+	const prefix = $derived(hypotheticalMode ? '' : mark?._CalculatedScoreString + ' ');
 
 	const value = $derived(
 		hypotheticalMode
 			? hypotheticalGrade / 100
-			: synergyCourse
-				? parseFloat(synergyCourse.Marks.Mark._CalculatedScoreRaw) / 100
+			: mark
+				? parseFloat(mark._CalculatedScoreRaw) / 100
 				: undefined
 	);
 
@@ -406,7 +406,7 @@
 	<ol class="space-y-4">
 		{#if hypotheticalMode}
 			{#each reactiveAssignments as assignment, i (assignment.id)}
-				{#if !filter || filter(assignment)}
+				{#if (!filter || filter(assignment)) && reactiveAssignments[i]}
 					{@render boundAssignmentSnippet(assignment, reactiveAssignments, i)}
 				{/if}
 			{/each}
@@ -448,7 +448,7 @@
 			{hidden}
 			category={showCategory ? category : undefined}
 			{date}
-			unseen={id ? !seenAssignmentIDs.has(id) : false}
+			unseen={id !== undefined ? !seenAssignmentIDs.has(id) : false}
 		/>
 	</li>
 {/snippet}
@@ -459,38 +459,40 @@
 	i: number,
 	showCategory = true
 )}
-	<li>
-		{#if showCategory}
-			<AssignmentCard
-				bind:name={reactiveAssignments[i].name}
-				bind:pointsEarned={reactiveAssignments[i].pointsEarned}
-				bind:pointsPossible={reactiveAssignments[i].pointsPossible}
-				bind:extraCredit={reactiveAssignments[i].extraCredit}
-				gradePercentageChange={rawGradeCalcMatches ? gradePercentageChange : undefined}
-				bind:notForGrade={reactiveAssignments[i].notForGrade}
-				{hidden}
-				showHypotheticalLabel={newHypothetical}
-				bind:category={reactiveAssignments[i].category}
-				categoryDropdownOptions={gradeCategories?.map((category) => category.name)}
-				{date}
-				editable={true}
-				{recalculateGradePercentage}
-			/>
-		{:else}
-			<AssignmentCard
-				bind:name={reactiveAssignments[i].name}
-				bind:pointsEarned={reactiveAssignments[i].pointsEarned}
-				bind:pointsPossible={reactiveAssignments[i].pointsPossible}
-				bind:extraCredit={reactiveAssignments[i].extraCredit}
-				gradePercentageChange={rawGradeCalcMatches ? gradePercentageChange : undefined}
-				bind:notForGrade={reactiveAssignments[i].notForGrade}
-				{hidden}
-				showHypotheticalLabel={newHypothetical}
-				categoryDropdownOptions={gradeCategories?.map((category) => category.name)}
-				{date}
-				editable={true}
-				{recalculateGradePercentage}
-			/>
-		{/if}
-	</li>
+	{#if reactiveAssignments[i]}
+		<li>
+			{#if showCategory}
+				<AssignmentCard
+					bind:name={reactiveAssignments[i].name}
+					bind:pointsEarned={reactiveAssignments[i].pointsEarned}
+					bind:pointsPossible={reactiveAssignments[i].pointsPossible}
+					bind:extraCredit={reactiveAssignments[i].extraCredit}
+					gradePercentageChange={rawGradeCalcMatches ? gradePercentageChange : undefined}
+					bind:notForGrade={reactiveAssignments[i].notForGrade}
+					{hidden}
+					showHypotheticalLabel={newHypothetical}
+					bind:category={reactiveAssignments[i].category}
+					categoryDropdownOptions={gradeCategories?.map((category) => category.name)}
+					{date}
+					editable={true}
+					{recalculateGradePercentage}
+				/>
+			{:else}
+				<AssignmentCard
+					bind:name={reactiveAssignments[i].name}
+					bind:pointsEarned={reactiveAssignments[i].pointsEarned}
+					bind:pointsPossible={reactiveAssignments[i].pointsPossible}
+					bind:extraCredit={reactiveAssignments[i].extraCredit}
+					gradePercentageChange={rawGradeCalcMatches ? gradePercentageChange : undefined}
+					bind:notForGrade={reactiveAssignments[i].notForGrade}
+					{hidden}
+					showHypotheticalLabel={newHypothetical}
+					categoryDropdownOptions={gradeCategories?.map((category) => category.name)}
+					{date}
+					editable={true}
+					{recalculateGradePercentage}
+				/>
+			{/if}
+		</li>
+	{/if}
 {/snippet}

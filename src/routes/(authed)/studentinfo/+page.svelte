@@ -18,15 +18,14 @@
 
 	const dataSources = Object.values(LocalStorageKey);
 
-	function copy(key: string) {
+	async function copy(key: string) {
 		const data = localStorage.getItem(key);
-
-		if (!data) {
+		if (data === null) {
 			alert('Not found');
 			return;
 		}
 
-		navigator.clipboard.writeText(data);
+		await navigator.clipboard.writeText(data);
 	}
 
 	async function paste(key: string) {
@@ -42,9 +41,7 @@
 		localStorage.setItem(key, text);
 	}
 
-	function remove(key: string) {
-		localStorage.removeItem(key);
-	}
+	const remove = (key: string) => localStorage.removeItem(key);
 </script>
 
 <svelte:head>
@@ -126,8 +123,8 @@
 					{#each dataSources as dataSource (dataSource)}
 						<TableBodyRow>
 							<TableBodyCell>{dataSource}</TableBodyCell>
-							{@render toolButton('Copy', () => copy(dataSource))}
-							{@render toolButton('Paste', () => paste(dataSource))}
+							{@render toolButton('Copy', () => void copy(dataSource))}
+							{@render toolButton('Paste', () => void paste(dataSource))}
 							{@render toolButton('Delete', () => remove(dataSource))}
 						</TableBodyRow>
 					{/each}

@@ -14,7 +14,7 @@
 	const currentGradebookState = $derived(getCurrentGradebookState(gradebooksState));
 
 	const activeReportingPeriodName = $derived(
-		gradebooksState.records && gradebooksState.activeIndex
+		gradebooksState.records && gradebooksState.activeIndex !== undefined
 			? gradebooksState.records[gradebooksState.activeIndex]?.data?.ReportingPeriod._GradePeriod
 			: undefined
 	);
@@ -40,15 +40,15 @@
 	/>
 {/if}
 
-{#if loadingError}
+{#if loadingError !== undefined}
 	<Alert color="red" class="m-4">
 		An error occurred while loading grades: {loadingError instanceof Error
 			? loadingError.message
-			: String(loadingError)}
+			: JSON.stringify(loadingError)}
 	</Alert>
 {/if}
 
-{#if gradebooksState.overrideIndex && gradebooksState.records && gradebooksState.activeIndex && currentGradebookState?.data}
+{#if gradebooksState.overrideIndex !== undefined && gradebooksState.records && gradebooksState.activeIndex !== undefined && currentGradebookState?.data}
 	<Alert class="mx-4 flex items-center justify-between" color="light" border>
 		<span class="text-white">
 			Viewing reporting period {currentGradebookState.data.ReportingPeriod._GradePeriod}
@@ -60,4 +60,6 @@
 	</Alert>
 {/if}
 
-{@render children?.()}
+<svelte:boundary>
+	{@render children?.()}
+</svelte:boundary>

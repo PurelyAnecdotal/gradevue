@@ -20,10 +20,10 @@
 	import InfoCircleOutline from 'flowbite-svelte-icons/InfoCircleOutline.svelte';
 	import { fly } from 'svelte/transition';
 
-	if (browser && localStorage.getItem(LocalStorageKey.token)) {
+	if (browser && localStorage.getItem(LocalStorageKey.token) !== null) {
 		if (!acc.studentAccount) loadStudentAccount();
 
-		goto('/grades');
+		void goto('/grades');
 	}
 
 	let username: string = $state('');
@@ -57,7 +57,7 @@
 
 		loggingIn = false;
 
-		goto('/grades');
+		void goto('/grades');
 	}
 </script>
 
@@ -68,7 +68,7 @@
 <LoadingBanner show={loggingIn} loadingMsg="Logging you in..." />
 
 {#if loginError}
-	<div in:fly={{ y: -50, duration: 200 }} class="fixed left-0 top-0 flex w-full justify-center p-4">
+	<div in:fly={{ y: -50, duration: 200 }} class="fixed top-0 left-0 flex w-full justify-center p-4">
 		<Alert color="red">
 			<ExclamationCircleSolid slot="icon" />
 			<span class="font-bold">Couldn't log in</span>
