@@ -19,7 +19,7 @@ export interface Courses {
 }
 
 export interface Course {
-	Marks: Marks;
+	Marks: Marks | '';
 	_Period: string;
 	_Title: string;
 	_CourseName: string;

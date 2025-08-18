@@ -73,16 +73,16 @@ export class StudentAccount {
 		return result;
 	}
 
-	async request(methodName: string, params: unknown = {}) {
+	request(methodName: string, params: unknown = {}) {
 		return this.soapRequest('ProcessWebServiceRequest', methodName, params);
 	}
 
-	async requestMultiWeb(methodName: string, params: unknown = {}) {
+	requestMultiWeb(methodName: string, params: unknown = {}) {
 		return this.soapRequest('ProcessWebServiceRequestMultiWeb', methodName, params);
 	}
 
-	async checkLogin() {
-		await this.request('StudentInfo');
+	checkLogin() {
+		return this.request('StudentInfo').then(() => {});
 	}
 
 	async getAuthToken(): Promise<AuthToken> {

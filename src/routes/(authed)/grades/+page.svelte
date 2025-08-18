@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { getColorForGrade, removeClassID } from '$lib';
 	import { parseSynergyAssignment } from '$lib/assignments';
-	import type { AssignmentEntity } from '$lib/types/Gradebook';
+	import type { AssignmentEntity, Mark } from '$lib/types/Gradebook';
 	import NumberFlow from '@number-flow/svelte';
 	import { Alert, Badge, Button, Card, Dropdown, DropdownItem, Progressbar } from 'flowbite-svelte';
 	import ChevronDownOutline from 'flowbite-svelte-icons/ChevronDownOutline.svelte';
@@ -59,8 +59,7 @@
 					<DropdownItem
 						onclick={() => {
 							dropdownOpen = false;
-
-							showGradebook(index);
+							void showGradebook(index);
 						}}
 						class="flex items-center"
 					>
@@ -73,22 +72,23 @@
 			</Dropdown>
 		</div>
 
-		{#if currentGradebookState.data.Courses.Course.map((course) => course.Marks.Mark._CalculatedScoreString).every((score) => score === 'N/A')}
+		{#if currentGradebookState.data.Courses.Course.map( (course) => (course.Marks === '' ? 'N/A' : course.Marks.Mark._CalculatedScoreString) ).every((score) => score === 'N/A')}
 			<Alert class="mx-auto flex w-fit items-center" color="dark">
 				<CloseCircleOutline />
 				It looks like you don't have any grades yet in this reporting period.
 
 				{#if currentPeriodIndex > 0}
 					<Button onclick={() => showGradebook(currentPeriodIndex - 1)} color="alternative" outline>
-						<span class="text-gray-300">View {allPeriods[currentPeriodIndex - 1]._GradePeriod}</span
-						>
+						<span class="text-gray-300">
+							View {allPeriods[currentPeriodIndex - 1]?._GradePeriod}
+						</span>
 					</Button>
 				{/if}
 			</Alert>
 		{/if}
 
 		<ol class="space-y-4">
-			{#each currentGradebookState.data.Courses.Course ?? [] as { _Title: title, Marks: { Mark: { _CalculatedScoreString: grade, _CalculatedScoreRaw: percent, Assignments } }, _CourseID }, index (_CourseID)}
+			{#each currentGradebookState.data.Courses.Course ?? [] as { _Title: title, Marks, _CourseID }, index (_CourseID)}
 				<li>
 					<Card
 						class="flex max-w-none flex-row items-center gap-2 text-xl dark:text-white"
@@ -96,27 +96,37 @@
 					>
 						<span class="mr-auto line-clamp-1">{removeClassID(title)}</span>
 
-						{#if Assignments.Assignment && getUnseenAssignmentsCount(Assignments.Assignment) > 0}
-							<Badge color="green" class="shrink-0 text-center">
-								{getUnseenAssignmentsCount(Assignments.Assignment)} new
-							</Badge>
+						{#if Marks !== ''}
+							{@render gradeInfo(Marks.Mark)}
 						{/if}
-
-						<NumberFlow
-							prefix={grade + ' '}
-							value={parseFloat(percent) / 100}
-							format={{ style: 'percent', maximumFractionDigits: 3 }}
-						/>
-
-						<Progressbar
-							color={getColorForGrade(grade)}
-							progress={Math.min(isNaN(parseFloat(percent)) ? 0 : parseFloat(percent), 100)}
-							animate={true}
-							class="hidden w-1/3 shrink-0 sm:block"
-						/>
 					</Card>
 				</li>
 			{/each}
 		</ol>
 	</main>
 {/if}
+
+{#snippet gradeInfo({
+	_CalculatedScoreString: grade,
+	_CalculatedScoreRaw: percent,
+	Assignments
+}: Mark)}
+	{#if Assignments.Assignment !== undefined && getUnseenAssignmentsCount(Assignments.Assignment) > 0}
+		<Badge color="green" class="shrink-0 text-center">
+			{getUnseenAssignmentsCount(Assignments.Assignment)} new
+		</Badge>
+	{/if}
+
+	<NumberFlow
+		prefix={grade + ' '}
+		value={parseFloat(percent) / 100}
+		format={{ style: 'percent', maximumFractionDigits: 3 }}
+	/>
+
+	<Progressbar
+		color={getColorForGrade(grade)}
+		progress={Math.min(isNaN(parseFloat(percent)) ? 0 : parseFloat(percent), 100)}
+		animate={true}
+		class="hidden w-1/3 shrink-0 sm:block"
+	/>
+{/snippet}

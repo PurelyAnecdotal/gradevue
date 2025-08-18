@@ -257,14 +257,19 @@ export function getHiddenAssignmentsFromCategories(
 	pointsByCategory: PointsByCategory
 ) {
 	return categories
-		.filter(
-			(category) =>
-				pointsByCategory[category.name] &&
-				(category.pointsEarned !== pointsByCategory[category.name].pointsEarned ||
-					category.pointsPossible !== pointsByCategory[category.name].pointsPossible)
-		)
+		.filter((category) => {
+			const categoryPoints = pointsByCategory[category.name];
+			if (categoryPoints === undefined) return false;
+			return (
+				category.pointsEarned !== categoryPoints.pointsEarned ||
+				category.pointsPossible !== categoryPoints.pointsPossible
+			);
+		})
 		.map((category) => {
-			const { pointsEarned, pointsPossible } = pointsByCategory[category.name];
+			const categoryPoints = pointsByCategory[category.name];
+			if (categoryPoints === undefined) return null;
+
+			const { pointsEarned, pointsPossible } = categoryPoints;
 
 			const hiddenPointsEarned = category.pointsEarned - pointsEarned;
 			const hiddenPointsPossible = category.pointsPossible - pointsPossible;
@@ -368,6 +373,8 @@ function getAssignmentPointTotals<T extends Assignment>(assignments: Calculable<
 }
 
 export function getSynergyCourseAssignmentCategories(course: Course) {
+	if (course?.Marks === '') return undefined;
+
 	const gradeCalcSummary = course?.Marks.Mark.GradeCalculationSummary;
 
 	if (typeof gradeCalcSummary === 'string' || !gradeCalcSummary?.AssignmentGradeCalc)
@@ -508,7 +515,11 @@ export function parseSynergyAssignment(synergyAssignment: AssignmentEntity) {
 
 	let unscaledPoints: { pointsEarned: number; pointsPossible: number } | undefined = undefined;
 
-	if ((pointsEarnedIsScaled || pointsPossibleIsScaled) && _ScoreCalValue && _ScoreMaxValue) {
+	if (
+		(pointsEarnedIsScaled || pointsPossibleIsScaled) &&
+		_ScoreCalValue !== undefined &&
+		_ScoreMaxValue !== undefined
+	) {
 		unscaledPoints = {
 			pointsEarned: parseFloat(_ScoreCalValue),
 			pointsPossible: parseFloat(_ScoreMaxValue)

@@ -10,7 +10,7 @@
 	let attachmentURLPromise: Promise<string> | undefined = $state();
 
 	const getAttachmentURL = async (attachmentGU: string | null) => {
-		if (!attachmentGU) throw new Error('AttachmentGU not provided');
+		if (attachmentGU === null) throw new Error('AttachmentGU not provided');
 
 		if (!acc.studentAccount) throw new Error('Student account not loaded');
 

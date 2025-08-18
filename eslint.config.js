@@ -1,16 +1,18 @@
 import { includeIgnoreFile } from '@eslint/compat';
-import js from '@eslint/js';
+import eslint from '@eslint/js';
 import prettier from 'eslint-config-prettier';
 import svelte from 'eslint-plugin-svelte';
 import globals from 'globals';
 import { fileURLToPath } from 'node:url';
-import ts from 'typescript-eslint';
+import svelteParser from 'svelte-eslint-parser';
+import tseslint from 'typescript-eslint';
+
 const gitignorePath = fileURLToPath(new URL('./.gitignore', import.meta.url));
 
-export default ts.config(
+export default tseslint.config(
 	includeIgnoreFile(gitignorePath),
-	js.configs.recommended,
-	...ts.configs.recommended,
+	eslint.configs.recommended,
+	...tseslint.configs.recommendedTypeChecked,
 	...svelte.configs['flat/recommended'],
 	prettier,
 	...svelte.configs['flat/prettier'],
@@ -19,21 +21,40 @@ export default ts.config(
 			globals: {
 				...globals.browser,
 				...globals.node
+			},
+			parser: tseslint.parser,
+			parserOptions: {
+				projectService: true,
+				tsconfigRootDir: import.meta.dirname,
+				extraFileExtensions: ['.svelte']
 			}
+		},
+		rules: {
+			'no-duplicate-imports': 'error',
+			eqeqeq: 'error',
+			'@typescript-eslint/strict-boolean-expressions': 'error',
+			'@typescript-eslint/no-unsafe-call': 'warn' // incorrectly flags {@render children?.()}
 		}
 	},
 	{
-		files: ['**/*.svelte'],
-
+		name: 'typescript',
+		files: ['**/*.ts', '*.ts']
+	},
+	{
+		name: 'svelte',
+		files: [
+			'**/*.svelte',
+			'*.svelte',
+			'**/*.svelte.js',
+			'*.svelte.js',
+			'**/*.svelte.ts',
+			'*.svelte.ts'
+		],
 		languageOptions: {
+			parser: svelteParser,
 			parserOptions: {
-				parser: ts.parser
+				parser: tseslint.parser
 			}
-		},
-
-		rules: {
-			'no-duplicate-imports': 'error',
-			eqeqeq: 'error'
 		}
 	}
 );

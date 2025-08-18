@@ -14,7 +14,7 @@ interface BeforeInstallPromptEvent extends Event {
 	prompt: () => Promise<UserChoice>;
 }
 
-export const init: ClientInit = async () => {
+export const init: ClientInit = () => {
 	addEventListener('beforeinstallprompt', (e) => {
 		const event = e as BeforeInstallPromptEvent;
 

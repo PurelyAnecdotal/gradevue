@@ -10,10 +10,10 @@
 	import GithubSolid from 'flowbite-svelte-icons/GithubSolid.svelte';
 	import GridPlusOutline from 'flowbite-svelte-icons/GridPlusOutline.svelte';
 
-	if (browser && localStorage.getItem(LocalStorageKey.token)) {
+	if (browser && localStorage.getItem(LocalStorageKey.token) !== null) {
 		if (!acc.studentAccount) loadStudentAccount();
 
-		goto('/grades');
+		void goto('/grades');
 	}
 </script>
 

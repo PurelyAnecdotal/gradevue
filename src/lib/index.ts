@@ -3,7 +3,7 @@ import { fileTypeFromBuffer } from 'file-type';
 import { acc } from './account.svelte';
 
 export function getColorForGrade(grade: string | number) {
-	if (typeof grade == 'number') {
+	if (typeof grade === 'number') {
 		if (grade > 100) return 'blue';
 		if (grade >= 90) return 'green';
 		else if (grade >= 80) return 'yellow';
@@ -57,7 +57,7 @@ export async function getBlobURLFromBase64String(base64: string) {
 
 	const mimeType = (await fileTypeFromBuffer(byteArray))?.mime;
 
-	if (!mimeType) throw new Error('Could not determine MIME type');
+	if (mimeType === undefined) throw new Error('Could not determine MIME type');
 
 	const blob = new Blob([byteArray], { type: mimeType });
 
@@ -66,7 +66,7 @@ export async function getBlobURLFromBase64String(base64: string) {
 
 export enum LocalStorageKey {
 	token = 'token',
-	gradebook = 'gradebook2',
+	gradebook = 'gradebook3',
 	seenAssignmentIDs = 'seenAssignmentIDs',
 	attendance = 'attendance',
 	documents = 'documents',
@@ -92,14 +92,14 @@ export const loadRecord = async <T>(
 	cacheExpirationTime: number | undefined,
 	forceRefresh = false
 ) => {
-	if ((recordState.data && !forceRefresh) || !acc.studentAccount) return;
+	if ((recordState.data !== undefined && !forceRefresh) || acc.studentAccount === undefined) return;
 
 	recordState.loaded = false;
 
 	let refresh = true;
 
 	const cacheStr = localStorage.getItem(localStorageKey);
-	if (cacheStr) {
+	if (cacheStr !== null) {
 		try {
 			const cache: LocalStorageCache<T> = JSON.parse(cacheStr);
 
