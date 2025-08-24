@@ -27,7 +27,7 @@
         "eslint-plugin-svelte": "^3.11.0",
         "flowbite": "3.1.2",
         "flowbite-svelte": "^0.48.6",
-        "flowbite-svelte-icons": "^2.2.1",
+        "flowbite-svelte-icons": "^3.0.0",
         "globals": "^16.3.0",
         "prettier": "^3.6.2",
         "prettier-plugin-organize-imports": "^4.2.0",
@@ -535,7 +535,7 @@
 
     "flowbite-svelte": ["flowbite-svelte@0.48.6", "", { "dependencies": { "@floating-ui/dom": "^1.6.13", "apexcharts": "^3.54.1", "flowbite": "^3.1.2", "tailwind-merge": "^3.0.1" }, "peerDependencies": { "svelte": "^3.55.1 || ^4.0.0 || ^5.0.0" } }, "sha512-/PmeR3ipHHvda8vVY9MZlymaRoJsk8VddEeoLzIygfYwJV68ey8gHuQPC1dq9J6NDCTE5+xOPtBiYUtVjCfvZw=="],
 
-    "flowbite-svelte-icons": ["flowbite-svelte-icons@2.2.1", "", { "dependencies": { "clsx": "^2.1.1", "tailwind-merge": "^3.3.1" }, "peerDependencies": { "svelte": "^5.0.0" } }, "sha512-SH59319zN4TFpmvFMD7+0ETyDxez4Wyw3mgz7hkjhvrx8HawNAS3Fp7au84pZEs1gniX4hvXIg54U+4YybV2rA=="],
+    "flowbite-svelte-icons": ["flowbite-svelte-icons@3.0.0", "", { "dependencies": { "clsx": "^2.1.1", "tailwind-merge": "^3.3.1" }, "peerDependencies": { "svelte": "^5.0.0" } }, "sha512-7qm8vLOW4uHq1UeDDx0DLrLZXiE8H0i/XCFjGMsSAhIFfpkyIwlE4qXlmy8mjO4p+rzKNbVALQIoDEnuo8tPgg=="],
 
     "foreground-child": ["foreground-child@3.3.0", "", { "dependencies": { "cross-spawn": "^7.0.0", "signal-exit": "^4.0.1" } }, "sha512-Ld2g8rrAyMYFXBhEqMz8ZAHBi4J4uS1i/CxGMDnjyFWddMXLVcDp051DZfu+t7+ab7Wv6SMqpWmyFIj5UbfFvg=="],
 
