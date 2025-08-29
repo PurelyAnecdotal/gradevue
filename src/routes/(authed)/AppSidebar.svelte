@@ -6,7 +6,8 @@
 		SidebarBrand,
 		SidebarGroup,
 		SidebarItem,
-		SidebarWrapper
+		SidebarWrapper,
+		Spinner
 	} from 'flowbite-svelte';
 	import AddressBookOutline from 'flowbite-svelte-icons/AddressBookOutline.svelte';
 	import AnnotationOutline from 'flowbite-svelte-icons/AnnotationOutline.svelte';
@@ -79,6 +80,7 @@
 							<ChevronDownOutline />
 						{/if}
 					</a>
+					<svelte:boundary>
 					{#if page.params.index !== undefined && currentGradebookState?.data}
 						<ul>
 							{#each currentGradebookState.data.Courses.Course as { _Title: title, _CourseID }, index (_CourseID)}
@@ -100,6 +102,15 @@
 							{/each}
 						</ul>
 					{/if}
+
+						{#snippet pending()}
+							{#if page.params.index !== undefined}
+								<div class="flex w-full items-center justify-center p-4">
+									<Spinner />
+								</div>
+							{/if}
+						{/snippet}
+					</svelte:boundary>
 				</li>
 			{:else}
 				{@render sidebarLink('Grades', '/grades', AddressBookOutline)}
@@ -126,11 +137,15 @@
 
 			{@render sidebarLink('Feedback', '/feedback', AnnotationOutline)}
 
-			{@render sidebarLink(
-				studentInfoState.data?.FormattedName ?? '',
-				'/studentinfo',
-				UserCircleOutline
-			)}
+			<SidebarItem
+				label={studentInfoState.data?.FormattedName ?? '.'}
+				spanClass="ms-3 {studentInfoState.data ? '' : 'opacity-0'}"
+				href="/studentinfo"
+			>
+				<svelte:fragment slot="icon">
+					<UserCircleOutline />
+				</svelte:fragment>
+			</SidebarItem>
 
 			{@render sidebarLink('Log Out', '/login', ArrowRightToBracketOutline, logOut)}
 		</SidebarGroup>
