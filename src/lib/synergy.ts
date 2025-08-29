@@ -11,7 +11,8 @@ import { XMLBuilder, XMLParser } from 'fast-xml-parser';
 const alwaysArray = [
 	'Gradebook.Courses.Course',
 	'Gradebook.Courses.Course.Marks.Mark.Assignments.Assignment',
-	'Gradebook.ReportingPeriods.ReportPeriod'
+	'Gradebook.ReportingPeriods.ReportPeriod',
+	'Attendance.Absences.Absence'
 ];
 
 const parser = new XMLParser({
