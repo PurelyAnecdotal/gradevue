@@ -69,7 +69,7 @@ export interface AssignmentEntity {
 	_Points: string;
 	_Point?: string;
 	_PointPossible?: string;
-	_Notes: string;
+	_Notes: string; // Teacher comments
 	_TeacherID: string;
 	_StudentID: string;
 	_MeasureDescription: string;

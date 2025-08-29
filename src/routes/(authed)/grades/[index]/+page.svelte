@@ -432,6 +432,7 @@
 		notForGrade,
 		hidden,
 		category,
+		comments,
 		date
 	}: RealAssignment | Flowed<RealAssignment | HiddenAssignment>,
 	showCategory = true
@@ -448,13 +449,14 @@
 			{hidden}
 			category={showCategory ? category : undefined}
 			{date}
+			{comments}
 			unseen={id !== undefined ? !seenAssignmentIDs.has(id) : false}
 		/>
 	</li>
 {/snippet}
 
 {#snippet boundAssignmentSnippet(
-	{ gradePercentageChange, hidden, newHypothetical, date }: ReactiveAssignment,
+	{ gradePercentageChange, hidden, newHypothetical, date, comments }: ReactiveAssignment,
 	reactiveAssignments: ReactiveAssignment[],
 	i: number,
 	showCategory = true
@@ -474,6 +476,7 @@
 					bind:category={reactiveAssignments[i].category}
 					categoryDropdownOptions={gradeCategories?.map((category) => category.name)}
 					{date}
+					{comments}
 					editable={true}
 					{recalculateGradePercentage}
 				/>
@@ -489,6 +492,7 @@
 					showHypotheticalLabel={newHypothetical}
 					categoryDropdownOptions={gradeCategories?.map((category) => category.name)}
 					{date}
+					{comments}
 					editable={true}
 					{recalculateGradePercentage}
 				/>

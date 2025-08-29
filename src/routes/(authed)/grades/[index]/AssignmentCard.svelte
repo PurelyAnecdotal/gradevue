@@ -3,6 +3,7 @@
 	import { calculateGradePercentage } from '$lib/assignments';
 	import DateBadge from '$lib/components/DateBadge.svelte';
 	import NumberInput from '$lib/components/NumberInput.svelte';
+	import CustomPopover from '$lib/components/Popover.svelte';
 	import {
 		Badge,
 		Button,
@@ -14,8 +15,10 @@
 		Popover,
 		Progressbar
 	} from 'flowbite-svelte';
+	import AnnotationOutline from 'flowbite-svelte-icons/AnnotationOutline.svelte';
 	import ChevronDownOutline from 'flowbite-svelte-icons/ChevronDownOutline.svelte';
 	import InfoCircleOutline from 'flowbite-svelte-icons/InfoCircleOutline.svelte';
+	import { fade } from 'svelte/transition';
 
 	interface Props {
 		name: string;
@@ -32,6 +35,7 @@
 		date?: Date | undefined;
 		editable?: boolean;
 		unseen?: boolean;
+		comments?: string;
 		recalculateGradePercentage?: () => void;
 	}
 
@@ -50,6 +54,7 @@
 		date = undefined,
 		editable = false,
 		unseen = false,
+		comments = undefined,
 		recalculateGradePercentage = () => {}
 	}: Props = $props();
 
@@ -75,7 +80,27 @@
 	const percentageChange = $derived(Math.round((gradePercentageChange ?? 0) * 100) / 100);
 
 	const border = $derived(unseen ? 'dark:border-t-green-600 border-t-4' : '');
+
+	let commentsVisible = $state(false);
+	const toggleComments = () => {
+		commentsVisible = !commentsVisible;
+	};
+
+	let commentsContainer: HTMLDivElement | undefined = $state();
+
+	function handleClick(event: MouseEvent) {
+		if (
+			commentsVisible &&
+			event.target &&
+			event.target instanceof Node &&
+			commentsContainer &&
+			!commentsContainer.contains(event.target)
+		)
+			commentsVisible = false;
+	}
 </script>
+
+<svelte:window onclick={handleClick} />
 
 <Card
 	class="flex max-w-none flex-row items-center transition duration-500 sm:p-4 dark:text-white {border}"
@@ -158,6 +183,28 @@
 	</div>
 
 	<div class="mr-2 ml-auto flex shrink-0 items-center gap-2">
+		{#if comments !== undefined}
+			<div class="relative" bind:this={commentsContainer}>
+				<button
+					onclick={toggleComments}
+					class="cursor-pointer rounded-lg p-2 text-sm transition-colors select-none hover:bg-slate-600 lg:p-1 {commentsVisible
+						? 'bg-slate-600'
+						: 'bg-slate-700'}"
+				>
+					<AnnotationOutline />
+				</button>
+
+				{#if commentsVisible}
+					<div
+						class="absolute bottom-full left-1/2 mb-2 -translate-x-1/2"
+						transition:fade={{ duration: 100 }}
+					>
+						<CustomPopover>{comments}</CustomPopover>
+					</div>
+				{/if}
+			</div>
+		{/if}
+
 		{#if gradePercentageChange !== undefined}
 			{#if percentageChange < 0}
 				<span class="text-red-500">
