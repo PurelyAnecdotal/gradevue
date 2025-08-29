@@ -1,4 +1,5 @@
 <script lang="ts">
+	import BoundaryFailure from '$lib/components/BoundaryFailure.svelte';
 	import LoadingBanner from '$lib/components/LoadingBanner.svelte';
 	import RefreshIndicator from '$lib/components/RefreshIndicator.svelte';
 	import { Alert, Button } from 'flowbite-svelte';
@@ -62,4 +63,8 @@
 
 <svelte:boundary>
 	{@render children?.()}
+
+	{#snippet failed(error, reset)}
+		<BoundaryFailure {error} {reset} />
+	{/snippet}
 </svelte:boundary>
