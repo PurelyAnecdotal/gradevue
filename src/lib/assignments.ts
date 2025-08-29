@@ -21,6 +21,7 @@ export interface Assignment {
 	hidden: boolean;
 	category: string | undefined;
 	date: Date;
+	comments?: string;
 	newHypothetical: boolean;
 }
 
@@ -526,6 +527,8 @@ export function parseSynergyAssignment(synergyAssignment: AssignmentEntity) {
 		};
 	}
 
+	const notesFormatted = _Notes.replace('(Not For Grading)', '');
+
 	const assignment: RealAssignment = {
 		name: _Measure,
 		id: synergyAssignment._GradebookID,
@@ -538,6 +541,7 @@ export function parseSynergyAssignment(synergyAssignment: AssignmentEntity) {
 		hidden: false,
 		category: _Type,
 		date: new Date(_Date),
+		comments: notesFormatted.length > 0 ? notesFormatted : undefined,
 		newHypothetical: false
 	};
 
