@@ -153,7 +153,7 @@
 	function addHypotheticalAssignment() {
 		const newHypotheticalAssignment: NewHypotheticalAssignment = $state({
 			name: 'Hypothetical Assignment',
-			id: undefined,
+			id: Math.random().toString(36).substring(2, 15),
 			pointsEarned: undefined,
 			pointsPossible: undefined,
 			unscaledPoints: undefined,
