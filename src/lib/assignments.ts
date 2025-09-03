@@ -49,7 +49,7 @@ export interface ReactiveAssignment extends Assignment {
 }
 
 export interface NewHypotheticalAssignment extends ReactiveAssignment {
-	id: undefined;
+	id: string;
 	newHypothetical: true;
 	unscaledPoints: undefined;
 	extraCredit: false;
