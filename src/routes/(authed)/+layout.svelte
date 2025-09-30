@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { browser } from '$app/environment';
 	import { goto } from '$app/navigation';
-	import { navigating } from '$app/state';
+	import { navigating, page } from '$app/state';
 	import { LocalStorageKey } from '$lib';
 	import { acc, loadStudentAccount } from '$lib/account.svelte';
 	import BoundaryFailure from '$lib/components/BoundaryFailure.svelte';
@@ -34,13 +34,13 @@
 </script>
 
 <svelte:boundary>
-		<div class="top-0 hidden md:fixed md:block">
-			<AppSidebar />
-		</div>
+	<div class="top-0 hidden md:fixed md:block">
+		<AppSidebar />
+	</div>
 
-		<Drawer {transitionParams} bind:hidden={drawerHidden} class="m-0 w-auto p-0">
-			<AppSidebar />
-		</Drawer>
+	<Drawer {transitionParams} bind:hidden={drawerHidden} class="m-0 w-auto p-0">
+		<AppSidebar />
+	</Drawer>
 
 	<div class="flex h-screen flex-col md:pt-0 md:pl-64">
 		<div class="sticky top-0 flex items-center bg-slate-800 p-2 pr-4 md:hidden">
@@ -48,24 +48,34 @@
 				onClick={() => {
 					drawerHidden = false;
 				}}
-				class="ml-0 text-white"
+				class="ml-0 cursor-pointer text-white"
 			/>
 			<a href="/grades" class="mr-auto text-xl text-white">GradeVue</a>
 			<div>{studentInfoState.data?.FormattedName}</div>
 		</div>
 
-		<div class="overflow-y-auto">
-			<svelte:boundary>
-				{@render children?.()}
+		<div class="flex flex-1 flex-col overflow-y-auto">
+			<div class="flex-1">
+				<svelte:boundary>
+					{@render children?.()}
 
-				{#snippet pending()}
-					{@render fullPageSpinner()}
-				{/snippet}
+					{#snippet pending()}
+						{@render fullPageSpinner()}
+					{/snippet}
 
-				{#snippet failed(error, reset)}
-					<BoundaryFailure {error} {reset} />
-				{/snippet}
-			</svelte:boundary>
+					{#snippet failed(error, reset)}
+						<BoundaryFailure {error} {reset} />
+					{/snippet}
+				</svelte:boundary>
+			</div>
+
+			{#if page.url.pathname !== '/feedback'}
+				<div class="mt-auto flex w-full justify-center gap-1 p-4 text-xs text-gray-600">
+					<a href="/feedback" class="text-gray-500">Report an issue</a> •
+					<a href="/feedback" class="text-gray-500">Suggest a feature</a> •
+					<a href="/feedback" class="text-gray-500">Provide feedback</a>
+				</div>
+			{/if}
 		</div>
 	</div>
 

@@ -1,0 +1,39 @@
+name: Broken Page or Feature
+description: Something isn't working
+title: "[Bug]: "
+labels: [ "bug" ]
+body:
+- type: input
+  id: synergy-domain
+  attributes:
+    label: Synergy domain
+    description: What domain does your district use to access StudentVue?
+    placeholder: ex. state-city-district.edupoint.com
+  validations:
+    required: false
+- type: dropdown
+  id: issue-scope
+  attributes:
+    label: Issue scope
+    description: What part of GradeVue is broken?
+    options:
+    - Whole site
+    - A specific page
+    - Part of a page/a specific feature
+  validations:
+    required: true
+- type: textarea
+  id: what-happened
+  attributes:
+    label: What happened?
+    description: If this only occurs to a specific page or feature, where does this occur? Does it show an error message? Does the whole page go blank? Is there a spinner on part of the page that never goes away? Please be as specific as possible. Include a screenshot if you can.
+    placeholder: What went wrong and how and where did it occur?
+  validations:
+    required: true
+- type: textarea
+  id: error-messages
+  attributes:
+    label: Error messages
+    description: If GradeVue shows an error screen, please click 'Show error details' and paste the error here. If you know how to access the browser console, please include a screenshot.
+  validations:
+    required: false
