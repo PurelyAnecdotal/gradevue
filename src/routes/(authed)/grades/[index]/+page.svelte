@@ -326,24 +326,6 @@
 		</Alert>
 	{/if}
 
-	{#if unseenAssignments.length > 0 && !hypotheticalMode}
-		<div transition:fade={{ duration: 200 }} class="mt-4">
-			<Alert color="green" border class="mx-4 flex items-center justify-between p-2 text-base">
-				{unseenAssignments.length} new assignments
-				<Button
-					color="green"
-					size="sm"
-					onclick={() => {
-						unseenAssignments.forEach(({ id }) => seenAssignmentIDs.add(id));
-						saveSeenAssignments();
-					}}
-				>
-					Mark as seen
-				</Button>
-			</Alert>
-		</div>
-	{/if}
-
 	<div class="m-4 flex flex-wrap items-center gap-2">
 		<Checkbox bind:checked={hypotheticalMode}>
 			<div id="hypothetical-toggle" class="mr-2 flex items-center">
@@ -397,6 +379,30 @@
 				<CloseCircleOutline />
 
 				Looks like this this course doesn't have any grades yet.
+			</Alert>
+		</div>
+	{/if}
+
+	{#if unseenAssignments.length > 0 && !hypotheticalMode}
+		<div transition:fade={{ duration: 200 }} class="sticky bottom-8 flex justify-center">
+			<Alert
+				color="gray"
+				border
+				class="mx-4 flex w-fit items-center justify-between border-1 p-2 pl-3 text-base shadow-lg/30 dark:border-gray-600"
+			>
+				{unseenAssignments.length} new assignments
+				<Button
+					color="green"
+					size="sm"
+					outline
+					class="cursor-pointer"
+					onclick={() => {
+						unseenAssignments.forEach(({ id }) => seenAssignmentIDs.add(id));
+						saveSeenAssignments();
+					}}
+				>
+					Mark as seen
+				</Button>
 			</Alert>
 		</div>
 	{/if}

@@ -79,7 +79,7 @@
 
 	const percentageChange = $derived(Math.round((gradePercentageChange ?? 0) * 100) / 100);
 
-	const border = $derived(unseen ? 'dark:border-t-green-600 border-t-4' : '');
+	const border = $derived(unseen ? 'dark:border-l-green-600 border-l-4' : '');
 
 	let commentsVisible = $state(false);
 	const toggleComments = () => {
@@ -179,6 +179,9 @@
 		{/if}
 		{#if date}
 			<DateBadge {date} />
+		{/if}
+		{#if unseen}
+			<Badge border color="green">New</Badge>
 		{/if}
 	</div>
 

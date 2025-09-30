@@ -117,6 +117,20 @@ export const loadGradebooks = async () => {
 
 	// Save the state to localStorage
 	saveGradebooksState();
+
+	// If there aren't any seen assignment ids saved, mark all assignments as seen
+	if (seenAssignmentIDs.size === 0) {
+		gradebooksState.records.forEach((record) =>
+			record?.data?.Courses.Course.map((course) => course.Marks)
+				.filter((marks) => marks !== '')
+				.forEach((marks) =>
+					marks.Mark.Assignments.Assignment?.forEach((assignment) =>
+						seenAssignmentIDs.add(assignment._GradebookID)
+					)
+				)
+		);
+		saveSeenAssignments();
+	}
 };
 
 export const showGradebook = async (overrideIndex?: number, forceRefresh = false) => {
