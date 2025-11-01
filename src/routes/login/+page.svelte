@@ -40,6 +40,11 @@
 		if (loggingIn) return;
 		loggingIn = true;
 
+        if (username().includes("@vbstudents.com") {
+			username(username().replace("@vbstudents.com", "");
+			domain("vbcps.studentvue.com");
+		}
+
 		const loginAccount = new StudentAccount(domain, username, password);
 
 		try {
