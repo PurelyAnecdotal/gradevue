@@ -40,8 +40,8 @@
 		if (loggingIn) return;
 		loggingIn = true;
 
-        if (username().includes("@vbstudents.com") {
-			username(username().replace("@vbstudents.com", "");
+        if (username().includes("@vbstudents.com")) {
+			username(username().replace("@vbstudents.com", ""));
 			domain("vbcps.studentvue.com");
 		}
 
