@@ -1,5 +1,6 @@
 {
   "lockfileVersion": 1,
+  "configVersion": 0,
   "workspaces": {
     "": {
       "name": "gradevue",
@@ -27,7 +28,7 @@
         "eslint-plugin-svelte": "^3.11.0",
         "flowbite": "3.1.2",
         "flowbite-svelte": "^0.48.6",
-        "flowbite-svelte-icons": "^2.2.1",
+        "flowbite-svelte-icons": "^3.0.0",
         "globals": "^16.3.0",
         "prettier": "^3.6.2",
         "prettier-plugin-organize-imports": "^4.2.0",
@@ -535,7 +536,7 @@
 
     "flowbite-svelte": ["flowbite-svelte@0.48.6", "", { "dependencies": { "@floating-ui/dom": "^1.6.13", "apexcharts": "^3.54.1", "flowbite": "^3.1.2", "tailwind-merge": "^3.0.1" }, "peerDependencies": { "svelte": "^3.55.1 || ^4.0.0 || ^5.0.0" } }, "sha512-/PmeR3ipHHvda8vVY9MZlymaRoJsk8VddEeoLzIygfYwJV68ey8gHuQPC1dq9J6NDCTE5+xOPtBiYUtVjCfvZw=="],
 
-    "flowbite-svelte-icons": ["flowbite-svelte-icons@2.2.1", "", { "dependencies": { "clsx": "^2.1.1", "tailwind-merge": "^3.3.1" }, "peerDependencies": { "svelte": "^5.0.0" } }, "sha512-SH59319zN4TFpmvFMD7+0ETyDxez4Wyw3mgz7hkjhvrx8HawNAS3Fp7au84pZEs1gniX4hvXIg54U+4YybV2rA=="],
+    "flowbite-svelte-icons": ["flowbite-svelte-icons@3.0.1", "", { "dependencies": { "clsx": "^2.1.1", "tailwind-merge": "^3.4.0" }, "peerDependencies": { "svelte": "^5.0.0" } }, "sha512-fz6OEueSoNau0IZdHHuvDro+iYTeG6o7pYpGk+2jc3Z+/r4MN++M6mAaApp566h56WYY6dFGCApgf7j+8Q9XVA=="],
 
     "foreground-child": ["foreground-child@3.3.0", "", { "dependencies": { "cross-spawn": "^7.0.0", "signal-exit": "^4.0.1" } }, "sha512-Ld2g8rrAyMYFXBhEqMz8ZAHBi4J4uS1i/CxGMDnjyFWddMXLVcDp051DZfu+t7+ab7Wv6SMqpWmyFIj5UbfFvg=="],
 
@@ -970,6 +971,8 @@
     "fast-glob/glob-parent": ["glob-parent@5.1.2", "", { "dependencies": { "is-glob": "^4.0.1" } }, "sha512-AOIgSQCepiJYwP3ARnGx+5VnTu2HBYdzbGP45eLw1vr3zB3vZLeyed1sC9hnbcOc9/SrMyM5RPQrkGz4aS9Zow=="],
 
     "flowbite-datepicker/flowbite": ["flowbite@2.5.2", "", { "dependencies": { "@popperjs/core": "^2.9.3", "flowbite-datepicker": "^1.3.0", "mini-svg-data-uri": "^1.4.3" } }, "sha512-kwFD3n8/YW4EG8GlY3Od9IoKND97kitO+/ejISHSqpn3vw2i5K/+ZI8Jm2V+KC4fGdnfi0XZ+TzYqQb4Q1LshA=="],
+
+    "flowbite-svelte-icons/tailwind-merge": ["tailwind-merge@3.4.0", "", {}, "sha512-uSaO4gnW+b3Y2aWoWfFpX62vn2sR3skfhbjsEnaBI81WD1wBLlHZe5sWf0AqjksNdYTbGBEd0UasQMT3SNV15g=="],
 
     "glob/minimatch": ["minimatch@9.0.5", "", { "dependencies": { "brace-expansion": "^2.0.1" } }, "sha512-G6T0ZX48xgozx7587koeX9Ys2NYy6Gmv//P89sEte9V9whIapMNF4idKxnW2QtCcLiTWlb/wfCabAtAFWhhBow=="],
 
