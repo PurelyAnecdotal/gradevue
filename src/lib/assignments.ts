@@ -11,7 +11,7 @@ export interface Category {
 
 export interface Assignment {
 	name: string;
-	id: string | undefined;
+	id: string;
 	pointsEarned: number | undefined;
 	pointsPossible: number | undefined;
 	unscaledPoints: { pointsEarned: number; pointsPossible: number } | undefined;
@@ -26,14 +26,12 @@ export interface Assignment {
 }
 
 export interface RealAssignment extends Assignment {
-	id: string;
 	hidden: false;
 	category: string;
 	newHypothetical: false;
 }
 
 export interface HiddenAssignment extends Assignment {
-	id: undefined;
 	pointsEarned: number;
 	pointsPossible: number;
 	unscaledPoints: undefined;
@@ -49,7 +47,6 @@ export interface ReactiveAssignment extends Assignment {
 }
 
 export interface NewHypotheticalAssignment extends ReactiveAssignment {
-	id: string;
 	newHypothetical: true;
 	unscaledPoints: undefined;
 	extraCredit: false;
@@ -293,7 +290,7 @@ export function getHiddenAssignmentsFromCategories(
 
 			const hiddenAssignment: Flowed<HiddenAssignment> = {
 				name: `Hidden ${category.name} Assignments`,
-				id: undefined,
+				id: randomAssignmentID(),
 				pointsEarned: hiddenPointsEarned,
 				pointsPossible: hiddenPointsPossible,
 				unscaledPoints: undefined,
@@ -310,6 +307,8 @@ export function getHiddenAssignmentsFromCategories(
 		})
 		.filter((x) => x !== null);
 }
+
+export const randomAssignmentID = () => Math.random().toString(36).substring(2, 15);
 
 export function getPointsByCategory<T extends Assignment>(assignments: Calculable<T>[]) {
 	const pointsByCategory: PointsByCategory = {};
@@ -359,7 +358,7 @@ export function gradesMatch(rawGrade: number, expectedGrade: number) {
 	return roundedMatches || flooredMatches;
 }
 
-function getAssignmentPointTotals<T extends Assignment>(assignments: Calculable<T>[]) {
+export function getAssignmentPointTotals<T extends Assignment>(assignments: Calculable<T>[]) {
 	let pointsEarned = 0;
 	let pointsPossible = 0;
 
@@ -546,4 +545,99 @@ export function parseSynergyAssignment(synergyAssignment: AssignmentEntity) {
 	};
 
 	return assignment;
+}
+
+export interface CategoryWeight {
+	name: string;
+	weightPercentage: number;
+}
+
+export interface TargetGradeCalculatorCategoryDetails {
+	gradeCategoryWeights: CategoryWeight[];
+	assignmentCategoryName: string;
+}
+
+export function calculatePointsNeededForTargetGrade<T extends Assignment>({
+	targetGradePercentage,
+	assignmentPointsPossible,
+	otherAssignments,
+	categoryDetails
+}: {
+	targetGradePercentage: number;
+	assignmentPointsPossible: number;
+	otherAssignments: Calculable<T>[];
+	categoryDetails?: TargetGradeCalculatorCategoryDetails;
+}) {
+	const targetGradeProportion = targetGradePercentage / 100;
+
+	if (categoryDetails) {
+		const { gradeCategoryWeights: gradeCategories, assignmentCategoryName } = categoryDetails;
+
+		const assignmentCategory = gradeCategories.find(
+			(category) => category.name === assignmentCategoryName
+		);
+		if (!assignmentCategory) {
+			console.error(
+				`Cannot calculate points needed for target grade: gradeCategories does not contain ${assignmentCategoryName}`
+			);
+			return NaN;
+		}
+
+		const pointsByCategory = getPointsByCategory(otherAssignments);
+		if (Object.entries(pointsByCategory).length === 0) {
+			console.error(
+				'Cannot calculate points needed for target grade: gradeCategories has no categories'
+			);
+			return NaN;
+		}
+
+		// should be one but just in case
+		const totalWeightProportion = Object.entries(gradeCategories)
+			.map(([_, { weightPercentage }]) => weightPercentage / 100)
+			.reduce((a, b) => a + b, 0);
+
+		if (totalWeightProportion !== 1)
+			console.warn(`Total weight of categories is not 100% (is ${totalWeightProportion * 100}%)`);
+
+		const categoryWeightProportion = assignmentCategory.weightPercentage / 100;
+
+		let otherCategoriesWeightedGradeProportion = 0;
+		Object.entries(pointsByCategory)
+			.filter(([categoryName]) => categoryName !== assignmentCategory.name)
+			.forEach(([categoryName, { pointsEarned, pointsPossible }]) => {
+				if (pointsPossible === 0) return;
+
+				const category = gradeCategories.find((category) => category.name === categoryName);
+				if (!category) return;
+
+				otherCategoriesWeightedGradeProportion +=
+					(pointsEarned / pointsPossible) * (category.weightPercentage / 100);
+			});
+
+		const categoryWeightedGradeProportion =
+			targetGradeProportion * totalWeightProportion - otherCategoriesWeightedGradeProportion;
+
+		const categoryGradeProportion = categoryWeightedGradeProportion / categoryWeightProportion;
+
+		const { pointsEarned: categoryOtherPointsEarned, pointsPossible: categoryOtherPointsPossible } =
+			getAssignmentPointTotals(
+				otherAssignments.filter((assignment) => assignment.category === assignmentCategory.name)
+			);
+
+		const categoryTotalPointsPossible = categoryOtherPointsPossible + assignmentPointsPossible;
+
+		const assignmentPointsNeeded =
+			categoryGradeProportion * categoryTotalPointsPossible - categoryOtherPointsEarned;
+
+		return assignmentPointsNeeded;
+	} else {
+		const { pointsEarned: otherPointsEarned, pointsPossible: otherPointsPossible } =
+			getAssignmentPointTotals(otherAssignments);
+
+		const pointsPossible = assignmentPointsPossible + otherPointsPossible;
+
+		const assignmentPointsNeeded = targetGradeProportion * pointsPossible - otherPointsEarned;
+
+		return assignmentPointsNeeded;
+	}
 }

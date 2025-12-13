@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { page } from '$app/state';
-	import { removeClassID } from '$lib';
+	import { LocalStorageKey, numberFlowDefaultEasing, removeClassID } from '$lib';
 	import {
 		type Assignment,
 		calculateAssignmentGPCs,
@@ -10,6 +10,7 @@
 		calculateCourseGradePercentageFromTotals,
 		calculateGradePercentage,
 		type Category,
+		type CategoryWeight,
 		type Flowed,
 		getCalculableAssignments,
 		getHiddenAssignmentsFromCategories,
@@ -19,6 +20,7 @@
 		type HiddenAssignment,
 		type NewHypotheticalAssignment,
 		parseSynergyAssignment,
+		randomAssignmentID,
 		type ReactiveAssignment,
 		type RealAssignment
 	} from '$lib/assignments';
@@ -27,6 +29,7 @@
 		Alert,
 		Button,
 		Checkbox,
+		Modal,
 		Popover,
 		TabItem,
 		Table,
@@ -37,6 +40,7 @@
 		TableHeadCell,
 		Tabs
 	} from 'flowbite-svelte';
+	import AddColumnAfterOutline from 'flowbite-svelte-icons/AddColumnAfterOutline.svelte';
 	import ChevronDownOutline from 'flowbite-svelte-icons/ChevronDownOutline.svelte';
 	import ChevronUpOutline from 'flowbite-svelte-icons/ChevronUpOutline.svelte';
 	import CloseCircleOutline from 'flowbite-svelte-icons/CloseCircleOutline.svelte';
@@ -53,6 +57,7 @@
 	} from '../gradebook.svelte';
 	import AssignmentCard from './AssignmentCard.svelte';
 	import GradeChart from './GradeChart.svelte';
+	import TargetGradeCalculator from './TargetGradeCalculator.svelte';
 
 	const gradebookState = $derived(getCurrentGradebookState(gradebooksState));
 
@@ -121,12 +126,13 @@
 			: calculateCourseGradePercentageFromTotals(calculable);
 
 		hypotheticalGrade = calculatedGrade;
+
+		showTargetGradeCalculator = false;
 	}
 
 	// Initialize reactive assignments and re-initialize them when assignments change
 	$effect(() => {
-		// eslint-disable-next-line @typescript-eslint/no-unused-expressions
-		assignments;
+		void assignments;
 
 		untrack(initReactiveAssignments);
 	});
@@ -153,7 +159,7 @@
 	function addHypotheticalAssignment() {
 		const newHypotheticalAssignment: NewHypotheticalAssignment = $state({
 			name: 'Hypothetical Assignment',
-			id: Math.random().toString(36).substring(2, 15),
+			id: randomAssignmentID(),
 			pointsEarned: undefined,
 			pointsPossible: undefined,
 			unscaledPoints: undefined,
@@ -161,7 +167,7 @@
 			gradePercentageChange: undefined,
 			notForGrade: false,
 			hidden: false,
-			category: 'Select category',
+			category: undefined,
 			newHypothetical: true,
 			date: new Date(),
 			reactive: true
@@ -174,23 +180,38 @@
 
 	const prefix = $derived(hypotheticalMode ? '' : mark?._CalculatedScoreString + ' ');
 
-	const value = $derived(
+	const grade = $derived(
 		hypotheticalMode
 			? hypotheticalGrade / 100
 			: mark
 				? parseFloat(mark._CalculatedScoreRaw) / 100
 				: undefined
 	);
-
-	// https://github.com/barvian/number-flow/blob/e9fc6999417df7cb7e7b290f7f2019f570c18cc7/packages/number-flow/src/index.ts#L73
-	const easing =
-		'linear(0,.005,.019,.039,.066,.096,.129,.165,.202,.24,.278,.316,.354,.39,.426,.461,.494,.526,.557,.586,.614,.64,.665,.689,.711,.731,.751,.769,.786,.802,.817,.831,.844,.856,.867,.877,.887,.896,.904,.912,.919,.925,.931,.937,.942,.947,.951,.955,.959,.962,.965,.968,.971,.973,.976,.978,.98,.981,.983,.984,.986,.987,.988,.989,.99,.991,.992,.992,.993,.994,.994,.995,.995,.996,.996,.9963,.9967,.9969,.9972,.9975,.9977,.9979,.9981,.9982,.9984,.9985,.9987,.9988,.9989,1)';
-
 	const unseenAssignments = $derived(
 		realAssignments.filter(({ id }) => !seenAssignmentIDs.has(id))
 	);
 
 	let pinChart = $state(false);
+
+	let showTargetGradeCalculator = $state(false);
+	function toggleTargetGradeCalculator() {
+		showTargetGradeCalculator = !showTargetGradeCalculator;
+	}
+	const gradeCategoryWeights: CategoryWeight[] | undefined = $derived(
+		gradeCategories?.map(({ name, weightPercentage }) => ({
+			name,
+			weightPercentage
+		}))
+	);
+
+	let showFinalsGradeCalcInfo = $state(
+		localStorage.getItem(LocalStorageKey.dismissedFinalsGradeCalcInfo) === null
+	);
+	let finalsGradeCalcInfoModalOpen = $state(false);
+	function dismissFinalsGradeCalcInfo() {
+		showFinalsGradeCalcInfo = false;
+		localStorage.setItem(LocalStorageKey.dismissedFinalsGradeCalcInfo, 'true');
+	}
 </script>
 
 <svelte:head>
@@ -207,12 +228,12 @@
 				{#if hypotheticalMode && !categories && !rawGradeCalcMatches}
 					<ExclamationCircleSolid class="mr-2" />
 				{/if}
-				{#if value}
+				{#if grade !== undefined}
 					<NumberFlow
 						{prefix}
-						{value}
+						value={grade}
 						format={{ style: 'percent', maximumFractionDigits: 3 }}
-						spinTiming={{ duration: 400, easing }}
+						spinTiming={{ duration: 400, easing: numberFlowDefaultEasing }}
 					/>
 				{/if}
 			</span>
@@ -333,7 +354,7 @@
 				<InfoCircleOutline size="sm" class="ml-2" />
 			</div>
 		</Checkbox>
-		<Popover triggeredBy="#hypothetical-toggle" class="max-w-md">
+		<Popover triggeredBy="#hypothetical-toggle" class="max-w-md text-sm dark:text-gray-300">
 			Hypothetical mode allows you to see what your grade would be if you got a certain score on an
 			assignment.
 		</Popover>
@@ -349,6 +370,13 @@
 					Reset
 				</Button>
 
+				{#if !showTargetGradeCalculator}
+					<Button color="light" size="sm" onclick={toggleTargetGradeCalculator}>
+						<AddColumnAfterOutline size="sm" class="mr-2" />
+						Target Grade Calculator
+					</Button>
+				{/if}
+
 				<Button color="light" size="sm" onclick={addHypotheticalAssignment}>
 					<GridPlusOutline size="sm" class="mr-2" />
 					Add Hypothetical Assignment
@@ -356,6 +384,71 @@
 			</div>
 		{/if}
 	</div>
+
+	{#if showFinalsGradeCalcInfo && (Date.now() - 1765608120379) / (1000 * 60 * 60 * 24) < 5 && !showTargetGradeCalculator}
+		<p class="px-4 text-sm dark:text-gray-400">
+			<InfoCircleOutline size="sm" class="inline" /> Finals grade calculation is now available.
+			<button
+				onclick={() => {
+					finalsGradeCalcInfoModalOpen = true;
+				}}
+				class="cursor-pointer underline">See how</button
+			>
+		</p>
+
+		<Modal
+			bind:open={finalsGradeCalcInfoModalOpen}
+			title="Finals Grade Calculation"
+			headerClass="flex items-center p-4 md:p-5 justify-between rounded-t-lg shrink-0 text-xl font-semibold text-gray-900 dark:text-white"
+			outsideclose={true}
+		>
+			<p class="text-sm dark:text-gray-300">
+				GradeVue can show you what grade you need to get on your final exam to achieve a desired
+				overall course grade.
+			</p>
+
+			<ol class="list-decimal space-y-2 pl-4 text-sm dark:text-gray-300">
+				<li>Enable Hypothetical Mode</li>
+				<li>
+					<p>See if your final has already been entered as a placeholder.</p>
+					<p>
+						If not, create a hypothetical assignment for it, select the final category for your
+						class (if applicable), and enter how many points it's out of.
+					</p>
+				</li>
+				<li>
+					Open the target grade calculator.
+					<Button color="light" size="sm" disabled>
+						<AddColumnAfterOutline size="sm" class="mr-2" />
+						Target Grade Calculator
+					</Button>
+				</li>
+				<li>
+					Enter your desired overall grade and select the assignment representing your final.
+				</li>
+			</ol>
+
+			<img
+				class="mx-auto w-xs"
+				src="/target-grade-calc-demo.png"
+				alt="Target grade calculator demonstration"
+			/>
+
+			<button
+				onclick={dismissFinalsGradeCalcInfo}
+				class="cursor-pointer text-sm underline dark:text-gray-300">Dismiss message</button
+			>
+		</Modal>
+	{/if}
+
+	{#if hypotheticalMode && showTargetGradeCalculator}
+		<TargetGradeCalculator
+			initialGradePercentage={grade !== undefined ? Math.round(grade * 100000) / 1000 : undefined}
+			assignments={reactiveAssignments}
+			{gradeCategoryWeights}
+			onclose={toggleTargetGradeCalculator}
+		/>
+	{/if}
 
 	{#if synergyAssignments.length > 0 || hypotheticalMode}
 		<div transition:fade={{ duration: 200 }}>
@@ -368,7 +461,7 @@
 							.map((assignment) => assignment.category)
 							.toSorted())] as categoryName (categoryName)}
 					<TabItem title={categoryName}>
-						{@render assignmentList((assignment) => assignment.category === categoryName)}
+						{@render assignmentList((assignment) => assignment.category === categoryName, false)}
 					</TabItem>
 				{/each}
 			</Tabs>
@@ -388,7 +481,7 @@
 			<Alert
 				color="gray"
 				border
-				class="mx-4 flex w-fit items-center justify-between border-1 p-2 pl-3 text-base shadow-lg/30 dark:border-gray-600"
+				class="mx-4 flex w-fit items-center justify-between border p-2 pl-3 text-base shadow-lg/30 dark:border-gray-600"
 			>
 				{unseenAssignments.length} new assignments
 				<Button
@@ -408,18 +501,18 @@
 	{/if}
 {/if}
 
-{#snippet assignmentList(filter?: (assignment: Assignment) => boolean)}
+{#snippet assignmentList(filter?: (assignment: Assignment) => boolean, showCategory = true)}
 	<ol class="space-y-4">
 		{#if hypotheticalMode}
 			{#each reactiveAssignments as assignment, i (assignment.id)}
 				{#if (!filter || filter(assignment)) && reactiveAssignments[i]}
-					{@render boundAssignmentSnippet(assignment, reactiveAssignments, i)}
+					{@render boundAssignmentSnippet(assignment, reactiveAssignments, i, showCategory)}
 				{/if}
 			{/each}
 		{:else}
 			{#each assignments as assignment (assignment.id)}
 				{#if !filter || filter(assignment)}
-					{@render assignmentSnippet(assignment)}
+					{@render assignmentSnippet(assignment, showCategory)}
 				{/if}
 			{/each}
 		{/if}
@@ -439,7 +532,8 @@
 		hidden,
 		category,
 		comments,
-		date
+		date,
+		newHypothetical
 	}: RealAssignment | Flowed<RealAssignment | HiddenAssignment>,
 	showCategory = true
 )}
@@ -453,6 +547,7 @@
 			gradePercentageChange={rawGradeCalcMatches ? gradePercentageChange : undefined}
 			{notForGrade}
 			{hidden}
+			showHypotheticalLabel={newHypothetical}
 			category={showCategory ? category : undefined}
 			{date}
 			{comments}
