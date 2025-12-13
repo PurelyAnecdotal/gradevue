@@ -3,7 +3,9 @@
 	import {
 		calculatePointsNeededForTargetGrade,
 		getCalculableAssignments,
+		type CategoryWeight,
 		type ReactiveAssignment,
+		type TargetGradeCalculatorCategoryDetails
 	} from '$lib/assignments';
 	import NumberInput from '$lib/components/NumberInput.svelte';
 	import NumberFlow, { NumberFlowGroup } from '@number-flow/svelte';
@@ -17,9 +19,10 @@
 		initialGradePercentage?: number;
 		assignments: ReactiveAssignment[];
 		onclose: () => void;
+		gradeCategoryWeights?: CategoryWeight[];
 	}
 
-	const { assignments, initialGradePercentage, onclose }: Props = $props();
+	const { assignments, initialGradePercentage, gradeCategoryWeights, onclose }: Props = $props();
 
 	let targetGradePercentage = $state(initialGradePercentage);
 	let targetAssignment = $state<ReactiveAssignment | undefined>(undefined);
@@ -41,14 +44,24 @@
 		getCalculableAssignments(assignments).filter(({ id }) => id !== targetAssignment?.id)
 	);
 
+	const categoryDetails: TargetGradeCalculatorCategoryDetails | undefined = $derived(
+		gradeCategoryWeights && targetAssignment?.category
+			? {
+					gradeCategoryWeights,
+					assignmentCategoryName: targetAssignment.category
+				}
+			: undefined
+	);
+
 	const targetGradePointsNeeded = $derived(
-		targetGradePercentage === undefined || targetAssignment?.pointsPossible === undefined
-			? undefined
-			: calculatePointsNeededForTargetGrade({
+		targetGradePercentage !== undefined && targetAssignment?.pointsPossible !== undefined
+			? calculatePointsNeededForTargetGrade({
 					targetGradePercentage,
 					assignmentPointsPossible: targetAssignment.pointsPossible,
-					otherAssignments
+					otherAssignments,
+					categoryDetails
 				})
+			: undefined
 	);
 </script>
 
@@ -87,7 +100,7 @@
 		{/if}
 	</div>
 
-	{#if targetAssignment?.pointsPossible !== undefined && targetGradePointsNeeded !== undefined}
+	{#if targetAssignment?.pointsPossible !== undefined && !(gradeCategoryWeights && targetAssignment.category === undefined) && targetGradePointsNeeded !== undefined}
 		<p class="mt-4 text-sm dark:text-gray-300">Required assignment grade:</p>
 
 		<div class="mt-2 ml-auto w-fit text-lg">
@@ -114,6 +127,10 @@
 			Selected assignment is missing the "points possible" value.
 		</p>
 	{/if}
+
+	{#if targetAssignment && gradeCategoryWeights && targetAssignment.category === undefined}
+		<p class="mt-4 text-sm dark:text-gray-300">Selected assignment is missing a category.</p>
+	{/if}
 </div>
 
 <Modal
@@ -124,8 +141,8 @@
 	outsideclose={true}
 >
 	<p class="text-sm dark:text-gray-300">
-		To use an assignment that has not yet been entered, first create it as a hypothetical assignment
-		and then select it in this menu.
+		To use an assignment that has not yet been entered, first create it as a hypothetical
+		assignment, then select it in this menu.
 	</p>
 
 	<ol class="space-y-4">

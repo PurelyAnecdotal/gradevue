@@ -547,23 +547,97 @@ export function parseSynergyAssignment(synergyAssignment: AssignmentEntity) {
 	return assignment;
 }
 
+export interface CategoryWeight {
+	name: string;
+	weightPercentage: number;
+}
+
+export interface TargetGradeCalculatorCategoryDetails {
+	gradeCategoryWeights: CategoryWeight[];
+	assignmentCategoryName: string;
+}
+
 export function calculatePointsNeededForTargetGrade<T extends Assignment>({
 	targetGradePercentage,
 	assignmentPointsPossible,
-	otherAssignments
+	otherAssignments,
+	categoryDetails
 }: {
 	targetGradePercentage: number;
 	assignmentPointsPossible: number;
 	otherAssignments: Calculable<T>[];
+	categoryDetails?: TargetGradeCalculatorCategoryDetails;
 }) {
-	const targetGrade = targetGradePercentage / 100;
+	const targetGradeProportion = targetGradePercentage / 100;
 
-	const { pointsEarned: otherPointsEarned, pointsPossible: otherPointsPossible } =
-		getAssignmentPointTotals(otherAssignments);
+	if (categoryDetails) {
+		const { gradeCategoryWeights: gradeCategories, assignmentCategoryName } = categoryDetails;
 
-	const pointsPossible = assignmentPointsPossible + otherPointsPossible;
+		const assignmentCategory = gradeCategories.find(
+			(category) => category.name === assignmentCategoryName
+		);
+		if (!assignmentCategory) {
+			console.error(
+				`Cannot calculate points needed for target grade: gradeCategories does not contain ${assignmentCategoryName}`
+			);
+			return NaN;
+		}
 
-	const assignmentPointsNeeded = targetGrade * pointsPossible - otherPointsEarned;
+		const pointsByCategory = getPointsByCategory(otherAssignments);
+		if (Object.entries(pointsByCategory).length === 0) {
+			console.error(
+				'Cannot calculate points needed for target grade: gradeCategories has no categories'
+			);
+			return NaN;
+		}
 
-	return assignmentPointsNeeded;
+		// should be one but just in case
+		const totalWeightProportion = Object.entries(gradeCategories)
+			.map(([_, { weightPercentage }]) => weightPercentage / 100)
+			.reduce((a, b) => a + b, 0);
+
+		if (totalWeightProportion !== 1)
+			console.warn(`Total weight of categories is not 100% (is ${totalWeightProportion * 100}%)`);
+
+		const categoryWeightProportion = assignmentCategory.weightPercentage / 100;
+
+		let otherCategoriesWeightedGradeProportion = 0;
+		Object.entries(pointsByCategory)
+			.filter(([categoryName]) => categoryName !== assignmentCategory.name)
+			.forEach(([categoryName, { pointsEarned, pointsPossible }]) => {
+				if (pointsPossible === 0) return;
+
+				const category = gradeCategories.find((category) => category.name === categoryName);
+				if (!category) return;
+
+				otherCategoriesWeightedGradeProportion +=
+					(pointsEarned / pointsPossible) * (category.weightPercentage / 100);
+			});
+
+		const categoryWeightedGradeProportion =
+			targetGradeProportion * totalWeightProportion - otherCategoriesWeightedGradeProportion;
+
+		const categoryGradeProportion = categoryWeightedGradeProportion / categoryWeightProportion;
+
+		const { pointsEarned: categoryOtherPointsEarned, pointsPossible: categoryOtherPointsPossible } =
+			getAssignmentPointTotals(
+				otherAssignments.filter((assignment) => assignment.category === assignmentCategory.name)
+			);
+
+		const categoryTotalPointsPossible = categoryOtherPointsPossible + assignmentPointsPossible;
+
+		const assignmentPointsNeeded =
+			categoryGradeProportion * categoryTotalPointsPossible - categoryOtherPointsEarned;
+
+		return assignmentPointsNeeded;
+	} else {
+		const { pointsEarned: otherPointsEarned, pointsPossible: otherPointsPossible } =
+			getAssignmentPointTotals(otherAssignments);
+
+		const pointsPossible = assignmentPointsPossible + otherPointsPossible;
+
+		const assignmentPointsNeeded = targetGradeProportion * pointsPossible - otherPointsEarned;
+
+		return assignmentPointsNeeded;
+	}
 }
