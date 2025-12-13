@@ -111,7 +111,7 @@
 
 			{#if categoryDropdownOptions.length > 0}
 				<Button color="light">
-					{category ?? 'Category'}
+					{category ?? 'Select category'}
 					<ChevronDownOutline size="xs" class="ml-2" />
 				</Button>
 
@@ -132,7 +132,7 @@
 		{:else}
 			<span>{name}</span>
 		{/if}
-		{#if category !== undefined && (!editable || categoryDropdownOptions.length === 0) && !showHypotheticalLabel}
+		{#if category !== undefined && (!editable || categoryDropdownOptions.length === 0)}
 			<Badge color={getCategoryColor(category)}>
 				{category}
 			</Badge>
@@ -175,7 +175,7 @@
 			</Badge>
 		{/if}
 		{#if showHypotheticalLabel}
-			<Badge border color="dark">Hypothetical Assignment</Badge>
+			<Badge border color="dark">Hypothetical</Badge>
 		{/if}
 		{#if date}
 			<DateBadge {date} />
@@ -231,6 +231,7 @@
 		{#if editable}
 			<div class="flex w-32 items-center">
 				<NumberInput
+					title="Points earned"
 					type="number"
 					size="sm"
 					bind:value={pointsEarned}
@@ -238,6 +239,7 @@
 				/>
 				<span class="mx-1"> / </span>
 				<NumberInput
+					title="Points possible"
 					type="number"
 					size="sm"
 					bind:value={pointsPossible}

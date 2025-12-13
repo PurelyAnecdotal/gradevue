@@ -11,7 +11,7 @@ export interface Category {
 
 export interface Assignment {
 	name: string;
-	id: string | undefined;
+	id: string;
 	pointsEarned: number | undefined;
 	pointsPossible: number | undefined;
 	unscaledPoints: { pointsEarned: number; pointsPossible: number } | undefined;
@@ -26,14 +26,12 @@ export interface Assignment {
 }
 
 export interface RealAssignment extends Assignment {
-	id: string;
 	hidden: false;
 	category: string;
 	newHypothetical: false;
 }
 
 export interface HiddenAssignment extends Assignment {
-	id: undefined;
 	pointsEarned: number;
 	pointsPossible: number;
 	unscaledPoints: undefined;
@@ -49,7 +47,6 @@ export interface ReactiveAssignment extends Assignment {
 }
 
 export interface NewHypotheticalAssignment extends ReactiveAssignment {
-	id: string;
 	newHypothetical: true;
 	unscaledPoints: undefined;
 	extraCredit: false;
@@ -293,7 +290,7 @@ export function getHiddenAssignmentsFromCategories(
 
 			const hiddenAssignment: Flowed<HiddenAssignment> = {
 				name: `Hidden ${category.name} Assignments`,
-				id: undefined,
+				id: randomAssignmentID(),
 				pointsEarned: hiddenPointsEarned,
 				pointsPossible: hiddenPointsPossible,
 				unscaledPoints: undefined,
@@ -310,6 +307,8 @@ export function getHiddenAssignmentsFromCategories(
 		})
 		.filter((x) => x !== null);
 }
+
+export const randomAssignmentID = () => Math.random().toString(36).substring(2, 15);
 
 export function getPointsByCategory<T extends Assignment>(assignments: Calculable<T>[]) {
 	const pointsByCategory: PointsByCategory = {};
@@ -359,7 +358,7 @@ export function gradesMatch(rawGrade: number, expectedGrade: number) {
 	return roundedMatches || flooredMatches;
 }
 
-function getAssignmentPointTotals<T extends Assignment>(assignments: Calculable<T>[]) {
+export function getAssignmentPointTotals<T extends Assignment>(assignments: Calculable<T>[]) {
 	let pointsEarned = 0;
 	let pointsPossible = 0;
 
@@ -546,4 +545,25 @@ export function parseSynergyAssignment(synergyAssignment: AssignmentEntity) {
 	};
 
 	return assignment;
+}
+
+export function calculatePointsNeededForTargetGrade<T extends Assignment>({
+	targetGradePercentage,
+	assignmentPointsPossible,
+	otherAssignments
+}: {
+	targetGradePercentage: number;
+	assignmentPointsPossible: number;
+	otherAssignments: Calculable<T>[];
+}) {
+	const targetGrade = targetGradePercentage / 100;
+
+	const { pointsEarned: otherPointsEarned, pointsPossible: otherPointsPossible } =
+		getAssignmentPointTotals(otherAssignments);
+
+	const pointsPossible = assignmentPointsPossible + otherPointsPossible;
+
+	const assignmentPointsNeeded = targetGrade * pointsPossible - otherPointsEarned;
+
+	return assignmentPointsNeeded;
 }
