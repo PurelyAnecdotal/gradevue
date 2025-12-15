@@ -3,9 +3,10 @@
 	import {
 		calculatePointsNeededForTargetGrade,
 		getCalculableAssignments,
+		getCalculableAssignmentsWithCategories,
 		type CategoryWeight,
 		type ReactiveAssignment,
-		type TargetGradeCalculatorCategoryDetails
+		type TargetGradeCalculatorCategoryDependentOptions
 	} from '$lib/assignments';
 	import NumberInput from '$lib/components/NumberInput.svelte';
 	import NumberFlow, { NumberFlowGroup } from '@number-flow/svelte';
@@ -40,26 +41,36 @@
 		});
 	});
 
-	const otherAssignments = $derived(
-		getCalculableAssignments(assignments).filter(({ id }) => id !== targetAssignment?.id)
-	);
-
-	const categoryDetails: TargetGradeCalculatorCategoryDetails | undefined = $derived(
+	const categoryDependentOptions:
+		| TargetGradeCalculatorCategoryDependentOptions<ReactiveAssignment>
+		| undefined = $derived(
 		gradeCategoryWeights && targetAssignment?.category
 			? {
+					hasCategories: true,
+					otherAssignments: getCalculableAssignmentsWithCategories(assignments).filter(
+						({ id }) => id !== targetAssignment?.id
+					),
 					gradeCategoryWeights,
 					assignmentCategoryName: targetAssignment.category
 				}
-			: undefined
+			: gradeCategoryWeights === undefined
+				? {
+						hasCategories: false,
+						otherAssignments: getCalculableAssignments(assignments).filter(
+							({ id }) => id !== targetAssignment?.id
+						)
+					}
+				: undefined
 	);
 
 	const targetGradePointsNeeded = $derived(
-		targetGradePercentage !== undefined && targetAssignment?.pointsPossible !== undefined
+		targetGradePercentage !== undefined &&
+			targetAssignment?.pointsPossible !== undefined &&
+			categoryDependentOptions
 			? calculatePointsNeededForTargetGrade({
 					targetGradePercentage,
 					assignmentPointsPossible: targetAssignment.pointsPossible,
-					otherAssignments,
-					categoryDetails
+					...categoryDependentOptions
 				})
 			: undefined
 	);
