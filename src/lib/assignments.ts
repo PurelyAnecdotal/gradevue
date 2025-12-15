@@ -57,6 +57,9 @@ export type Calculable<T extends Assignment> = T & {
 	pointsEarned: number;
 	pointsPossible: number;
 	notForGrade: false;
+};
+
+export type CalculableWithCategory<T extends Assignment> = Calculable<T> & {
 	category: string;
 };
 
@@ -137,7 +140,7 @@ function flowAssignmentFromTotals<T extends Assignment>(
 }
 
 function flowAssignmentFromCategories<T extends Assignment>(
-	assignment: Calculable<T>,
+	assignment: CalculableWithCategory<T>,
 	pointsByCategory: PointsByCategory,
 	gradeCategories: Category[]
 ): { assignment: Flowed<T>; pointsByCategory: PointsByCategory } {
@@ -185,7 +188,7 @@ export function calculateAssignmentGPCsFromCategories<T extends Assignment>(
 			)
 				return assignment;
 
-			const calculable: Calculable<T> = {
+			const calculable: CalculableWithCategory<T> = {
 				...assignment,
 				pointsEarned,
 				pointsPossible,
@@ -310,7 +313,9 @@ export function getHiddenAssignmentsFromCategories(
 
 export const randomAssignmentID = () => Math.random().toString(36).substring(2, 15);
 
-export function getPointsByCategory<T extends Assignment>(assignments: Calculable<T>[]) {
+export function getPointsByCategory<T extends Assignment>(
+	assignments: CalculableWithCategory<T>[]
+) {
 	const pointsByCategory: PointsByCategory = {};
 
 	assignments.forEach((assignment) => {
@@ -397,6 +402,25 @@ export function getCalculableAssignments<T extends Assignment>(assignments: T[])
 		.map((assignment) => {
 			const { pointsEarned, pointsPossible, notForGrade, category } = assignment;
 
+			if (pointsEarned === undefined || pointsPossible === undefined || notForGrade) return null;
+
+			const calculable: Calculable<T> = {
+				...assignment,
+				pointsEarned,
+				pointsPossible,
+				notForGrade
+			};
+
+			return calculable;
+		})
+		.filter((assignments) => assignments !== null);
+}
+
+export function getCalculableAssignmentsWithCategories<T extends Assignment>(assignments: T[]) {
+	return assignments
+		.map((assignment) => {
+			const { pointsEarned, pointsPossible, notForGrade, category } = assignment;
+
 			if (
 				pointsEarned === undefined ||
 				pointsPossible === undefined ||
@@ -405,7 +429,7 @@ export function getCalculableAssignments<T extends Assignment>(assignments: T[])
 			)
 				return null;
 
-			const calculable: Calculable<T> = {
+			const calculable: CalculableWithCategory<T> = {
 				...assignment,
 				pointsEarned,
 				pointsPossible,
@@ -552,28 +576,35 @@ export interface CategoryWeight {
 	weightPercentage: number;
 }
 
-export interface TargetGradeCalculatorCategoryDetails {
-	gradeCategoryWeights: CategoryWeight[];
-	assignmentCategoryName: string;
-}
+export type TargetGradeCalculatorCategoryDependentOptions<T extends Assignment> =
+	| {
+			hasCategories: false;
+			otherAssignments: Calculable<T>[];
+	  }
+	| {
+			hasCategories: true;
+			otherAssignments: CalculableWithCategory<T>[];
+			gradeCategoryWeights: CategoryWeight[];
+			assignmentCategoryName: string;
+	  };
+
+type TargetGradeCalculatorOptions<T extends Assignment> = {
+	targetGradePercentage: number;
+	assignmentPointsPossible: number;
+} & TargetGradeCalculatorCategoryDependentOptions<T>;
 
 export function calculatePointsNeededForTargetGrade<T extends Assignment>({
 	targetGradePercentage,
 	assignmentPointsPossible,
-	otherAssignments,
-	categoryDetails
-}: {
-	targetGradePercentage: number;
-	assignmentPointsPossible: number;
-	otherAssignments: Calculable<T>[];
-	categoryDetails?: TargetGradeCalculatorCategoryDetails;
-}) {
+	...categoryDependentParams
+}: TargetGradeCalculatorOptions<T>) {
 	const targetGradeProportion = targetGradePercentage / 100;
 
-	if (categoryDetails) {
-		const { gradeCategoryWeights: gradeCategories, assignmentCategoryName } = categoryDetails;
+	if (categoryDependentParams.hasCategories) {
+		const { otherAssignments, gradeCategoryWeights, assignmentCategoryName } =
+			categoryDependentParams;
 
-		const assignmentCategory = gradeCategories.find(
+		const assignmentCategory = gradeCategoryWeights.find(
 			(category) => category.name === assignmentCategoryName
 		);
 		if (!assignmentCategory) {
@@ -592,7 +623,7 @@ export function calculatePointsNeededForTargetGrade<T extends Assignment>({
 		}
 
 		// should be one but just in case
-		const totalWeightProportion = Object.entries(gradeCategories)
+		const totalWeightProportion = Object.entries(gradeCategoryWeights)
 			.map(([_, { weightPercentage }]) => weightPercentage / 100)
 			.reduce((a, b) => a + b, 0);
 
@@ -607,7 +638,7 @@ export function calculatePointsNeededForTargetGrade<T extends Assignment>({
 			.forEach(([categoryName, { pointsEarned, pointsPossible }]) => {
 				if (pointsPossible === 0) return;
 
-				const category = gradeCategories.find((category) => category.name === categoryName);
+				const category = gradeCategoryWeights.find((category) => category.name === categoryName);
 				if (!category) return;
 
 				otherCategoriesWeightedGradeProportion +=
@@ -631,6 +662,8 @@ export function calculatePointsNeededForTargetGrade<T extends Assignment>({
 
 		return assignmentPointsNeeded;
 	} else {
+		const { otherAssignments } = categoryDependentParams;
+
 		const { pointsEarned: otherPointsEarned, pointsPossible: otherPointsPossible } =
 			getAssignmentPointTotals(otherAssignments);
 
