@@ -10,11 +10,12 @@
 		calculateCourseGradePercentageFromTotals,
 		calculateGradePercentage,
 		type Category,
-		type CategoryWeight,
 		type Flowed,
 		getCalculableAssignments,
+		getCalculableAssignmentsWithCategories,
 		getHiddenAssignmentsFromCategories,
 		getPointsByCategory,
+		getPointsByCategoryMap,
 		getSynergyCourseAssignmentCategories,
 		gradesMatch,
 		type HiddenAssignment,
@@ -140,21 +141,39 @@
 	function recalculateGradePercentage() {
 		if (gradeCategories === undefined) {
 			reactiveAssignments = calculateAssignmentGPCsFromTotals(reactiveAssignments);
+
+			const calculable = getCalculableAssignments(reactiveAssignments);
+
+			hypotheticalGrade = calculateCourseGradePercentageFromTotals(calculable);
 		} else {
 			reactiveAssignments = calculateAssignmentGPCsFromCategories(
 				reactiveAssignments,
 				gradeCategories
 			);
-		}
-		const calculable = getCalculableAssignments(reactiveAssignments);
 
-		hypotheticalGrade = gradeCategories
-			? calculateCourseGradePercentageFromCategories(
-					getPointsByCategory(calculable),
-					gradeCategories
-				)
-			: calculateCourseGradePercentageFromTotals(calculable);
+			const calculable = getCalculableAssignmentsWithCategories(reactiveAssignments);
+
+			hypotheticalGrade = calculateCourseGradePercentageFromCategories(
+				getPointsByCategory(calculable),
+				gradeCategories
+			);
+		}
 	}
+
+	const pointsByCategory = $derived(
+		getPointsByCategoryMap(getCalculableAssignmentsWithCategories(reactiveAssignments))
+	);
+
+	const categoryGradePercentages = $derived(
+		new Map(
+			pointsByCategory
+				.entries()
+				.map(([categoryName, { pointsEarned, pointsPossible }]) => [
+					categoryName,
+					calculateGradePercentage(pointsEarned, pointsPossible)
+				])
+		)
+	);
 
 	function addHypotheticalAssignment() {
 		const newHypotheticalAssignment: NewHypotheticalAssignment = $state({
@@ -197,11 +216,14 @@
 	function toggleTargetGradeCalculator() {
 		showTargetGradeCalculator = !showTargetGradeCalculator;
 	}
-	const gradeCategoryWeights: CategoryWeight[] | undefined = $derived(
-		gradeCategories?.map(({ name, weightPercentage }) => ({
-			name,
-			weightPercentage
-		}))
+	const gradeCategoryWeightProportions: Map<string, number> | undefined = $derived(
+		gradeCategories
+			? new Map(gradeCategories.map(({ name, weightPercentage }) => [name, weightPercentage / 100]))
+			: undefined
+	);
+
+	const roundedGradePercentage = $derived(
+		grade !== undefined ? Math.round(grade * 100 * 1000) / 1000 : undefined
 	);
 
 	let showFinalsGradeCalcInfo = $state(
@@ -272,39 +294,33 @@
 							<TableBodyCell>{category.name}</TableBodyCell>
 							<TableBodyCell>
 								{#if category.pointsEarned !== 0 || category.pointsPossible !== 0}
-									{category.gradeLetter}
-									{#if rawGradeCalcMatches}
+									{#if !hypotheticalMode}
+										{category.gradeLetter}
+									{/if}
+									{#if rawGradeCalcMatches && (!hypotheticalMode || categoryGradePercentages.has(category.name))}
 										({Math.round(
-											calculateGradePercentage(category.pointsEarned, category.pointsPossible) *
-												1000
+											(hypotheticalMode
+												? categoryGradePercentages.get(category.name)!
+												: calculateGradePercentage(
+														category.pointsEarned,
+														category.pointsPossible
+													)) * 1000
 										) / 1000}%)
 									{/if}
 								{/if}
 							</TableBodyCell>
 							<TableBodyCell>{category.weightPercentage}%</TableBodyCell>
 							<TableBodyCell>
-								{category.pointsEarned} / {category.pointsPossible}
+								{#if hypotheticalMode}
+									{pointsByCategory?.get(category.name)?.pointsEarned}
+									/
+									{pointsByCategory?.get(category.name)?.pointsPossible}
+								{:else}
+									{category.pointsEarned} / {category.pointsPossible}
+								{/if}
 							</TableBodyCell>
 						</TableBodyRow>
 					{/each}
-					<TableBodyRow>
-						<TableBodyCell>Total</TableBodyCell>
-						<TableBodyCell>
-							{totalCategory.gradeLetter}
-							{#if rawGradeCalcMatches}
-								({Math.round(
-									calculateGradePercentage(
-										totalCategory.pointsEarned,
-										totalCategory.pointsPossible
-									) * 1000
-								) / 1000}%)
-							{/if}
-						</TableBodyCell>
-						<TableBodyCell />
-						<TableBodyCell>
-							{totalCategory.pointsEarned} / {totalCategory.pointsPossible}
-						</TableBodyCell>
-					</TableBodyRow>
 				</TableBody>
 			</Table>
 		</div>
@@ -423,9 +439,7 @@
 						Target Grade Calculator
 					</Button>
 				</li>
-				<li>
-					Enter your desired overall grade and select the assignment representing your final.
-				</li>
+				<li>Enter your desired overall grade and select the assignment representing your final.</li>
 			</ol>
 
 			<img
@@ -443,9 +457,9 @@
 
 	{#if hypotheticalMode && showTargetGradeCalculator}
 		<TargetGradeCalculator
-			initialGradePercentage={grade !== undefined ? Math.round(grade * 100000) / 1000 : undefined}
+			initialGradePercentage={roundedGradePercentage}
 			assignments={reactiveAssignments}
-			{gradeCategoryWeights}
+			{gradeCategoryWeightProportions}
 			onclose={toggleTargetGradeCalculator}
 		/>
 	{/if}
