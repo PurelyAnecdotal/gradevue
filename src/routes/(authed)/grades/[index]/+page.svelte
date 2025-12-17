@@ -10,9 +10,9 @@
 		calculateCourseGradePercentageFromTotals,
 		calculateGradePercentage,
 		type Category,
-		type CategoryWeight,
 		type Flowed,
 		getCalculableAssignments,
+		getCalculableAssignmentsWithCategories,
 		getHiddenAssignmentsFromCategories,
 		getPointsByCategory,
 		getSynergyCourseAssignmentCategories,
@@ -140,20 +140,23 @@
 	function recalculateGradePercentage() {
 		if (gradeCategories === undefined) {
 			reactiveAssignments = calculateAssignmentGPCsFromTotals(reactiveAssignments);
+
+			const calculable = getCalculableAssignments(reactiveAssignments);
+
+			hypotheticalGrade = calculateCourseGradePercentageFromTotals(calculable);
 		} else {
 			reactiveAssignments = calculateAssignmentGPCsFromCategories(
 				reactiveAssignments,
 				gradeCategories
 			);
-		}
-		const calculable = getCalculableAssignments(reactiveAssignments);
 
-		hypotheticalGrade = gradeCategories
-			? calculateCourseGradePercentageFromCategories(
-					getPointsByCategory(calculable),
-					gradeCategories
-				)
-			: calculateCourseGradePercentageFromTotals(calculable);
+			const calculable = getCalculableAssignmentsWithCategories(reactiveAssignments);
+
+			hypotheticalGrade = calculateCourseGradePercentageFromCategories(
+				getPointsByCategory(calculable),
+				gradeCategories
+			);
+		}
 	}
 
 	function addHypotheticalAssignment() {
@@ -197,11 +200,14 @@
 	function toggleTargetGradeCalculator() {
 		showTargetGradeCalculator = !showTargetGradeCalculator;
 	}
-	const gradeCategoryWeights: CategoryWeight[] | undefined = $derived(
-		gradeCategories?.map(({ name, weightPercentage }) => ({
-			name,
-			weightPercentage
-		}))
+	const gradeCategoryWeightProportions: Map<string, number> | undefined = $derived(
+		gradeCategories
+			? new Map(gradeCategories.map(({ name, weightPercentage }) => [name, weightPercentage / 100]))
+			: undefined
+	);
+
+	const roundedGradePercentage = $derived(
+		grade !== undefined ? Math.round(grade * 100 * 1000) / 1000 : undefined
 	);
 
 	let showFinalsGradeCalcInfo = $state(
@@ -423,9 +429,7 @@
 						Target Grade Calculator
 					</Button>
 				</li>
-				<li>
-					Enter your desired overall grade and select the assignment representing your final.
-				</li>
+				<li>Enter your desired overall grade and select the assignment representing your final.</li>
 			</ol>
 
 			<img
@@ -443,9 +447,9 @@
 
 	{#if hypotheticalMode && showTargetGradeCalculator}
 		<TargetGradeCalculator
-			initialGradePercentage={grade !== undefined ? Math.round(grade * 100000) / 1000 : undefined}
+			initialGradePercentage={roundedGradePercentage}
 			assignments={reactiveAssignments}
-			{gradeCategoryWeights}
+			{gradeCategoryWeightProportions}
 			onclose={toggleTargetGradeCalculator}
 		/>
 	{/if}

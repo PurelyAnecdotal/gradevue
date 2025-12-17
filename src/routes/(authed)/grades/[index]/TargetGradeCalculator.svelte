@@ -4,7 +4,6 @@
 		calculatePointsNeededForTargetGrade,
 		getCalculableAssignments,
 		getCalculableAssignmentsWithCategories,
-		type CategoryWeight,
 		type ReactiveAssignment,
 		type TargetGradeCalculatorCategoryDependentOptions
 	} from '$lib/assignments';
@@ -20,10 +19,11 @@
 		initialGradePercentage?: number;
 		assignments: ReactiveAssignment[];
 		onclose: () => void;
-		gradeCategoryWeights?: CategoryWeight[];
+		gradeCategoryWeightProportions?: Map<string, number>;
 	}
 
-	const { assignments, initialGradePercentage, gradeCategoryWeights, onclose }: Props = $props();
+	const { assignments, initialGradePercentage, gradeCategoryWeightProportions, onclose }: Props =
+		$props();
 
 	let targetGradePercentage = $state(initialGradePercentage);
 	let targetAssignment = $state<ReactiveAssignment | undefined>(undefined);
@@ -44,16 +44,16 @@
 	const categoryDependentOptions:
 		| TargetGradeCalculatorCategoryDependentOptions<ReactiveAssignment>
 		| undefined = $derived(
-		gradeCategoryWeights && targetAssignment?.category
+		gradeCategoryWeightProportions && targetAssignment?.category
 			? {
 					hasCategories: true,
 					otherAssignments: getCalculableAssignmentsWithCategories(assignments).filter(
 						({ id }) => id !== targetAssignment?.id
 					),
-					gradeCategoryWeights,
+					gradeCategoryWeightProportions,
 					assignmentCategoryName: targetAssignment.category
 				}
-			: gradeCategoryWeights === undefined
+			: gradeCategoryWeightProportions === undefined
 				? {
 						hasCategories: false,
 						otherAssignments: getCalculableAssignments(assignments).filter(
@@ -111,7 +111,7 @@
 		{/if}
 	</div>
 
-	{#if targetAssignment?.pointsPossible !== undefined && !(gradeCategoryWeights && targetAssignment.category === undefined) && targetGradePointsNeeded !== undefined}
+	{#if targetAssignment?.pointsPossible !== undefined && !(gradeCategoryWeightProportions && targetAssignment.category === undefined) && targetGradePointsNeeded !== undefined}
 		<p class="mt-4 text-sm dark:text-gray-300">Required assignment grade:</p>
 
 		<div class="mt-2 ml-auto w-fit text-lg">
@@ -139,7 +139,7 @@
 		</p>
 	{/if}
 
-	{#if targetAssignment && gradeCategoryWeights && targetAssignment.category === undefined}
+	{#if targetAssignment && gradeCategoryWeightProportions && targetAssignment.category === undefined}
 		<p class="mt-4 text-sm dark:text-gray-300">Selected assignment is missing a category.</p>
 	{/if}
 </div>
