@@ -332,7 +332,9 @@ export function getPointsByCategory<T extends Assignment>(
 	return pointsByCategory;
 }
 
-function getPointsByCategoryMap<T extends Assignment>(assignments: CalculableWithCategory<T>[]) {
+export function getPointsByCategoryMap<T extends Assignment>(
+	assignments: CalculableWithCategory<T>[]
+) {
 	const pointsByCategory: Map<string, { pointsEarned: number; pointsPossible: number }> = new Map();
 
 	assignments.forEach((assignment) => {
@@ -417,7 +419,7 @@ export function getSynergyCourseAssignmentCategories(course: Course) {
 export function getCalculableAssignments<T extends Assignment>(assignments: T[]) {
 	return assignments
 		.map((assignment) => {
-			const { pointsEarned, pointsPossible, notForGrade, category } = assignment;
+			const { pointsEarned, pointsPossible, notForGrade } = assignment;
 
 			if (pointsEarned === undefined || pointsPossible === undefined || notForGrade) return null;
 

@@ -15,6 +15,7 @@
 		getCalculableAssignmentsWithCategories,
 		getHiddenAssignmentsFromCategories,
 		getPointsByCategory,
+		getPointsByCategoryMap,
 		getSynergyCourseAssignmentCategories,
 		gradesMatch,
 		type HiddenAssignment,
@@ -159,6 +160,21 @@
 		}
 	}
 
+	const pointsByCategory = $derived(
+		getPointsByCategoryMap(getCalculableAssignmentsWithCategories(reactiveAssignments))
+	);
+
+	const categoryGradePercentages = $derived(
+		new Map(
+			pointsByCategory
+				.entries()
+				.map(([categoryName, { pointsEarned, pointsPossible }]) => [
+					categoryName,
+					calculateGradePercentage(pointsEarned, pointsPossible)
+				])
+		)
+	);
+
 	function addHypotheticalAssignment() {
 		const newHypotheticalAssignment: NewHypotheticalAssignment = $state({
 			name: 'Hypothetical Assignment',
@@ -278,39 +294,33 @@
 							<TableBodyCell>{category.name}</TableBodyCell>
 							<TableBodyCell>
 								{#if category.pointsEarned !== 0 || category.pointsPossible !== 0}
-									{category.gradeLetter}
-									{#if rawGradeCalcMatches}
+									{#if !hypotheticalMode}
+										{category.gradeLetter}
+									{/if}
+									{#if rawGradeCalcMatches && (!hypotheticalMode || categoryGradePercentages.has(category.name))}
 										({Math.round(
-											calculateGradePercentage(category.pointsEarned, category.pointsPossible) *
-												1000
+											(hypotheticalMode
+												? categoryGradePercentages.get(category.name)!
+												: calculateGradePercentage(
+														category.pointsEarned,
+														category.pointsPossible
+													)) * 1000
 										) / 1000}%)
 									{/if}
 								{/if}
 							</TableBodyCell>
 							<TableBodyCell>{category.weightPercentage}%</TableBodyCell>
 							<TableBodyCell>
-								{category.pointsEarned} / {category.pointsPossible}
+								{#if hypotheticalMode}
+									{pointsByCategory?.get(category.name)?.pointsEarned}
+									/
+									{pointsByCategory?.get(category.name)?.pointsPossible}
+								{:else}
+									{category.pointsEarned} / {category.pointsPossible}
+								{/if}
 							</TableBodyCell>
 						</TableBodyRow>
 					{/each}
-					<TableBodyRow>
-						<TableBodyCell>Total</TableBodyCell>
-						<TableBodyCell>
-							{totalCategory.gradeLetter}
-							{#if rawGradeCalcMatches}
-								({Math.round(
-									calculateGradePercentage(
-										totalCategory.pointsEarned,
-										totalCategory.pointsPossible
-									) * 1000
-								) / 1000}%)
-							{/if}
-						</TableBodyCell>
-						<TableBodyCell />
-						<TableBodyCell>
-							{totalCategory.pointsEarned} / {totalCategory.pointsPossible}
-						</TableBodyCell>
-					</TableBodyRow>
 				</TableBody>
 			</Table>
 		</div>
