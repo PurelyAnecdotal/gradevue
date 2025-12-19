@@ -33,7 +33,8 @@ export default tseslint.config(
 			'no-duplicate-imports': 'error',
 			eqeqeq: 'error',
 			'@typescript-eslint/strict-boolean-expressions': 'error',
-			'@typescript-eslint/no-unsafe-call': 'warn' // incorrectly flags {@render children?.()}
+			'@typescript-eslint/no-unsafe-call': 'warn', // incorrectly flags {@render children?.()},
+			'svelte/no-navigation-without-resolve': 'off'
 		}
 	},
 	{
@@ -55,6 +56,7 @@ export default tseslint.config(
 			parserOptions: {
 				parser: tseslint.parser
 			}
-		}
+		},
+		extends: [tseslint.configs.disableTypeChecked]
 	}
 );

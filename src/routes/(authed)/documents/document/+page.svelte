@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { page } from '$app/state';
-	import { getBlobURLFromBase64String } from '$lib';
+	import { brand, getBlobURLFromBase64String } from '$lib';
 	import { acc } from '$lib/account.svelte';
 	import LoadingBanner from '$lib/components/LoadingBanner.svelte';
 	import type { ReportCard } from '$lib/types/ReportCard';
@@ -33,7 +33,7 @@
 </script>
 
 <svelte:head>
-	<title>Document - GradeVue</title>
+	<title>Document - {brand}</title>
 </svelte:head>
 
 {#if reportCardURLPromise}

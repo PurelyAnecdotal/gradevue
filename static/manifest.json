@@ -1,6 +1,6 @@
 {
-	"name": "GradeVue",
-	"description": "An improved StudentVue experience, with calculators and tools to help you understand your grade.",
+	"name": "GradeCompass",
+	"description": "An advanced grade calculator.",
 	"start_url": "/grades",
 	"display": "standalone",
 	"background_color": "#111827",

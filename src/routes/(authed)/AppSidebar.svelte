@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { page } from '$app/state';
-	import { removeClassID } from '$lib';
+	import { brand, removeClassID } from '$lib';
 	import {
 		Sidebar,
 		SidebarBrand,
@@ -59,11 +59,8 @@
 	<SidebarWrapper class="flex h-screen flex-col justify-between gap-2">
 		<SidebarGroup>
 			<SidebarBrand
-				site={{
-					name: 'GradeVue',
-					href: '/grades',
-					img: '/favicon.svg'
-				}}
+				site={{ name: brand, href: '/grades', img: '/favicon.svg' }}
+				class="tracking-tight"
 			/>
 
 			{#if page.url.pathname.startsWith('/grades')}
@@ -81,27 +78,27 @@
 						{/if}
 					</a>
 					<svelte:boundary>
-					{#if page.params.index !== undefined && currentGradebookState?.data}
-						<ul>
-							{#each currentGradebookState.data.Courses.Course as { _Title: title, _CourseID }, index (_CourseID)}
-								<li>
-									<a
-										href={`/grades/${index.toString()}`}
-										class="text-gray-90 group flex w-full items-center rounded-lg p-2 text-base font-normal transition duration-75 hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
-									>
-										<MapPinAltOutline
-											class={page.params.index !== index.toString()
-												? 'opacity-0 transition'
-												: 'transition'}
-										/>
-										<span class="ml-3">
-											{removeClassID(title)}
-										</span>
-									</a>
-								</li>
-							{/each}
-						</ul>
-					{/if}
+						{#if page.params.index !== undefined && currentGradebookState?.data}
+							<ul>
+								{#each currentGradebookState.data.Courses.Course as { _Title: title, _CourseID }, index (_CourseID)}
+									<li>
+										<a
+											href={`/grades/${index.toString()}`}
+											class="text-gray-90 group flex w-full items-center rounded-lg p-2 text-base font-normal transition duration-75 hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
+										>
+											<MapPinAltOutline
+												class={page.params.index !== index.toString()
+													? 'opacity-0 transition'
+													: 'transition'}
+											/>
+											<span class="ml-3">
+												{removeClassID(title)}
+											</span>
+										</a>
+									</li>
+								{/each}
+							</ul>
+						{/if}
 
 						{#snippet pending()}
 							{#if page.params.index !== undefined}

@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { page } from '$app/state';
-	import { LocalStorageKey, numberFlowDefaultEasing, removeClassID } from '$lib';
+	import { brand, LocalStorageKey, numberFlowDefaultEasing, removeClassID } from '$lib';
 	import {
 		type Assignment,
 		calculateAssignmentGPCs,
@@ -237,7 +237,7 @@
 </script>
 
 <svelte:head>
-	<title>{courseName} - GradeVue</title>
+	<title>{courseName} - {brand}</title>
 </svelte:head>
 
 {#if synergyCourse}
@@ -353,9 +353,9 @@
 
 				{#if calcWarningOpen}
 					<span>
-						Your class's official grade percentage does not match GradeVue's calculated grade
-						percentage. This could mean that there are hidden assignments that GradeVue can't see,
-						or that GradeVue isn't calculating your grade correctly. Your overall grade is still
+						Your class's official grade percentage does not match {brand}'s calculated grade
+						percentage. This could mean that there are hidden assignments that {brand} can't see,
+						or that {brand} isn't calculating your grade correctly. Your overall grade is still
 						correct, but other things might be off.
 					</span>
 				{/if}
@@ -419,7 +419,7 @@
 			outsideclose={true}
 		>
 			<p class="text-sm dark:text-gray-300">
-				GradeVue can show you what grade you need to get on your final exam to achieve a desired
+				{brand} can show you what grade you need to get on your final exam to achieve a desired
 				overall course grade.
 			</p>
 

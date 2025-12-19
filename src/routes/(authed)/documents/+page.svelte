@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { brand } from '$lib';
 	import DateBadge from '$lib/components/DateBadge.svelte';
 	import LoadingBanner from '$lib/components/LoadingBanner.svelte';
 	import RefreshIndicator from '$lib/components/RefreshIndicator.svelte';
@@ -44,7 +45,7 @@
 </script>
 
 <svelte:head>
-	<title>Documents - GradeVue</title>
+	<title>Documents - {brand}</title>
 </svelte:head>
 
 <LoadingBanner show={!documentsState.loaded} loadingMsg="Loading documents..." />

@@ -1,6 +1,8 @@
-# GradeVue
+# GradeCompass
 
-An improved StudentVue experience.
+An advanced grade calculator designed to interface with StudentVUE®.
+
+<sub>StudentVUE is a registered trademark of Edupoint Educational Systems LLC. GradeCompass is not affiliated with or endorsed by Edupoint Educational Systems LLC.</sub>
 
 ## Developing
 
@@ -21,4 +23,4 @@ bun run build
 
 You can preview the production build with `bun run preview`.
 
-Commits to this repository will automatically be deployed to [Vercel](https://gradevue.org).
+Commits to this repository will automatically be deployed to [Vercel](https://gradecompass.org).

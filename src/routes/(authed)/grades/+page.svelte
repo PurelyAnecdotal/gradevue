@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { getColorForGrade, removeClassID } from '$lib';
+	import { brand, getColorForGrade, removeClassID } from '$lib';
 	import { parseSynergyAssignment } from '$lib/assignments';
 	import type { AssignmentEntity, Mark } from '$lib/types/Gradebook';
 	import NumberFlow from '@number-flow/svelte';
@@ -38,7 +38,7 @@
 </script>
 
 <svelte:head>
-	<title>Grades - GradeVue</title>
+	<title>Grades - {brand}</title>
 </svelte:head>
 
 {#if allPeriods && currentPeriod && currentPeriodIndex !== undefined && currentGradebookState?.data}
