@@ -11,13 +11,13 @@
 </svelte:head>
 
 <div class="flex min-h-screen flex-col items-center">
-	<div class="flex grow items-center">
+	<main class="flex grow items-center">
 		<Card class="space-y-4 text-sm leading-relaxed dark:text-gray-200">
 			<h1 class="text-xl dark:text-white">Sign up for {brand}</h1>
 
 			{@render children?.()}
 		</Card>
-	</div>
+	</main>
 
 	<Disclaimer />
 </div>

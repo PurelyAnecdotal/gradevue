@@ -13,7 +13,7 @@
 </svelte:head>
 
 <div class="flex min-h-screen flex-col items-center">
-	<div class="flex grow items-center">
+	<main class="flex grow items-center">
 		<Card size="lg" class="m-4 gap-4 dark:text-gray-200">
 			<h1 class="text-2xl dark:text-white">About the privacy of {brand}</h1>
 
@@ -33,7 +33,7 @@
 				<a href="mailto:{email}" class="text-primary-600 underline">{email}</a>.
 			</p>
 		</Card>
-	</div>
+	</main>
 
 	<Disclaimer />
 </div>

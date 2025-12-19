@@ -79,7 +79,7 @@
 {/if}
 
 <div class="flex min-h-screen flex-col items-center">
-	<div class="flex grow items-center">
+	<main class="flex grow items-center">
 		<Card>
 			<form onsubmit={login}>
 				<h1 class="mb-4 text-xl dark:text-white">Sign in to {brand}</h1>
@@ -120,7 +120,7 @@
 				<Button type="submit" class="w-full">Log in</Button>
 			</form>
 		</Card>
-	</div>
+	</main>
 
 	<Disclaimer />
 </div>

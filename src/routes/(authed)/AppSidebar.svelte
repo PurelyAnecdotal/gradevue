@@ -58,7 +58,10 @@
 <Sidebar activeUrl={page.url.pathname} class="h-screen">
 	<SidebarWrapper class="flex h-screen flex-col justify-between gap-2">
 		<SidebarGroup>
-			<SidebarBrand site={{ name: brand, href: '/grades', img: '/favicon.svg' }} />
+			<SidebarBrand
+				site={{ name: brand, href: '/grades', img: '/favicon.svg' }}
+				class="tracking-tight"
+			/>
 
 			{#if page.url.pathname.startsWith('/grades')}
 				<li class="rounded-lg bg-gray-900">

@@ -3,7 +3,7 @@
   "configVersion": 0,
   "workspaces": {
     "": {
-      "name": "gradevue",
+      "name": "gradecompass",
       "dependencies": {
         "buffer": "^6.0.3",
         "chart.js": "^4.5.1",
