@@ -3,6 +3,7 @@
 	import { goto } from '$app/navigation';
 	import { brand, LocalStorageKey } from '$lib';
 	import { acc, loadStudentAccount } from '$lib/account.svelte';
+	import Disclaimer from '$lib/components/Disclaimer.svelte';
 	import LoadingBanner from '$lib/components/LoadingBanner.svelte';
 	import { StudentAccount } from '$lib/synergy';
 	import {
@@ -77,45 +78,49 @@
 	</div>
 {/if}
 
-<div class="flex min-h-screen items-center justify-center">
-	<Card>
-		<form onsubmit={login}>
-			<h1 class="mb-4 text-xl dark:text-white">Sign in to {brand}</h1>
-			<Label class="mb-4 space-y-2">
-				<span>Username</span>
-				<Input
-					type="text"
-					id="username"
-					bind:value={username}
-					placeholder="student@school.net"
-					required
-				/>
-			</Label>
-			<Label class="mb-4 space-y-2">
-				<span>Password</span>
-				<Input type="password" id="password" bind:value={password} class="mb-2" required />
-				<Helper class="flex items-center text-xs">
-					<EyeSlashOutline size="sm" class="mr-2" />
-					Your device connects directly to StudentVue. We can't see your password or your grades.
-				</Helper>
-				<Helper class="flex items-center text-xs">
-					<InfoCircleOutline size="sm" class="mr-2" />
-					<span>
-						If you've never used {brand} or SynergyPlus before, you may need to
-						<a href="/signup" class="text-primary-600 underline">create a password</a>.
-					</span>
-				</Helper>
-			</Label>
-			<Accordion flush class="mb-4">
-				<AccordionItem paddingFlush="mb-2" borderBottomClass="">
-					<span slot="header" class="text-sm dark:text-gray-300">Advanced</span>
-					<Label class="space-y-2">
-						<span>Domain</span>
-						<Input type="text" id="domain" bind:value={domain} required />
-					</Label>
-				</AccordionItem>
-			</Accordion>
-			<Button type="submit" class="w-full">Log in</Button>
-		</form>
-	</Card>
+<div class="flex min-h-screen flex-col items-center">
+	<div class="flex grow items-center">
+		<Card>
+			<form onsubmit={login}>
+				<h1 class="mb-4 text-xl dark:text-white">Sign in to {brand}</h1>
+				<Label class="mb-4 space-y-2">
+					<span>Username</span>
+					<Input
+						type="text"
+						id="username"
+						bind:value={username}
+						placeholder="student@school.net"
+						required
+					/>
+				</Label>
+				<Label class="mb-4 space-y-2">
+					<span>Password</span>
+					<Input type="password" id="password" bind:value={password} class="mb-2" required />
+					<Helper class="flex items-center text-xs">
+						<EyeSlashOutline size="sm" class="mr-2" />
+						Your device connects directly to StudentVue. We can't see your password or your grades.
+					</Helper>
+					<Helper class="flex items-center text-xs">
+						<InfoCircleOutline size="sm" class="mr-2" />
+						<span>
+							If you've never used {brand} or SynergyPlus before, you may need to
+							<a href="/signup" class="text-primary-600 underline">create a password</a>.
+						</span>
+					</Helper>
+				</Label>
+				<Accordion flush class="mb-4">
+					<AccordionItem paddingFlush="mb-2" borderBottomClass="">
+						<span slot="header" class="text-sm dark:text-gray-300">Advanced</span>
+						<Label class="space-y-2">
+							<span>Domain</span>
+							<Input type="text" id="domain" bind:value={domain} required />
+						</Label>
+					</AccordionItem>
+				</Accordion>
+				<Button type="submit" class="w-full">Log in</Button>
+			</form>
+		</Card>
+	</div>
+
+	<Disclaimer />
 </div>

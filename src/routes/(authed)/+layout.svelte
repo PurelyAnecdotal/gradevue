@@ -5,6 +5,7 @@
 	import { brand, LocalStorageKey } from '$lib';
 	import { acc, loadStudentAccount } from '$lib/account.svelte';
 	import BoundaryFailure from '$lib/components/BoundaryFailure.svelte';
+	import Disclaimer from '$lib/components/Disclaimer.svelte';
 	import { Drawer, NavHamburger, Spinner } from 'flowbite-svelte';
 	import { sineIn } from 'svelte/easing';
 	import AppSidebar from './AppSidebar.svelte';
@@ -70,10 +71,14 @@
 			</div>
 
 			{#if page.url.pathname !== '/feedback'}
-				<div class="mt-auto flex w-full justify-center gap-1 p-4 text-xs text-gray-600">
-					<a href="/feedback" class="text-gray-500">Report an issue</a> •
-					<a href="/feedback" class="text-gray-500">Suggest a feature</a> •
-					<a href="/feedback" class="text-gray-500">Provide feedback</a>
+				<div class="mt-auto w-full text-xs">
+					<div class="mx-auto w-fit p-4 pb-0 dark:text-gray-600">
+						<a href="/feedback" class="text-gray-500">Report an issue</a> •
+						<a href="/feedback" class="text-gray-500">Suggest a feature</a> •
+						<a href="/feedback" class="text-gray-500">Provide feedback</a>
+					</div>
+
+					<Disclaimer />
 				</div>
 			{/if}
 		</div>
