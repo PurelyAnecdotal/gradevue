@@ -94,7 +94,7 @@
 						<a href="/feedback" class="text-gray-500">Provide feedback</a>
 					</div>
 
-					<Disclaimer />
+					<Disclaimer trademark={false} />
 				</div>
 			{/if}
 		</div>
@@ -116,8 +116,7 @@
 		<div>
 			GradeVue is now {brand}.
 			<p class="text-xs text-gray-400">
-				The name was changed to avoid confusion with StudentVUE®, a product of Edupoint Educational
-				Systems LLC. In the next few days, we'll be moving to a new domain to reflect this change.
+				In the next few days, we'll be moving to a new domain to reflect this change.
 			</p>
 		</div>
 		<CloseButton onclick={dismissRebrandAlert} class="-my-1.5 ms-auto -me-1.5 cursor-pointer" />

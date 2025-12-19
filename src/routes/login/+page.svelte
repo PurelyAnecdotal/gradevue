@@ -6,15 +6,7 @@
 	import Disclaimer from '$lib/components/Disclaimer.svelte';
 	import LoadingBanner from '$lib/components/LoadingBanner.svelte';
 	import { StudentAccount } from '$lib/synergy';
-	import {
-		Alert,
-		Button,
-		Card,
-		Helper,
-		Input,
-		Label,
-		Popover
-	} from 'flowbite-svelte';
+	import { Alert, Button, Card, Checkbox, Helper, Input, Label, Popover } from 'flowbite-svelte';
 	import ExclamationCircleSolid from 'flowbite-svelte-icons/ExclamationCircleSolid.svelte';
 	import EyeSlashOutline from 'flowbite-svelte-icons/EyeSlashOutline.svelte';
 	import InfoCircleOutline from 'flowbite-svelte-icons/InfoCircleOutline.svelte';
@@ -105,13 +97,20 @@
 						id="username"
 						bind:value={username}
 						placeholder="student@school.net"
+						autocomplete="username"
 						required
 					/>
 				</p>
 
 				<p class="space-y-2">
 					<Label for="password">StudentVUE Password</Label>
-					<Input type="password" id="password" bind:value={password} required />
+					<Input
+						type="password"
+						id="password"
+						bind:value={password}
+						autocomplete="current-password"
+						required
+					/>
 					<Helper class="flex items-center text-xs">
 						<EyeSlashOutline size="sm" class="mr-2" />
 						Your device connects directly to StudentVUE. We can't see your password or your grades.
@@ -156,10 +155,18 @@
 						type="text"
 						id="domain"
 						placeholder="[your-district]-psv.edupoint.com"
+						autocomplete="on"
 						bind:value={domain}
 						required
 					/>
 				</p>
+
+				<Checkbox class="text-xs" required>
+					I understand that {brand} is an independent, unofficial application and is not affiliated with
+					or endorsed by Edupoint Educational Systems LLC. Use of StudentVUE is subject to Edupoint Educational
+					Systems LLC's terms of service, and I am responsible for ensuring my use complies with those
+					terms.
+				</Checkbox>
 
 				<Button type="submit" class="w-full">Log in</Button>
 			</form>
