@@ -6,7 +6,7 @@
 	import { acc, loadStudentAccount } from '$lib/account.svelte';
 	import BoundaryFailure from '$lib/components/BoundaryFailure.svelte';
 	import Disclaimer from '$lib/components/Disclaimer.svelte';
-	import { Drawer, NavHamburger, Spinner } from 'flowbite-svelte';
+	import { Alert, CloseButton, Drawer, NavHamburger, Spinner } from 'flowbite-svelte';
 	import { sineIn } from 'svelte/easing';
 	import AppSidebar from './AppSidebar.svelte';
 	import { studentInfoState } from './studentinfo/studentInfo.svelte';
@@ -32,6 +32,16 @@
 			void goto('/login');
 		}
 	}
+
+	let showRebrandAlert = $state();
+	function dismissRebrandAlert() {
+		showRebrandAlert = false;
+		localStorage.setItem(LocalStorageKey.dismissedRebrandAlert, 'true');
+	}
+
+	if (browser) {
+		showRebrandAlert = localStorage.getItem(LocalStorageKey.dismissedRebrandAlert) === null;
+	}
 </script>
 
 <svelte:boundary>
@@ -49,10 +59,16 @@
 				onClick={() => {
 					drawerHidden = false;
 				}}
-				class="ml-0 cursor-pointer text-white"
+				class="m-0 cursor-pointer text-white"
 			/>
-			<a href="/grades" class="mr-auto text-xl text-white">{brand}</a>
-			<div>{studentInfoState.data?.FormattedName}</div>
+			<a
+				href="/grades"
+				class="mr-auto ml-1 flex items-center gap-2 text-xl font-semibold tracking-tight whitespace-nowrap dark:text-white"
+			>
+				<img src="/favicon.svg" class="h-6 sm:h-7" alt={brand} />
+				{brand}
+			</a>
+			<div class="hidden sm:block">{studentInfoState.data?.FormattedName}</div>
 		</div>
 
 		<div class="flex flex-1 flex-col overflow-y-auto">
@@ -94,3 +110,16 @@
 		<Spinner />
 	</div>
 {/snippet}
+
+{#if showRebrandAlert && Date.now() < 1766612675146}
+	<Alert color="dark" border class="absolute right-0 bottom-0 m-4 flex max-w-96 items-center">
+		<div>
+			GradeVue is now {brand}.
+			<p class="text-xs text-gray-400">
+				The name was changed to avoid confusion with StudentVUE®, a product of Edupoint Educational
+				Systems LLC. In the next few days, we'll be moving to a new domain to reflect this change.
+			</p>
+		</div>
+		<CloseButton onclick={dismissRebrandAlert} class="-my-1.5 ms-auto -me-1.5 cursor-pointer" />
+	</Alert>
+{/if}
