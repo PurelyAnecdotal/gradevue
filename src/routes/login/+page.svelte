@@ -98,12 +98,12 @@
 					<Input type="password" id="password" bind:value={password} class="mb-2" required />
 					<Helper class="flex items-center text-xs">
 						<EyeSlashOutline size="sm" class="mr-2" />
-						Your device connects directly to StudentVue. We can't see your password or your grades.
+						Your device connects directly to StudentVUE. We can't see your password or your grades.
 					</Helper>
 					<Helper class="flex items-center text-xs">
 						<InfoCircleOutline size="sm" class="mr-2" />
 						<span>
-							If you've never used {brand} or SynergyPlus before, you may need to
+							If you've never used {brand} before, you may need to
 							<a href="/signup" class="text-primary-600 underline">create a password</a>.
 						</span>
 					</Helper>

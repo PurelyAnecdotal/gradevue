@@ -7,7 +7,7 @@ body:
   id: synergy-domain
   attributes:
     label: Synergy domain
-    description: What domain does your district use to access StudentVue?
+    description: What domain does your district use to access StudentVUE?
     placeholder: ex. state-city-district.edupoint.com
   validations:
     required: false
