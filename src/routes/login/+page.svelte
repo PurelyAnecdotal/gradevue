@@ -7,14 +7,13 @@
 	import LoadingBanner from '$lib/components/LoadingBanner.svelte';
 	import { StudentAccount } from '$lib/synergy';
 	import {
-		Accordion,
-		AccordionItem,
 		Alert,
 		Button,
 		Card,
 		Helper,
 		Input,
-		Label
+		Label,
+		Popover
 	} from 'flowbite-svelte';
 	import ExclamationCircleSolid from 'flowbite-svelte-icons/ExclamationCircleSolid.svelte';
 	import EyeSlashOutline from 'flowbite-svelte-icons/EyeSlashOutline.svelte';
@@ -29,7 +28,7 @@
 
 	let username: string = $state('');
 	let password: string = $state('');
-	let domain: string = $state('ca-pleas-psv.edupoint.com');
+	let domain: string = $state('');
 
 	let loginError: string | undefined = $state();
 
@@ -60,6 +59,21 @@
 
 		void goto('/grades');
 	}
+
+	let pastedUrl = $state('');
+	const convertedDomain = $derived.by(() => {
+		try {
+			const url = new URL(pastedUrl);
+			return url.host;
+		} catch {
+			return undefined;
+		}
+	});
+
+	function findDomain() {
+		if (convertedDomain === undefined) return;
+		domain = convertedDomain;
+	}
 </script>
 
 <svelte:head>
@@ -81,10 +95,11 @@
 <div class="flex min-h-screen flex-col items-center">
 	<main class="flex grow items-center">
 		<Card>
-			<form onsubmit={login}>
-				<h1 class="mb-4 text-xl dark:text-white">Sign in to {brand}</h1>
-				<Label class="mb-4 space-y-2">
-					<span>Username</span>
+			<form onsubmit={login} class="space-y-4">
+				<h1 class="text-xl dark:text-white">Sign in to {brand}</h1>
+
+				<p class="space-y-2">
+					<Label for="username">StudentVUE Username</Label>
 					<Input
 						type="text"
 						id="username"
@@ -92,10 +107,11 @@
 						placeholder="student@school.net"
 						required
 					/>
-				</Label>
-				<Label class="mb-4 space-y-2">
-					<span>Password</span>
-					<Input type="password" id="password" bind:value={password} class="mb-2" required />
+				</p>
+
+				<p class="space-y-2">
+					<Label for="password">StudentVUE Password</Label>
+					<Input type="password" id="password" bind:value={password} required />
 					<Helper class="flex items-center text-xs">
 						<EyeSlashOutline size="sm" class="mr-2" />
 						Your device connects directly to StudentVUE. We can't see your password or your grades.
@@ -107,16 +123,44 @@
 							<a href="/signup" class="text-primary-600 underline">create a password</a>.
 						</span>
 					</Helper>
-				</Label>
-				<Accordion flush class="mb-4">
-					<AccordionItem paddingFlush="mb-2" borderBottomClass="">
-						<span slot="header" class="text-sm dark:text-gray-300">Advanced</span>
-						<Label class="space-y-2">
-							<span>Domain</span>
-							<Input type="text" id="domain" bind:value={domain} required />
-						</Label>
-					</AccordionItem>
-				</Accordion>
+				</p>
+
+				<p class="space-y-2">
+					<Label for="domain" class="flex w-full justify-between">
+						StudentVUE Domain
+						<button class="text-primary-700 cursor-pointer text-xs underline">
+							Help me find my domain
+						</button>
+						<Popover
+							class="w-96"
+							title="Paste any link to your district's StudentVUE website"
+							trigger="click"
+						>
+							<div class="flex items-center gap-2">
+								<Input
+									type="url"
+									placeholder="https://[your-district]-psv.edupoint.com/Home_PXP2.aspx"
+									bind:value={pastedUrl}
+								/>
+								<Button
+									onclick={findDomain}
+									disabled={convertedDomain === undefined}
+									class={convertedDomain === undefined ? 'cursor-not-allowed' : 'cursor-pointer'}
+								>
+									Submit
+								</Button>
+							</div>
+						</Popover>
+					</Label>
+					<Input
+						type="text"
+						id="domain"
+						placeholder="[your-district]-psv.edupoint.com"
+						bind:value={domain}
+						required
+					/>
+				</p>
+
 				<Button type="submit" class="w-full">Log in</Button>
 			</form>
 		</Card>
