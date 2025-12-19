@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { browser } from '$app/environment';
 	import { goto } from '$app/navigation';
-	import { LocalStorageKey } from '$lib';
+	import { brand, LocalStorageKey } from '$lib';
 	import { acc, loadStudentAccount } from '$lib/account.svelte';
 	import LoadingBanner from '$lib/components/LoadingBanner.svelte';
 	import { StudentAccount } from '$lib/synergy';
@@ -62,7 +62,7 @@
 </script>
 
 <svelte:head>
-	<title>Log In - Gradevue</title>
+	<title>Log In - {brand}</title>
 </svelte:head>
 
 <LoadingBanner show={loggingIn} loadingMsg="Logging you in..." />
@@ -80,7 +80,7 @@
 <div class="flex min-h-screen items-center justify-center">
 	<Card>
 		<form onsubmit={login}>
-			<h1 class="mb-4 text-xl dark:text-white">Sign in to GradeVue</h1>
+			<h1 class="mb-4 text-xl dark:text-white">Sign in to {brand}</h1>
 			<Label class="mb-4 space-y-2">
 				<span>Username</span>
 				<Input
@@ -101,7 +101,7 @@
 				<Helper class="flex items-center text-xs">
 					<InfoCircleOutline size="sm" class="mr-2" />
 					<span>
-						If you've never used GradeVue or SynergyPlus before, you may need to
+						If you've never used {brand} or SynergyPlus before, you may need to
 						<a href="/signup" class="text-primary-600 underline">create a password</a>.
 					</span>
 				</Helper>

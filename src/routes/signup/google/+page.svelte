@@ -1,11 +1,12 @@
 <script lang="ts">
+	import { brand } from '$lib';
 	import { Alert, Button } from 'flowbite-svelte';
 	import InfoCircleOutline from 'flowbite-svelte-icons/InfoCircleOutline.svelte';
 </script>
 
 <p>
-	GradeVue isn't able to use Sign in with Google to sign you in. You'll need to create a password
-	for StudentVue that GradeVue can sign you in with instead.
+	{brand} isn't able to use Sign in with Google to sign you in. You'll need to create a password
+	for StudentVue that {brand} can sign you in with instead.
 	<span class="font-bold">
 		You'll still be able to use Sign in with Google with StudentVue afterwards.
 	</span>
@@ -18,7 +19,7 @@
 <Alert color="dark" class="p-0">
 	<InfoCircleOutline slot="icon" size="sm" />
 	If you've used SynergyPlus before, you can use the same password to
-	<a href="/login" class="text-primary-600 underline">log in to GradeVue</a>.
+	<a href="/login" class="text-primary-600 underline">log in to {brand}</a>.
 </Alert>
 
 <p>

@@ -15,7 +15,7 @@ body:
   id: issue-scope
   attributes:
     label: Issue scope
-    description: What part of GradeVue is broken?
+    description: What part of GradeCompass is broken?
     options:
     - Whole site
     - A specific page
@@ -34,6 +34,6 @@ body:
   id: error-messages
   attributes:
     label: Error messages
-    description: If GradeVue shows an error screen, please click 'Show error details' and paste the error here. If you know how to access the browser console, please include a screenshot.
+    description: If GradeCompass shows an error screen, please click 'Show error details' and paste the error here. If you know how to access the browser console, please include a screenshot.
   validations:
     required: false

@@ -2,6 +2,8 @@ import { Buffer } from 'buffer';
 import { fileTypeFromBuffer } from 'file-type';
 import { acc } from './account.svelte';
 
+export const brand = 'GradeCompass';
+
 export function getColorForGrade(grade: string | number) {
 	if (typeof grade === 'number') {
 		if (grade > 100) return 'blue';

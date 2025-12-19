@@ -1,11 +1,12 @@
 <script>
+	import { brand } from '$lib';
 	import { Card } from 'flowbite-svelte';
 	import EnvelopeOutline from 'flowbite-svelte-icons/EnvelopeOutline.svelte';
 	import GithubSolid from 'flowbite-svelte-icons/GithubSolid.svelte';
 </script>
 
 <svelte:head>
-	<title>Feedback - GradeVue</title>
+	<title>Feedback - {brand}</title>
 </svelte:head>
 
 <h1 class="mx-4 mt-8 text-2xl font-bold">Feedback</h1>

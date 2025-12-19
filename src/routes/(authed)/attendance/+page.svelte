@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { fullDateFormatter, removeClassID } from '$lib';
+	import { brand, fullDateFormatter, removeClassID } from '$lib';
 	import LoadingBanner from '$lib/components/LoadingBanner.svelte';
 	import RefreshIndicator from '$lib/components/RefreshIndicator.svelte';
 	import type { Period } from '$lib/types/Attendance';
@@ -42,7 +42,7 @@
 </script>
 
 <svelte:head>
-	<title>Attendance - GradeVue</title>
+	<title>Attendance - {brand}</title>
 </svelte:head>
 
 <LoadingBanner show={!attendanceState.loaded} loadingMsg="Loading attendance..." />

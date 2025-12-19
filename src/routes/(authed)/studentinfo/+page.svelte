@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { LocalStorageKey } from '$lib';
+	import { brand, LocalStorageKey } from '$lib';
 	import LoadingBanner from '$lib/components/LoadingBanner.svelte';
 	import RefreshIndicator from '$lib/components/RefreshIndicator.svelte';
 	import {
@@ -45,7 +45,7 @@
 </script>
 
 <svelte:head>
-	<title>Student Info - GradeVue</title>
+	<title>Student Info - {brand}</title>
 </svelte:head>
 
 <LoadingBanner show={!studentInfoState.loaded} loadingMsg="Loading student info..." />

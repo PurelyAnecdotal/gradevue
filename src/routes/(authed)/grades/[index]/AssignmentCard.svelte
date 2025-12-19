@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { getColorForGrade } from '$lib';
+	import { brand, getColorForGrade } from '$lib';
 	import { calculateGradePercentage } from '$lib/assignments';
 	import DateBadge from '$lib/components/DateBadge.svelte';
 	import NumberInput from '$lib/components/NumberInput.svelte';
@@ -168,7 +168,7 @@
 		{#if hidden}
 			<Popover triggeredBy=".hidden-badge" class="max-w-md">
 				Teachers can choose to have assignments hidden from the assignment list but still calculated
-				toward your grade. GradeVue can reveal these assignments.
+				toward your grade. {brand} can reveal these assignments.
 			</Popover>
 			<Badge border color="dark" class="hidden-badge">
 				Hidden Assignments <InfoCircleOutline size="xs" class="ml-1" />

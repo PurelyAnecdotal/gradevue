@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { page } from '$app/state';
-	import { getBlobURLFromBase64String } from '$lib';
+	import { brand, getBlobURLFromBase64String } from '$lib';
 	import { acc } from '$lib/account.svelte';
 	import LoadingBanner from '$lib/components/LoadingBanner.svelte';
 	import type { Attachment } from '$lib/types/Attachment';
@@ -33,7 +33,7 @@
 </script>
 
 <svelte:head>
-	<title>Attachment - GradeVue</title>
+	<title>Attachment - {brand}</title>
 </svelte:head>
 
 {#if attachmentURLPromise}

@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { browser } from '$app/environment';
+	import { brand } from '$lib';
 	import LoadingBanner from '$lib/components/LoadingBanner.svelte';
 	import RefreshIndicator from '$lib/components/RefreshIndicator.svelte';
 	import type { InboxItemListingsMessageXML } from '$lib/types/MailData';
@@ -42,7 +43,7 @@
 </script>
 
 <svelte:head>
-	<title>Mail - GradeVue</title>
+	<title>Mail - {brand}</title>
 </svelte:head>
 
 <LoadingBanner show={!mailDataState.loaded} loadingMsg="Loading mail..." />

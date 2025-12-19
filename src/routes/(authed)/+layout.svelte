@@ -2,7 +2,7 @@
 	import { browser } from '$app/environment';
 	import { goto } from '$app/navigation';
 	import { navigating, page } from '$app/state';
-	import { LocalStorageKey } from '$lib';
+	import { brand, LocalStorageKey } from '$lib';
 	import { acc, loadStudentAccount } from '$lib/account.svelte';
 	import BoundaryFailure from '$lib/components/BoundaryFailure.svelte';
 	import { Drawer, NavHamburger, Spinner } from 'flowbite-svelte';
@@ -50,7 +50,7 @@
 				}}
 				class="ml-0 cursor-pointer text-white"
 			/>
-			<a href="/grades" class="mr-auto text-xl text-white">GradeVue</a>
+			<a href="/grades" class="mr-auto text-xl text-white">{brand}</a>
 			<div>{studentInfoState.data?.FormattedName}</div>
 		</div>
 

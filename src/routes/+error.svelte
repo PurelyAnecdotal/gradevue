@@ -1,10 +1,11 @@
 <script lang="ts">
 	import { page } from '$app/state';
+	import { brand } from '$lib';
 	import { Alert, Button } from 'flowbite-svelte';
 </script>
 
 <svelte:head>
-	<title>{page.status} {page.error?.message} - GradeVue</title>
+	<title>{page.status} {page.error?.message} - {brand}</title>
 </svelte:head>
 
 <div class="flex min-h-screen items-center justify-center">
