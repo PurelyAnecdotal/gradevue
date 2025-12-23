@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { page } from '$app/state';
-	import { brand, LocalStorageKey, numberFlowDefaultEasing, removeClassID } from '$lib';
+	import { brand, numberFlowDefaultEasing, removeClassID } from '$lib';
 	import {
 		type Assignment,
 		calculateAssignmentGPCs,
@@ -30,7 +30,6 @@
 		Alert,
 		Button,
 		Checkbox,
-		Modal,
 		Popover,
 		TabItem,
 		Table,
@@ -345,9 +344,9 @@
 				{#if calcWarningOpen}
 					<span>
 						Your class's official grade percentage does not match {brand}'s calculated grade
-						percentage. This could mean that there are hidden assignments that {brand} can't see,
-						or that {brand} isn't calculating your grade correctly. Your overall grade is still
-						correct, but other things might be off.
+						percentage. This could mean that there are hidden assignments that {brand} can't see, or that
+						{brand} isn't calculating your grade correctly. Your overall grade is still correct, but other
+						things might be off.
 					</span>
 				{/if}
 			</div>
