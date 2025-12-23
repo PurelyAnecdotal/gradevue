@@ -74,7 +74,7 @@ export enum LocalStorageKey {
 	documents = 'documents',
 	mailData = 'mailData',
 	studentInfo = 'studentInfo',
-	dismissedRebrandAlert = 'dismissedRebrandAlert'
+	migrationComplete = 'migrationComplete'
 }
 
 export interface RecordState<T> {

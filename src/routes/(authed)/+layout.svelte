@@ -2,11 +2,15 @@
 	import { browser } from '$app/environment';
 	import { goto } from '$app/navigation';
 	import { navigating, page } from '$app/state';
+	import { env } from '$env/dynamic/public';
 	import { brand, LocalStorageKey } from '$lib';
 	import { acc, loadStudentAccount } from '$lib/account.svelte';
 	import BoundaryFailure from '$lib/components/BoundaryFailure.svelte';
 	import Disclaimer from '$lib/components/Disclaimer.svelte';
-	import { Alert, CloseButton, Drawer, NavHamburger, Spinner } from 'flowbite-svelte';
+	import { migrateData } from '$lib/migrate';
+	import { Alert, Button, Drawer, NavHamburger, Spinner } from 'flowbite-svelte';
+	import ArrowRightOutline from 'flowbite-svelte-icons/ArrowRightOutline.svelte';
+	import FolderArrowRightOutline from 'flowbite-svelte-icons/FolderArrowRightOutline.svelte';
 	import { sineIn } from 'svelte/easing';
 	import AppSidebar from './AppSidebar.svelte';
 	import { studentInfoState } from './studentinfo/studentInfo.svelte';
@@ -33,14 +37,19 @@
 		}
 	}
 
-	let showRebrandAlert = $state();
-	function dismissRebrandAlert() {
-		showRebrandAlert = false;
-		localStorage.setItem(LocalStorageKey.dismissedRebrandAlert, 'true');
-	}
+	let migrationComplete = $state(false);
 
 	if (browser) {
-		showRebrandAlert = localStorage.getItem(LocalStorageKey.dismissedRebrandAlert) === null;
+		migrationComplete = localStorage.getItem(LocalStorageKey.migrationComplete) === 'true';
+	}
+
+	const targetMigrationOrigin = env.PUBLIC_TARGET_MIGRATION_ORIGIN;
+
+	function migrate() {
+		migrateData(page.url.origin, targetMigrationOrigin).then(() => {
+			localStorage.setItem(LocalStorageKey.migrationComplete, 'true');
+			migrationComplete = true;
+		});
 	}
 </script>
 
@@ -111,14 +120,26 @@
 	</div>
 {/snippet}
 
-{#if showRebrandAlert && Date.now() < 1766612675146}
-	<Alert color="dark" border class="absolute right-0 bottom-0 m-4 flex max-w-96 items-center">
-		<div>
-			GradeVue is now {brand}.
-			<p class="text-xs text-gray-400">
-				In the next few days, we'll be moving to a new domain to reflect this change.
-			</p>
-		</div>
-		<CloseButton onclick={dismissRebrandAlert} class="-my-1.5 ms-auto -me-1.5 cursor-pointer" />
-	</Alert>
-{/if}
+<Alert color="dark" border class="absolute right-0 bottom-0 m-4 max-w-96 space-y-2">
+	<h2 class="text-white">GradeVue is now {brand}.</h2>
+	<p class="text-xs text-gray-400">We're moving to a new domain to reflect this change.</p>
+	{#if !migrationComplete}
+		<Button
+			onclick={migrate}
+			color="light"
+			class="mx-auto flex w-fit cursor-pointer items-center gap-1"
+		>
+			<FolderArrowRightOutline />
+			Transfer my data
+		</Button>
+	{:else}
+		<Button
+			href={page.url.href.replace(page.url.origin, targetMigrationOrigin)}
+			color="light"
+			class="mx-auto flex w-fit cursor-pointer items-center gap-1"
+		>
+			<ArrowRightOutline />
+			Go to gradecompass.org
+		</Button>
+	{/if}
+</Alert>

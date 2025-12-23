@@ -1,6 +1,8 @@
 <script lang="ts">
 	import { browser } from '$app/environment';
 	import { goto } from '$app/navigation';
+	import { page } from '$app/state';
+	import { env } from '$env/dynamic/public';
 	import { brand, LocalStorageKey } from '$lib';
 	import { acc, loadStudentAccount } from '$lib/account.svelte';
 	import Disclaimer from '$lib/components/Disclaimer.svelte';
@@ -11,10 +13,15 @@
 	import GithubSolid from 'flowbite-svelte-icons/GithubSolid.svelte';
 	import InsertTableOutline from 'flowbite-svelte-icons/InsertTableOutline.svelte';
 
-	if (browser && localStorage.getItem(LocalStorageKey.token) !== null) {
-		if (!acc.studentAccount) loadStudentAccount();
+	if (browser) {
+		if (localStorage.getItem(LocalStorageKey.token) === null) {
+			if (env.PUBLIC_TARGET_MIGRATION_ORIGIN !== undefined)
+				location.assign(page.url.href.replace(page.url.origin, env.PUBLIC_TARGET_MIGRATION_ORIGIN));
+		} else {
+			if (!acc.studentAccount) loadStudentAccount();
 
-		void goto('/grades');
+			void goto('/grades');
+		}
 	}
 </script>
 
