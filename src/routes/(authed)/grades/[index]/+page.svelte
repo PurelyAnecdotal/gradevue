@@ -225,15 +225,6 @@
 	const roundedGradePercentage = $derived(
 		grade !== undefined ? Math.round(grade * 100 * 1000) / 1000 : undefined
 	);
-
-	let showFinalsGradeCalcInfo = $state(
-		localStorage.getItem(LocalStorageKey.dismissedFinalsGradeCalcInfo) === null
-	);
-	let finalsGradeCalcInfoModalOpen = $state(false);
-	function dismissFinalsGradeCalcInfo() {
-		showFinalsGradeCalcInfo = false;
-		localStorage.setItem(LocalStorageKey.dismissedFinalsGradeCalcInfo, 'true');
-	}
 </script>
 
 <svelte:head>
@@ -400,60 +391,6 @@
 			</div>
 		{/if}
 	</div>
-
-	{#if showFinalsGradeCalcInfo && (Date.now() - 1765608120379) / (1000 * 60 * 60 * 24) < 5 && !showTargetGradeCalculator}
-		<p class="px-4 text-sm dark:text-gray-400">
-			<InfoCircleOutline size="sm" class="inline" /> Finals grade calculation is now available.
-			<button
-				onclick={() => {
-					finalsGradeCalcInfoModalOpen = true;
-				}}
-				class="cursor-pointer underline">See how</button
-			>
-		</p>
-
-		<Modal
-			bind:open={finalsGradeCalcInfoModalOpen}
-			title="Finals Grade Calculation"
-			headerClass="flex items-center p-4 md:p-5 justify-between rounded-t-lg shrink-0 text-xl font-semibold text-gray-900 dark:text-white"
-			outsideclose={true}
-		>
-			<p class="text-sm dark:text-gray-300">
-				{brand} can show you what grade you need to get on your final exam to achieve a desired
-				overall course grade.
-			</p>
-
-			<ol class="list-decimal space-y-2 pl-4 text-sm dark:text-gray-300">
-				<li>Enable Hypothetical Mode</li>
-				<li>
-					<p>See if your final has already been entered as a placeholder.</p>
-					<p>
-						If not, create a hypothetical assignment for it, select the final category for your
-						class (if applicable), and enter how many points it's out of.
-					</p>
-				</li>
-				<li>
-					Open the target grade calculator.
-					<Button color="light" size="sm" disabled>
-						<AddColumnAfterOutline size="sm" class="mr-2" />
-						Target Grade Calculator
-					</Button>
-				</li>
-				<li>Enter your desired overall grade and select the assignment representing your final.</li>
-			</ol>
-
-			<img
-				class="mx-auto w-xs"
-				src="/target-grade-calc-demo.png"
-				alt="Target grade calculator demonstration"
-			/>
-
-			<button
-				onclick={dismissFinalsGradeCalcInfo}
-				class="cursor-pointer text-sm underline dark:text-gray-300">Dismiss message</button
-			>
-		</Modal>
-	{/if}
 
 	{#if hypotheticalMode && showTargetGradeCalculator}
 		<TargetGradeCalculator

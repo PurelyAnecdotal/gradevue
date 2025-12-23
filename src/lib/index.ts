@@ -74,7 +74,6 @@ export enum LocalStorageKey {
 	documents = 'documents',
 	mailData = 'mailData',
 	studentInfo = 'studentInfo',
-	dismissedFinalsGradeCalcInfo = 'dismissedFinalsGradeCalcInfo',
 	dismissedRebrandAlert = 'dismissedRebrandAlert'
 }
 
