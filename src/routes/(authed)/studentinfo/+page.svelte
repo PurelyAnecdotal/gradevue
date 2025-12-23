@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { brand, LocalStorageKey } from '$lib';
+	import { acc } from '$lib/account.svelte';
 	import LoadingBanner from '$lib/components/LoadingBanner.svelte';
 	import RefreshIndicator from '$lib/components/RefreshIndicator.svelte';
 	import {
@@ -12,6 +13,9 @@
 		TableBodyCell,
 		TableBodyRow
 	} from 'flowbite-svelte';
+	import ClipboardOutline from 'flowbite-svelte-icons/ClipboardOutline.svelte';
+	import EyeOutline from 'flowbite-svelte-icons/EyeOutline.svelte';
+	import LockOutline from 'flowbite-svelte-icons/LockOutline.svelte';
 	import { loadStudentInfo, studentInfoState } from './studentInfo.svelte';
 
 	loadStudentInfo();
@@ -42,6 +46,24 @@
 	}
 
 	const remove = (key: string) => localStorage.removeItem(key);
+
+	let showPassword = $state(false);
+	function togglePassword() {
+		showPassword = !showPassword;
+	}
+
+	function copyUsername() {
+		if (!acc.studentAccount) return;
+		navigator.clipboard.writeText(acc.studentAccount.userID);
+	}
+	function copyPassword() {
+		if (!acc.studentAccount) return;
+		navigator.clipboard.writeText(acc.studentAccount.password);
+	}
+	function copyDomain() {
+		if (!acc.studentAccount) return;
+		navigator.clipboard.writeText(acc.studentAccount.domain);
+	}
 </script>
 
 <svelte:head>
@@ -58,9 +80,9 @@
 	/>
 {/if}
 
-<div class="flex flex-col justify-center gap-4 px-4">
+<div class="m-4 flex flex-wrap gap-4">
 	{#if studentInfoState.data}
-		<Card class="flex max-w-none flex-row gap-4 dark:text-white">
+		<Card class="mx-auto flex max-w-lg grow flex-row gap-4 dark:text-white">
 			<img
 				class="h-xl rounded-sm"
 				src="data:image/png;base64,{studentInfoState.data.Photo}"
@@ -79,60 +101,104 @@
 		</Card>
 	{/if}
 
-	<Accordion>
-		<AccordionItem paddingDefault="0">
-			<span slot="header" class="p-5">Developer Tools</span>
+	{#if acc.studentAccount}
+		<Card class="mx-auto max-w-lg grow space-y-2 dark:text-gray-300">
+			<div class="flex items-center justify-between">
+				<h2 class="text-xl text-white">Login Information</h2>
+				<p class="flex items-center"><LockOutline />Stored on-device</p>
+			</div>
 
-			<svg
-				slot="arrowdown"
-				class="mr-5 h-3 w-3 text-gray-800 dark:text-white"
-				aria-hidden="true"
-				xmlns="http://www.w3.org/2000/svg"
-				fill="none"
-				viewBox="0 0 10 6"
-			>
-				<path
-					stroke="currentColor"
-					stroke-linecap="round"
-					stroke-linejoin="round"
-					stroke-width="2"
-					d="m1 1 4 4 4-4"
-				/>
-			</svg>
-
-			<svg
-				slot="arrowup"
-				class="mr-5 h-3 w-3 text-gray-800 dark:text-white"
-				aria-hidden="true"
-				xmlns="http://www.w3.org/2000/svg"
-				fill="none"
-				viewBox="0 0 10 6"
-			>
-				hi
-				<path
-					stroke="currentColor"
-					stroke-linecap="round"
-					stroke-linejoin="round"
-					stroke-width="2"
-					d="M9 5 5 1 1 5"
-				/>
-			</svg>
-
-			<Table>
-				<TableBody>
-					{#each dataSources as dataSource (dataSource)}
-						<TableBodyRow>
-							<TableBodyCell>{dataSource}</TableBodyCell>
-							{@render toolButton('Copy', () => void copy(dataSource))}
-							{@render toolButton('Paste', () => void paste(dataSource))}
-							{@render toolButton('Delete', () => remove(dataSource))}
-						</TableBodyRow>
-					{/each}
-				</TableBody>
-			</Table>
-		</AccordionItem>
-	</Accordion>
+			<dl>
+				<dt class="">Username</dt>
+				<dd class="flex items-center justify-end gap-2 text-white">
+					{acc.studentAccount.userID}
+					<Button onclick={copyUsername} color="light" class="p-1" title="Copy username">
+						<ClipboardOutline />
+					</Button>
+				</dd>
+				<dt class="">Password</dt>
+				<dd class="flex items-center justify-end gap-2 text-white">
+					<span class="{showPassword ? '' : 'blur select-none'} transition-all">
+						{#if showPassword}
+							{acc.studentAccount.password}
+						{:else}
+							#Wa5$^yB%4R#6K^C
+						{/if}
+					</span>
+					{#if !showPassword}
+						<Button onclick={togglePassword} color="light" class="p-1" title="Show password">
+							<EyeOutline />
+						</Button>
+					{/if}
+					<Button onclick={copyPassword} color="light" class="p-1" title="Copy password">
+						<ClipboardOutline />
+					</Button>
+				</dd>
+				<dt>Domain</dt>
+				<dd class="flex items-center justify-end gap-2 text-white">
+					{acc.studentAccount.domain}
+					<Button onclick={copyDomain} color="light" class="p-1" title="Copy domain">
+						<ClipboardOutline />
+					</Button>
+				</dd>
+			</dl>
+		</Card>
+	{/if}
 </div>
+
+<Accordion class="m-4">
+	<AccordionItem paddingDefault="0">
+		<span slot="header" class="p-5">Developer Tools</span>
+
+		<svg
+			slot="arrowdown"
+			class="mr-5 h-3 w-3 text-gray-800 dark:text-white"
+			aria-hidden="true"
+			xmlns="http://www.w3.org/2000/svg"
+			fill="none"
+			viewBox="0 0 10 6"
+		>
+			<path
+				stroke="currentColor"
+				stroke-linecap="round"
+				stroke-linejoin="round"
+				stroke-width="2"
+				d="m1 1 4 4 4-4"
+			/>
+		</svg>
+
+		<svg
+			slot="arrowup"
+			class="mr-5 h-3 w-3 text-gray-800 dark:text-white"
+			aria-hidden="true"
+			xmlns="http://www.w3.org/2000/svg"
+			fill="none"
+			viewBox="0 0 10 6"
+		>
+			hi
+			<path
+				stroke="currentColor"
+				stroke-linecap="round"
+				stroke-linejoin="round"
+				stroke-width="2"
+				d="M9 5 5 1 1 5"
+			/>
+		</svg>
+
+		<Table>
+			<TableBody>
+				{#each dataSources as dataSource (dataSource)}
+					<TableBodyRow>
+						<TableBodyCell>{dataSource}</TableBodyCell>
+						{@render toolButton('Copy', () => void copy(dataSource))}
+						{@render toolButton('Paste', () => void paste(dataSource))}
+						{@render toolButton('Delete', () => remove(dataSource))}
+					</TableBodyRow>
+				{/each}
+			</TableBody>
+		</Table>
+	</AccordionItem>
+</Accordion>
 
 {#snippet toolButton(name: string, func: () => void)}
 	<TableBodyCell>
