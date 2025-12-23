@@ -73,8 +73,7 @@ export enum LocalStorageKey {
 	attendance = 'attendance',
 	documents = 'documents',
 	mailData = 'mailData',
-	studentInfo = 'studentInfo',
-	dismissedRebrandAlert = 'dismissedRebrandAlert'
+	studentInfo = 'studentInfo'
 }
 
 export interface RecordState<T> {
