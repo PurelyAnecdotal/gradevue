@@ -1,7 +1,8 @@
 <script lang="ts">
 	import { page } from '$app/state';
-	import { brand, getBlobURLFromBase64String } from '$lib';
+	import { getBlobURLFromBase64String } from '$lib';
 	import { acc } from '$lib/account.svelte';
+	import { brand } from '$lib/brand';
 	import LoadingBanner from '$lib/components/LoadingBanner.svelte';
 	import type { ReportCard } from '$lib/types/ReportCard';
 	import { Button, Card } from 'flowbite-svelte';

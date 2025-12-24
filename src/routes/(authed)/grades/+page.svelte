@@ -1,6 +1,7 @@
 <script lang="ts">
-	import { brand, getColorForGrade, removeClassID } from '$lib';
+	import { getColorForGrade, removeClassID } from '$lib';
 	import { parseSynergyAssignment } from '$lib/assignments';
+	import { brand } from '$lib/brand';
 	import type { AssignmentEntity, Mark } from '$lib/types/Gradebook';
 	import NumberFlow from '@number-flow/svelte';
 	import { Alert, Badge, Button, Card, Dropdown, DropdownItem, Progressbar } from 'flowbite-svelte';

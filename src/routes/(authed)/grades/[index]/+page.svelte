@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { page } from '$app/state';
-	import { brand, numberFlowDefaultEasing, removeClassID } from '$lib';
+	import { numberFlowDefaultEasing, removeClassID } from '$lib';
 	import {
 		type Assignment,
 		calculateAssignmentGPCs,
@@ -25,6 +25,7 @@
 		type ReactiveAssignment,
 		type RealAssignment
 	} from '$lib/assignments';
+	import { brand } from '$lib/brand';
 	import NumberFlow from '@number-flow/svelte';
 	import {
 		Alert,
@@ -484,7 +485,7 @@
 		comments,
 		date,
 		newHypothetical
-	}: RealAssignment | Flowed<RealAssignment | HiddenAssignment>,
+	}: RealAssignment | Flowed,
 	showCategory = true
 )}
 	<li>

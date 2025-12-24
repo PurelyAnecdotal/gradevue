@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { brand } from '$lib';
+	import { brand } from '$lib/brand';
 	import DateBadge from '$lib/components/DateBadge.svelte';
 	import LoadingBanner from '$lib/components/LoadingBanner.svelte';
 	import RefreshIndicator from '$lib/components/RefreshIndicator.svelte';

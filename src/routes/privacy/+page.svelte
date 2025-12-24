@@ -1,11 +1,11 @@
 <script lang="ts">
 	import { browser } from '$app/environment';
-	import { brand } from '$lib';
+	import { brand, contactEmail } from '$lib/brand';
 	import Disclaimer from '$lib/components/Disclaimer.svelte';
 	import { Card } from 'flowbite-svelte';
 
 	let email = $state('[email protected]');
-	if (browser) email = 'hello@gradevue.org';
+	if (browser) email = contactEmail;
 </script>
 
 <svelte:head>

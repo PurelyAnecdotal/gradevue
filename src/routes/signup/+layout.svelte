@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { brand } from '$lib';
+	import { brand } from '$lib/brand';
 	import Disclaimer from '$lib/components/Disclaimer.svelte';
 	import { Card } from 'flowbite-svelte';
 

@@ -1,5 +1,6 @@
 <script lang="ts">
-	import { brand, fullDateFormatter, removeClassID } from '$lib';
+	import { fullDateFormatter, removeClassID } from '$lib';
+	import { brand } from '$lib/brand';
 	import LoadingBanner from '$lib/components/LoadingBanner.svelte';
 	import RefreshIndicator from '$lib/components/RefreshIndicator.svelte';
 	import type { Period } from '$lib/types/Attendance';

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { brand } from '$lib';
+	import { brand } from '$lib/brand';
 	import { Alert, Button } from 'flowbite-svelte';
 	import InfoCircleOutline from 'flowbite-svelte-icons/InfoCircleOutline.svelte';
 </script>

@@ -1,8 +1,9 @@
 <script lang="ts">
 	import { browser } from '$app/environment';
 	import { goto } from '$app/navigation';
-	import { brand, LocalStorageKey } from '$lib';
+	import { LocalStorageKey } from '$lib';
 	import { acc, loadStudentAccount } from '$lib/account.svelte';
+	import { brand, repoLink } from '$lib/brand';
 	import Disclaimer from '$lib/components/Disclaimer.svelte';
 	import { Button, Card } from 'flowbite-svelte';
 	import ChartLineUpOutline from 'flowbite-svelte-icons/ChartLineUpOutline.svelte';
@@ -95,12 +96,7 @@
 			</Card>
 		</div>
 
-		<Button
-			href="https://github.com/PurelyAnecdotal/gradevue"
-			target="_blank"
-			color="light"
-			class="gap-2"
-		>
+		<Button href={repoLink} target="_blank" color="light" class="gap-2">
 			<GithubSolid class="inline" />
 			Open Source
 		</Button>

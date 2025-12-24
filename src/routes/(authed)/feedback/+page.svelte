@@ -1,5 +1,5 @@
 <script>
-	import { brand } from '$lib';
+	import { brand, contactEmail } from '$lib/brand';
 	import { Card } from 'flowbite-svelte';
 	import EnvelopeOutline from 'flowbite-svelte-icons/EnvelopeOutline.svelte';
 	import GithubSolid from 'flowbite-svelte-icons/GithubSolid.svelte';
@@ -25,7 +25,7 @@
 		<h1 class="text-lg text-gray-900 dark:text-white">Create an issue on GitHub</h1>
 	</Card>
 
-	<Card href="mailto:hello@gradevue.org" class="flex flex-row items-center gap-4" padding="sm">
+	<Card href="mailto:{contactEmail}" class="flex flex-row items-center gap-4" padding="sm">
 		<EnvelopeOutline size="lg" class="text-white" />
 		<h1 class="text-lg text-gray-900 dark:text-white">Send an email</h1>
 	</Card>

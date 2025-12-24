@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { page } from '$app/state';
-	import { brand, removeClassID } from '$lib';
+	import { removeClassID } from '$lib';
+	import { brand } from '$lib/brand';
 	import {
 		Sidebar,
 		SidebarBrand,

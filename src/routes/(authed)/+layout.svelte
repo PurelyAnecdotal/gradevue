@@ -2,8 +2,9 @@
 	import { browser } from '$app/environment';
 	import { goto } from '$app/navigation';
 	import { navigating, page } from '$app/state';
-	import { brand, LocalStorageKey } from '$lib';
+	import { LocalStorageKey } from '$lib';
 	import { acc, loadStudentAccount } from '$lib/account.svelte';
+	import { brand } from '$lib/brand';
 	import BoundaryFailure from '$lib/components/BoundaryFailure.svelte';
 	import Disclaimer from '$lib/components/Disclaimer.svelte';
 	import { Drawer, NavHamburger, Spinner } from 'flowbite-svelte';
