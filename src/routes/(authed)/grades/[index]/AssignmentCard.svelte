@@ -1,6 +1,7 @@
 <script lang="ts">
-	import { brand, getColorForGrade } from '$lib';
+	import { getColorForGrade } from '$lib';
 	import { calculateGradePercentage } from '$lib/assignments';
+	import { brand } from '$lib/brand';
 	import DateBadge from '$lib/components/DateBadge.svelte';
 	import NumberInput from '$lib/components/NumberInput.svelte';
 	import CustomPopover from '$lib/components/Popover.svelte';

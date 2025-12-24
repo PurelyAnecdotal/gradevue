@@ -1,6 +1,7 @@
 <script lang="ts">
-	import { brand, LocalStorageKey } from '$lib';
+	import { LocalStorageKey } from '$lib';
 	import { acc } from '$lib/account.svelte';
+	import { brand } from '$lib/brand';
 	import LoadingBanner from '$lib/components/LoadingBanner.svelte';
 	import RefreshIndicator from '$lib/components/RefreshIndicator.svelte';
 	import {

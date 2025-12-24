@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { brand } from '$lib';
+	import { brand } from '$lib/brand';
 
 	interface Props {
 		trademark?: boolean;

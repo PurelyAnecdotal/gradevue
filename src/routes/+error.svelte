@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { page } from '$app/state';
-	import { brand } from '$lib';
+	import { brand } from '$lib/brand';
 	import { Alert, Button } from 'flowbite-svelte';
 </script>
 
