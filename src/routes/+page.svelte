@@ -5,12 +5,12 @@
 	import { acc, loadStudentAccount } from '$lib/account.svelte';
 	import { brand, repoLink } from '$lib/brand';
 	import Disclaimer from '$lib/components/Disclaimer.svelte';
+	import BellDotIcon from '@lucide/svelte/icons/bell-dot';
+	import CalculatorIcon from '@lucide/svelte/icons/calculator';
+	import ChartLineIcon from '@lucide/svelte/icons/chart-line';
+	import GithubIcon from '@lucide/svelte/icons/github';
+	import FolderLockIcon from '@lucide/svelte/icons/folder-lock';
 	import { Button, Card } from 'flowbite-svelte';
-	import ChartLineUpOutline from 'flowbite-svelte-icons/ChartLineUpOutline.svelte';
-	import ClockOutline from 'flowbite-svelte-icons/ClockOutline.svelte';
-	import EyeSlashOutline from 'flowbite-svelte-icons/EyeSlashOutline.svelte';
-	import GithubSolid from 'flowbite-svelte-icons/GithubSolid.svelte';
-	import InsertTableOutline from 'flowbite-svelte-icons/InsertTableOutline.svelte';
 
 	if (browser && localStorage.getItem(LocalStorageKey.token) !== null) {
 		if (!acc.studentAccount) loadStudentAccount();
@@ -52,8 +52,7 @@
 		<div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
 			<Card>
 				<h2 class="mb-2 flex items-center gap-2 text-xl dark:text-white">
-					<ChartLineUpOutline class="inline" />
-					Grade Chart
+					<ChartLineIcon class="h-5 w-5" /> Grade Chart
 				</h2>
 				<p>
 					Visually see how your grade has changed over time, how each assignment affects your grade,
@@ -63,8 +62,7 @@
 
 			<Card>
 				<h2 class="mb-2 flex items-center gap-2 text-xl dark:text-white">
-					<InsertTableOutline class="inline" />
-					Grade Calculator
+					<CalculatorIcon class="h-5 w-5" /> Grade Calculator
 				</h2>
 				<p>
 					{brand}'s powerful Hypothetical Mode let you calculate what your grade would be if you got
@@ -74,8 +72,7 @@
 
 			<Card>
 				<h2 class="mb-2 flex items-center gap-2 text-xl dark:text-white">
-					<ClockOutline class="inline" />
-					Attendance and more
+					<BellDotIcon class="h-5 w-5" /> Attendance and more
 				</h2>
 				<p>
 					{brand} breaks down your attendance by day and shows what periods you missed. It also shows
@@ -85,8 +82,7 @@
 
 			<Card>
 				<h2 class="mb-2 flex items-center gap-2 text-xl dark:text-white">
-					<EyeSlashOutline class="inline" />
-					Private Login
+					<FolderLockIcon class="h-5 w-5" /> Private Login
 				</h2>
 				<p>
 					{brand} does not have access to your data. When you use {brand}, your device connects
@@ -97,8 +93,7 @@
 		</div>
 
 		<Button href={repoLink} target="_blank" color="light" class="gap-2">
-			<GithubSolid class="inline" />
-			Open Source
+			<GithubIcon class="h-5 w-5" /> Open Source
 		</Button>
 	</main>
 

@@ -4,10 +4,10 @@
 	import LoadingBanner from '$lib/components/LoadingBanner.svelte';
 	import RefreshIndicator from '$lib/components/RefreshIndicator.svelte';
 	import type { Period } from '$lib/types/Attendance';
+	import CircleCheckIcon from '@lucide/svelte/icons/circle-check';
 	import { Accordion, AccordionItem, Alert, Badge } from 'flowbite-svelte';
-	import CheckCircleOutline from 'flowbite-svelte-icons/CheckCircleOutline.svelte';
 	import { attendanceState, loadAttendance } from './attendance.svelte';
-	
+
 	loadAttendance();
 
 	const excusedReasonRegex =
@@ -57,7 +57,7 @@
 {/if}
 
 {#if attendanceState.data && attendanceState.data.Absences.Absence}
-	<div class="mx-2 md:mx-4 mt-8">
+	<div class="mx-2 mt-8 md:mx-4">
 		{#if attendanceState.data.Absences.Absence?.length > 0}
 			<Accordion class="mx-auto max-w-2xl">
 				{#each attendanceState.data.Absences.Absence as absence (absence._AbsenceDate)}
@@ -88,9 +88,7 @@
 			</Accordion>
 		{:else}
 			<Alert class="mx-auto flex w-fit items-center" color="green">
-				<CheckCircleOutline />
-
-				Looks like you haven't had any attendence events yet.
+				<CircleCheckIcon class="h-5 w-5" /> Looks like you haven't had any attendence events yet.
 			</Alert>
 		{/if}
 	</div>

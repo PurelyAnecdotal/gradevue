@@ -5,6 +5,7 @@
 	import RefreshIndicator from '$lib/components/RefreshIndicator.svelte';
 	import type { InboxItemListingsMessageXML } from '$lib/types/MailData';
 	import { Modal } from 'flowbite-svelte';
+	import { SvelteSet } from 'svelte/reactivity';
 	import MessageCard from './MessageCard.svelte';
 	import MessageView from './MessageView.svelte';
 	import { loadMailData, mailDataState } from './mailData.svelte';
@@ -17,7 +18,7 @@
 	let messageOpen = $state(false);
 	let openedMessage: InboxItemListingsMessageXML | undefined = $state(undefined);
 	let openedMessageContent = $state('');
-	let openedMessageLinks: string[] = $state([]);
+	const openedMessageLinks: SvelteSet<string> = new SvelteSet();
 
 	let touchscreen = $state(false);
 
@@ -28,12 +29,12 @@
 
 		const links = doc.querySelectorAll('a');
 
-		openedMessageLinks = [];
+		openedMessageLinks.clear();
 
 		links.forEach((link) => {
 			link.setAttribute('target', '_blank');
 
-			if (new URL(link.href).hostname) openedMessageLinks.push(link.href);
+			if (new URL(link.href).hostname) openedMessageLinks.add(link.href);
 		});
 
 		openedMessageContent = doc.body.innerHTML;

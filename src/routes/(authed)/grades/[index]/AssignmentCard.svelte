@@ -5,6 +5,10 @@
 	import DateBadge from '$lib/components/DateBadge.svelte';
 	import NumberInput from '$lib/components/NumberInput.svelte';
 	import CustomPopover from '$lib/components/Popover.svelte';
+	import ChevronDownIcon from '@lucide/svelte/icons/chevron-down';
+	import ChevronUpIcon from '@lucide/svelte/icons/chevron-up';
+	import InfoIcon from '@lucide/svelte/icons/info';
+	import MessageCircleIcon from '@lucide/svelte/icons/message-circle';
 	import {
 		Badge,
 		Button,
@@ -16,9 +20,6 @@
 		Popover,
 		Progressbar
 	} from 'flowbite-svelte';
-	import AnnotationOutline from 'flowbite-svelte-icons/AnnotationOutline.svelte';
-	import ChevronDownOutline from 'flowbite-svelte-icons/ChevronDownOutline.svelte';
-	import InfoCircleOutline from 'flowbite-svelte-icons/InfoCircleOutline.svelte';
 	import { fade } from 'svelte/transition';
 
 	interface Props {
@@ -113,7 +114,11 @@
 			{#if categoryDropdownOptions.length > 0}
 				<Button color="light">
 					{category ?? 'Select category'}
-					<ChevronDownOutline size="xs" class="ml-2" />
+					{#if categoryDropdownOpen}
+						<ChevronUpIcon class="ml-2 h-4 w-4" />
+					{:else}
+						<ChevronDownIcon class="ml-2 h-4 w-4" />
+					{/if}
 				</Button>
 
 				<Dropdown bind:open={categoryDropdownOpen}>
@@ -172,7 +177,7 @@
 				toward your grade. {brand} can reveal these assignments.
 			</Popover>
 			<Badge border color="dark" class="hidden-badge">
-				Hidden Assignments <InfoCircleOutline size="xs" class="ml-1" />
+				Hidden Assignments <InfoIcon class="ml-1 h-4 w-4" />
 			</Badge>
 		{/if}
 		{#if showHypotheticalLabel}
@@ -191,16 +196,17 @@
 			<div class="relative" bind:this={commentsContainer}>
 				<button
 					onclick={toggleComments}
-					class="cursor-pointer rounded-lg p-2 text-sm transition-colors select-none hover:bg-slate-600 lg:p-1 {commentsVisible
+					title="Teacher comments"
+					class="cursor-pointer rounded-lg p-2 text-sm transition-colors select-none hover:bg-slate-600 {commentsVisible
 						? 'bg-slate-600'
 						: 'bg-slate-700'}"
 				>
-					<AnnotationOutline />
+					<MessageCircleIcon class="h-4 w-4"/>
 				</button>
 
 				{#if commentsVisible}
 					<div
-						class="absolute bottom-full left-1/2 mb-2 -translate-x-1/2"
+						class="absolute bottom-full left-1/2 mb-2 w-fit -translate-x-1/2"
 						transition:fade={{ duration: 100 }}
 					>
 						<CustomPopover>{comments}</CustomPopover>

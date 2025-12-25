@@ -1,8 +1,8 @@
 <script>
-	import { brand, contactEmail } from '$lib/brand';
-	import { Card } from 'flowbite-svelte';
-	import EnvelopeOutline from 'flowbite-svelte-icons/EnvelopeOutline.svelte';
-	import GithubSolid from 'flowbite-svelte-icons/GithubSolid.svelte';
+	import { brand, contactEmail, repoLink } from '$lib/brand';
+	import GithubIcon from '@lucide/svelte/icons/github';
+	import SendIcon from '@lucide/svelte/icons/send';
+	import { Button } from 'flowbite-svelte';
 </script>
 
 <svelte:head>
@@ -11,22 +11,24 @@
 
 <h1 class="mx-4 mt-8 text-2xl font-bold">Feedback</h1>
 
-<p class="m-4 text-gray-300">
+<p class="m-4 dark:text-gray-300">
 	If you're experiencing a problem or have suggestions or feedback, please let us know.
 </p>
 
 <div class="flex flex-col gap-4 px-4">
-	<Card
-		href="https://github.com/Nonexistent-Name/gradevue/issues"
-		class="flex flex-row items-center gap-4"
-		padding="sm"
+	<Button
+		href="{repoLink}/issues"
+		color="light"
+		class="flex max-w-sm flex-row items-center justify-start gap-4 px-4 text-lg dark:text-white"
 	>
-		<GithubSolid size="lg" class="text-white" />
-		<h1 class="text-lg text-gray-900 dark:text-white">Create an issue on GitHub</h1>
-	</Card>
+		<GithubIcon class="h-5 w-5 shrink-0" />Create an issue on GitHub
+	</Button>
 
-	<Card href="mailto:{contactEmail}" class="flex flex-row items-center gap-4" padding="sm">
-		<EnvelopeOutline size="lg" class="text-white" />
-		<h1 class="text-lg text-gray-900 dark:text-white">Send an email</h1>
-	</Card>
+	<Button
+		href="mailto:{contactEmail}"
+		color="light"
+		class="flex max-w-sm flex-row items-center justify-start gap-4 px-4 text-lg dark:text-white"
+	>
+		<SendIcon class="h-5 w-5 shrink-0" /> Send us an email
+	</Button>
 </div>

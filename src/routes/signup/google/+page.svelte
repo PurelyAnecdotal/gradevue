@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { brand } from '$lib/brand';
+	import InfoIcon from '@lucide/svelte/icons/info';
 	import { Button, Input, Modal } from 'flowbite-svelte';
-	import InfoCircleOutline from 'flowbite-svelte-icons/InfoCircleOutline.svelte';
 	import { SvelteURL } from 'svelte/reactivity';
 
 	let modalOpen = $state(false);
@@ -35,8 +35,7 @@
 	color="light"
 	class="mx-auto flex w-fit cursor-pointer items-center gap-2"
 >
-	<InfoCircleOutline size="sm" />
-	How to set your StudentVUE password
+	<InfoIcon class="h-4 w-4" /> How to set your StudentVUE password
 </Button>
 
 <Modal

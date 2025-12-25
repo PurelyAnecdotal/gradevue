@@ -26,6 +26,14 @@
 		type RealAssignment
 	} from '$lib/assignments';
 	import { brand } from '$lib/brand';
+	import ChevronDownIcon from '@lucide/svelte/icons/chevron-down';
+	import ChevronUpIcon from '@lucide/svelte/icons/chevron-up';
+	import CircleAlertIcon from '@lucide/svelte/icons/circle-alert';
+	import CircleXIcon from '@lucide/svelte/icons/circle-x';
+	import Columns3CogIcon from '@lucide/svelte/icons/columns-3-cog';
+	import Grid2x2PlusIcon from '@lucide/svelte/icons/grid-2x2-plus';
+	import InfoIcon from '@lucide/svelte/icons/info';
+	import RotateCCWIcon from '@lucide/svelte/icons/rotate-ccw';
 	import NumberFlow from '@number-flow/svelte';
 	import {
 		Alert,
@@ -41,13 +49,6 @@
 		TableHeadCell,
 		Tabs
 	} from 'flowbite-svelte';
-	import AddColumnAfterOutline from 'flowbite-svelte-icons/AddColumnAfterOutline.svelte';
-	import ChevronDownOutline from 'flowbite-svelte-icons/ChevronDownOutline.svelte';
-	import ChevronUpOutline from 'flowbite-svelte-icons/ChevronUpOutline.svelte';
-	import CloseCircleOutline from 'flowbite-svelte-icons/CloseCircleOutline.svelte';
-	import ExclamationCircleSolid from 'flowbite-svelte-icons/ExclamationCircleSolid.svelte';
-	import GridPlusOutline from 'flowbite-svelte-icons/GridPlusOutline.svelte';
-	import InfoCircleOutline from 'flowbite-svelte-icons/InfoCircleOutline.svelte';
 	import { untrack } from 'svelte';
 	import { fade } from 'svelte/transition';
 	import {
@@ -239,7 +240,7 @@
 			</span>
 			<span class="flex shrink-0 items-center text-2xl">
 				{#if hypotheticalMode && !categories && !rawGradeCalcMatches}
-					<ExclamationCircleSolid class="mr-2" />
+					<CircleAlertIcon class="mr-2 h-5 w-5" />
 				{/if}
 				{#if grade !== undefined}
 					<NumberFlow
@@ -319,11 +320,11 @@
 
 	{#if !rawGradeCalcMatches}
 		<Alert class="m-4" color="red" border>
-			<ExclamationCircleSolid slot="icon" size="sm" />
+			<CircleAlertIcon slot="icon" class="h-5 w-5 shrink-0" />
 
 			<div class="flex flex-col gap-2">
 				<button
-					class="flex items-center"
+					class="flex items-center gap-1"
 					onclick={() => {
 						calcWarningOpen = !calcWarningOpen;
 					}}
@@ -336,9 +337,9 @@
 						{/if}
 					</span>
 					{#if calcWarningOpen}
-						<ChevronUpOutline size="md" class="focus" />
+						<ChevronUpIcon class="focus h-4 w-4" />
 					{:else}
-						<ChevronDownOutline size="md" class="focus" />
+						<ChevronDownIcon class="focus h-4 w-4" />
 					{/if}
 				</button>
 
@@ -357,8 +358,7 @@
 	<div class="m-4 flex flex-wrap items-center gap-2">
 		<Checkbox bind:checked={hypotheticalMode}>
 			<div id="hypothetical-toggle" class="mr-2 flex items-center">
-				Hypothetical Mode
-				<InfoCircleOutline size="sm" class="ml-2" />
+				Hypothetical Mode <InfoIcon class="ml-2 h-4 w-4" />
 			</div>
 		</Checkbox>
 		<Popover triggeredBy="#hypothetical-toggle" class="max-w-md text-sm dark:text-gray-300">
@@ -373,19 +373,19 @@
 		{#if hypotheticalMode}
 			<div transition:fade={{ duration: 200 }} class="ml-auto">
 				<Button color="light" size="sm" onclick={initReactiveAssignments}>
-					<CloseCircleOutline size="sm" class="mr-2" />
+					<RotateCCWIcon class="mr-2 h-4 w-4" />
 					Reset
 				</Button>
 
 				{#if !showTargetGradeCalculator}
 					<Button color="light" size="sm" onclick={toggleTargetGradeCalculator}>
-						<AddColumnAfterOutline size="sm" class="mr-2" />
+						<Columns3CogIcon class="mr-2 h-4 w-4" />
 						Target Grade Calculator
 					</Button>
 				{/if}
 
 				<Button color="light" size="sm" onclick={addHypotheticalAssignment}>
-					<GridPlusOutline size="sm" class="mr-2" />
+					<Grid2x2PlusIcon class="mr-2 h-4 w-4" />
 					Add Hypothetical Assignment
 				</Button>
 			</div>
@@ -420,7 +420,7 @@
 	{:else}
 		<div class="flex justify-center">
 			<Alert class="mx-4 flex w-fit items-center" color="dark">
-				<CloseCircleOutline />
+				<CircleXIcon class="h-4 w-4" />
 
 				Looks like this this course doesn't have any grades yet.
 			</Alert>
@@ -485,7 +485,8 @@
 		comments,
 		date,
 		newHypothetical
-	}: RealAssignment | Flowed,
+		// Flowed<RealAssignment | HiddenAssignment>
+	}: RealAssignment | Flowed<RealAssignment | HiddenAssignment>,
 	showCategory = true
 )}
 	<li>

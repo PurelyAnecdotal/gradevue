@@ -3,12 +3,12 @@
 	import { parseSynergyAssignment } from '$lib/assignments';
 	import { brand } from '$lib/brand';
 	import type { AssignmentEntity, Mark } from '$lib/types/Gradebook';
+	import ChevronDownIcon from '@lucide/svelte/icons/chevron-down';
+	import ChevronUpIcon from '@lucide/svelte/icons/chevron-up';
+	import CircleXIcon from '@lucide/svelte/icons/circle-x';
+	import MapPinIcon from '@lucide/svelte/icons/map-pin';
 	import NumberFlow from '@number-flow/svelte';
 	import { Alert, Badge, Button, Card, Dropdown, DropdownItem, Progressbar } from 'flowbite-svelte';
-	import ChevronDownOutline from 'flowbite-svelte-icons/ChevronDownOutline.svelte';
-	import ChevronUpOutline from 'flowbite-svelte-icons/ChevronUpOutline.svelte';
-	import CloseCircleOutline from 'flowbite-svelte-icons/CloseCircleOutline.svelte';
-	import MapPinAltOutline from 'flowbite-svelte-icons/MapPinAltOutline.svelte';
 	import {
 		getCurrentGradebookState,
 		getPeriodIndex,
@@ -45,13 +45,13 @@
 {#if allPeriods && currentPeriod && currentPeriodIndex !== undefined && currentGradebookState?.data}
 	<main class="m-4 space-y-4">
 		<div class="flex flex-col justify-center">
-			<Button color="light" class="mx-auto flex items-center">
+			<Button color="light" class="mx-auto flex items-center gap-2">
 				{currentGradebookState.data.ReportingPeriod._GradePeriod}
 
 				{#if dropdownOpen}
-					<ChevronUpOutline size="sm" class="ml-2" />
+					<ChevronUpIcon class="h-4 w-4" />
 				{:else}
-					<ChevronDownOutline size="sm" class="ml-2" />
+					<ChevronDownIcon class="h-4 w-4" />
 				{/if}
 			</Button>
 
@@ -65,7 +65,7 @@
 						class="flex items-center"
 					>
 						{#if period._GradePeriod === currentPeriod._GradePeriod}
-							<MapPinAltOutline size="sm" class="mr-2" />
+							<MapPinIcon class="mr-2 h-4 w-4" />
 						{/if}
 						{period._GradePeriod}
 					</DropdownItem>
@@ -75,7 +75,7 @@
 
 		{#if currentGradebookState.data.Courses.Course.map( (course) => (course.Marks === '' ? 'N/A' : course.Marks.Mark._CalculatedScoreString) ).every((score) => score === 'N/A')}
 			<Alert class="mx-auto flex w-fit items-center" color="dark">
-				<CloseCircleOutline />
+				<CircleXIcon class="h-5 w-5" />
 				It looks like you don't have any grades yet in this reporting period.
 
 				{#if currentPeriodIndex > 0}

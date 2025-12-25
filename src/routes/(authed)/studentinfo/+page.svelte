@@ -4,6 +4,9 @@
 	import { brand } from '$lib/brand';
 	import LoadingBanner from '$lib/components/LoadingBanner.svelte';
 	import RefreshIndicator from '$lib/components/RefreshIndicator.svelte';
+	import CopyIcon from '@lucide/svelte/icons/copy';
+	import EyeIcon from '@lucide/svelte/icons/eye';
+	import FolderLockIcon from '@lucide/svelte/icons/folder-lock';
 	import {
 		Accordion,
 		AccordionItem,
@@ -14,9 +17,6 @@
 		TableBodyCell,
 		TableBodyRow
 	} from 'flowbite-svelte';
-	import ClipboardOutline from 'flowbite-svelte-icons/ClipboardOutline.svelte';
-	import EyeOutline from 'flowbite-svelte-icons/EyeOutline.svelte';
-	import LockOutline from 'flowbite-svelte-icons/LockOutline.svelte';
 	import { loadStudentInfo, studentInfoState } from './studentInfo.svelte';
 
 	loadStudentInfo();
@@ -106,15 +106,17 @@
 		<Card class="mx-auto max-w-lg grow space-y-2 dark:text-gray-300">
 			<div class="flex items-center justify-between">
 				<h2 class="text-xl text-white">Login Information</h2>
-				<p class="flex items-center"><LockOutline />Stored on-device</p>
+				<p class="flex items-center gap-2">
+					<FolderLockIcon class="h-4 w-4" />Stored on-device
+				</p>
 			</div>
 
 			<dl>
 				<dt class="">Username</dt>
 				<dd class="flex items-center justify-end gap-2 text-white">
 					{acc.studentAccount.userID}
-					<Button onclick={copyUsername} color="light" class="p-1" title="Copy username">
-						<ClipboardOutline />
+					<Button onclick={copyUsername} color="light" class="p-2" title="Copy username">
+						<CopyIcon class="h-4 w-4" />
 					</Button>
 				</dd>
 				<dt class="">Password</dt>
@@ -127,19 +129,19 @@
 						{/if}
 					</span>
 					{#if !showPassword}
-						<Button onclick={togglePassword} color="light" class="p-1" title="Show password">
-							<EyeOutline />
+						<Button onclick={togglePassword} color="light" class="p-2" title="Show password">
+							<EyeIcon class="h-4 w-4" />
 						</Button>
 					{/if}
-					<Button onclick={copyPassword} color="light" class="p-1" title="Copy password">
-						<ClipboardOutline />
+					<Button onclick={copyPassword} color="light" class="p-2" title="Copy password">
+						<CopyIcon class="h-4 w-4" />
 					</Button>
 				</dd>
 				<dt>Domain</dt>
 				<dd class="flex items-center justify-end gap-2 text-white">
 					{acc.studentAccount.domain}
-					<Button onclick={copyDomain} color="light" class="p-1" title="Copy domain">
-						<ClipboardOutline />
+					<Button onclick={copyDomain} color="light" class="p-2" title="Copy domain">
+						<CopyIcon class="h-4 w-4" />
 					</Button>
 				</dd>
 			</dl>

@@ -7,10 +7,11 @@
 	import Disclaimer from '$lib/components/Disclaimer.svelte';
 	import LoadingBanner from '$lib/components/LoadingBanner.svelte';
 	import { StudentAccount } from '$lib/synergy';
+	import CircleXIcon from '@lucide/svelte/icons/circle-x';
+	import FolderLockIcon from '@lucide/svelte/icons/folder-lock';
+	import InfoIcon from '@lucide/svelte/icons/info';
+	import LogInIcon from '@lucide/svelte/icons/log-in';
 	import { Alert, Button, Card, Checkbox, Helper, Input, Label, Popover } from 'flowbite-svelte';
-	import ExclamationCircleSolid from 'flowbite-svelte-icons/ExclamationCircleSolid.svelte';
-	import EyeSlashOutline from 'flowbite-svelte-icons/EyeSlashOutline.svelte';
-	import InfoCircleOutline from 'flowbite-svelte-icons/InfoCircleOutline.svelte';
 	import { fly } from 'svelte/transition';
 
 	if (browser && localStorage.getItem(LocalStorageKey.token) !== null) {
@@ -78,7 +79,7 @@
 {#if loginError}
 	<div in:fly={{ y: -50, duration: 200 }} class="fixed top-0 left-0 flex w-full justify-center p-4">
 		<Alert color="red">
-			<ExclamationCircleSolid slot="icon" />
+			<CircleXIcon slot="icon" class="h-5 w-5" />
 			<span class="font-bold">Couldn't log in</span>
 			<p>{loginError}</p>
 		</Alert>
@@ -112,15 +113,15 @@
 						autocomplete="current-password"
 						required
 					/>
-					<Helper class="flex items-center text-xs">
-						<EyeSlashOutline size="sm" class="mr-2" />
+					<Helper class="flex items-center gap-2 text-xs dark:text-gray-400">
+						<FolderLockIcon class="h-4 w-4 shrink-0" />
 						Your device connects directly to StudentVUE. We can't see your password or your grades.
 					</Helper>
-					<Helper class="flex items-center text-xs">
-						<InfoCircleOutline size="sm" class="mr-2" />
+					<Helper class="flex items-center gap-2 text-xs dark:text-gray-400">
+						<InfoIcon class="h-4 w-4 shrink-0" />
 						<span>
 							If you've never used {brand} before, you may need to
-							<a href="/signup" class="text-primary-600 underline">create a password</a>.
+							<a href="/signup" class="dark:text-primary-600 underline">create a password</a>.
 						</span>
 					</Helper>
 				</p>
@@ -169,7 +170,9 @@
 					terms.
 				</Checkbox>
 
-				<Button type="submit" class="w-full">Log in</Button>
+				<Button type="submit" class="flex w-full items-center gap-2">
+					<LogInIcon class="h-4 w-4" /> Log in
+				</Button>
 			</form>
 		</Card>
 	</main>
