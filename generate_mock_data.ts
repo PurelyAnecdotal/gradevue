@@ -107,16 +107,26 @@ console.log(`Connecting to ${domain} as ${username}\n`);
 const outputDir = path.join(process.cwd(), 'src', 'lib', 'mocks', 'data');
 if (!(await fs.exists(outputDir))) await fs.mkdir(outputDir, { recursive: true });
 
-const resources: [string, string][] = [
+const documentGU =
+	process.env.STUDENTVUE_MOCK_DOCUMENT_GU ?? (await prompt('Example DocumentGU to mock: '));
+
+const attachmentGU =
+	process.env.STUDENTVUE_MOCK_ATTACHMENT_GU ?? (await prompt('Example AttachmentGU to mock: '));
+
+const resources: ([string, string] | [string, string, Map<string, unknown>])[] = [
 	['Gradebook', 'gradebook.xml'],
 	['Attendance', 'attendance.xml'],
 	['GetStudentDocumentInitialData', 'documents.xml'],
+	['GetReportCardDocumentData', 'document.xml', new Map([['DocumentGU', documentGU]])],
 	['SynergyMailGetData', 'mail.xml'],
+	['SynergyMailGetAttachment', 'attachment.xml', new Map([['SmAttachmentGU', attachmentGU]])],
 	['StudentInfo', 'studentinfo.xml']
 ];
 
 await Promise.allSettled(
-	resources.map(([methodName, fileName]) => generateMethodMockData(methodName, fileName))
+	resources.map(([methodName, fileName, params]) =>
+		generateMethodMockData(methodName, fileName, params)
+	)
 );
 
 console.log('\nMock data generation complete');
