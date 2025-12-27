@@ -8,10 +8,11 @@
 		type TargetGradeCalculatorCategoryDependentOptions
 	} from '$lib/assignments';
 	import NumberInput from '$lib/components/NumberInput.svelte';
+	import SquareDashedMousePointerIcon from '@lucide/svelte/icons/square-dashed-mouse-pointer';
+	import SquareMousePointerIcon from '@lucide/svelte/icons/square-mouse-pointer';
+	import XIcon from '@lucide/svelte/icons/x';
 	import NumberFlow, { NumberFlowGroup } from '@number-flow/svelte';
 	import { Button, Label, Modal, Radio } from 'flowbite-svelte';
-	import CloseOutline from 'flowbite-svelte-icons/CloseOutline.svelte';
-	import EditOutline from 'flowbite-svelte-icons/EditOutline.svelte';
 	import { untrack } from 'svelte';
 	import AssignmentCard from './AssignmentCard.svelte';
 
@@ -80,7 +81,7 @@
 	<h3 class="mb-4 flex justify-between">
 		Target Grade Calculator
 		<Button color="alternative" class="p-1" size="xs" onclick={onclose}>
-			<CloseOutline class="dark:text-white" />
+			<XIcon />
 		</Button>
 	</h3>
 
@@ -100,12 +101,13 @@
 		{#if targetAssignment}
 			<p class="flex items-center gap-2">
 				{targetAssignment.name}
-				<Button color="light" class="p-2!">
-					<EditOutline onclick={toggleTargetAssignmentSelectMode} class="h-4 w-4" />
+				<Button title="Select another assignment" color="light" class="p-2!">
+					<SquareDashedMousePointerIcon onclick={toggleTargetAssignmentSelectMode}  class="h-4 w-4" />
 				</Button>
 			</p>
 		{:else}
-			<Button color="light" size="sm" class="w-fit" onclick={toggleTargetAssignmentSelectMode}>
+			<Button color="light" size="sm" class="w-fit flex items-center gap-2" onclick={toggleTargetAssignmentSelectMode}>
+				<SquareMousePointerIcon class="h-4 w-4" />
 				Select
 			</Button>
 		{/if}
