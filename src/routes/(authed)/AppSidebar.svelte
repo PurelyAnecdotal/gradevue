@@ -2,6 +2,17 @@
 	import { page } from '$app/state';
 	import { removeClassID } from '$lib';
 	import { brand } from '$lib/brand';
+	import AppWindowMacIcon from '@lucide/svelte/icons/app-window-mac';
+	import BellIcon from '@lucide/svelte/icons/bell';
+	import ChevronDownIcon from '@lucide/svelte/icons/chevron-down';
+	import ChevronUpIcon from '@lucide/svelte/icons/chevron-up';
+	import CircleUserIcon from '@lucide/svelte/icons/circle-user';
+	import FolderOpenIcon from '@lucide/svelte/icons/folder-open';
+	import InboxIcon from '@lucide/svelte/icons/inbox';
+	import LogOutIcon from '@lucide/svelte/icons/log-out';
+	import MapPinIcon from '@lucide/svelte/icons/map-pin';
+	import MessageSquareWarningIcon from '@lucide/svelte/icons/message-square-warning';
+	import NotebookTextIcon from '@lucide/svelte/icons/notebook-text';
 	import {
 		Sidebar,
 		SidebarBrand,
@@ -10,17 +21,6 @@
 		SidebarWrapper,
 		Spinner
 	} from 'flowbite-svelte';
-	import AddressBookOutline from 'flowbite-svelte-icons/AddressBookOutline.svelte';
-	import AnnotationOutline from 'flowbite-svelte-icons/AnnotationOutline.svelte';
-	import ArrowRightToBracketOutline from 'flowbite-svelte-icons/ArrowRightToBracketOutline.svelte';
-	import BellOutline from 'flowbite-svelte-icons/BellOutline.svelte';
-	import ChevronDownOutline from 'flowbite-svelte-icons/ChevronDownOutline.svelte';
-	import ChevronUpOutline from 'flowbite-svelte-icons/ChevronUpOutline.svelte';
-	import DownloadOutline from 'flowbite-svelte-icons/DownloadOutline.svelte';
-	import FolderOpenOutline from 'flowbite-svelte-icons/FolderOpenOutline.svelte';
-	import MailBoxOutline from 'flowbite-svelte-icons/MailBoxOutline.svelte';
-	import MapPinAltOutline from 'flowbite-svelte-icons/MapPinAltOutline.svelte';
-	import UserCircleOutline from 'flowbite-svelte-icons/UserCircleOutline.svelte';
 	import type { Component, Snippet } from 'svelte';
 	import { fade } from 'svelte/transition';
 	import { installPrompt } from '../../hooks.client';
@@ -46,7 +46,7 @@
 )}
 	<SidebarItem {label} {href} {onclick}>
 		<svelte:fragment slot="icon">
-			<Icon />
+			<Icon class="h-5 w-5" />
 		</svelte:fragment>
 		<svelte:fragment slot="subtext">
 			{#if subtext}
@@ -65,17 +65,17 @@
 			/>
 
 			{#if page.url.pathname.startsWith('/grades')}
-				<li class="rounded-lg bg-gray-900">
+				<li class="rounded-lg dark:bg-gray-900">
 					<a
 						href="/grades"
-						class="flex items-center rounded-lg bg-gray-200 p-2 text-base font-normal text-gray-900 hover:bg-gray-100 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-700"
+						class="flex items-center rounded-lg p-2 text-base font-normal hover:bg-gray-100 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-700"
 					>
-						<AddressBookOutline />
-						<span class="ms-3">Grades</span>
+						<NotebookTextIcon class="mr-3 h-5 w-5" />
+						<span class="mr-1">Grades</span>
 						{#if page.params.index}
-							<ChevronUpOutline />
+							<ChevronUpIcon class="h-4 w-4" />
 						{:else}
-							<ChevronDownOutline />
+							<ChevronDownIcon class="h-4 w-4" />
 						{/if}
 					</a>
 					<svelte:boundary>
@@ -85,16 +85,14 @@
 									<li>
 										<a
 											href={`/grades/${index.toString()}`}
-											class="text-gray-90 group flex w-full items-center rounded-lg p-2 text-base font-normal transition duration-75 hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
+											class="text-gray-90 group flex w-full items-center gap-3 rounded-lg p-2 text-base font-normal transition duration-75 hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
 										>
-											<MapPinAltOutline
-												class={page.params.index !== index.toString()
+											<MapPinIcon
+												class="{page.params.index !== index.toString()
 													? 'opacity-0 transition'
-													: 'transition'}
+													: 'transition'} h-5 w-5"
 											/>
-											<span class="ml-3">
-												{removeClassID(title)}
-											</span>
+											{removeClassID(title)}
 										</a>
 									</li>
 								{/each}
@@ -111,14 +109,14 @@
 					</svelte:boundary>
 				</li>
 			{:else}
-				{@render sidebarLink('Grades', '/grades', AddressBookOutline)}
+				{@render sidebarLink('Grades', '/grades', NotebookTextIcon)}
 			{/if}
 
-			{@render sidebarLink('Attendance', '/attendance', BellOutline)}
+			{@render sidebarLink('Attendance', '/attendance', BellIcon)}
 
-			{@render sidebarLink('Documents', '/documents', FolderOpenOutline)}
+			{@render sidebarLink('Documents', '/documents', FolderOpenIcon)}
 
-			{@render sidebarLink('Mail', '/mail', MailBoxOutline)}
+			{@render sidebarLink('Mail', '/mail', InboxIcon)}
 		</SidebarGroup>
 
 		<SidebarGroup>
@@ -127,13 +125,13 @@
 					{@render sidebarLink(
 						'Install Web App',
 						'#',
-						DownloadOutline,
+						AppWindowMacIcon,
 						() => void $installPrompt.prompt?.()
 					)}
 				</div>
 			{/if}
 
-			{@render sidebarLink('Feedback', '/feedback', AnnotationOutline)}
+			{@render sidebarLink('Feedback', '/feedback', MessageSquareWarningIcon)}
 
 			<SidebarItem
 				label={studentInfoState.data?.FormattedName ?? '.'}
@@ -141,11 +139,11 @@
 				href="/studentinfo"
 			>
 				<svelte:fragment slot="icon">
-					<UserCircleOutline />
+					<CircleUserIcon class="h-5 w-5" />
 				</svelte:fragment>
 			</SidebarItem>
 
-			{@render sidebarLink('Log Out', '/login', ArrowRightToBracketOutline, logOut)}
+			{@render sidebarLink('Log Out', '/login', LogOutIcon, logOut)}
 		</SidebarGroup>
 	</SidebarWrapper>
 </Sidebar>

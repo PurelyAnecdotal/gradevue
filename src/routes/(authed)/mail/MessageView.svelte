@@ -1,19 +1,19 @@
 <script lang="ts">
 	import type { InboxItemListingsMessageXML } from '$lib/types/MailData';
-	import { Badge, Card } from 'flowbite-svelte';
-	import ChevronDownOutline from 'flowbite-svelte-icons/ChevronDownOutline.svelte';
-	import ChevronRightOutline from 'flowbite-svelte-icons/ChevronRightOutline.svelte';
-	import LinkOutline from 'flowbite-svelte-icons/LinkOutline.svelte';
-	import PaperClipOutline from 'flowbite-svelte-icons/PaperClipOutline.svelte';
+	import ChevronDownIcon from '@lucide/svelte/icons/chevron-down';
+	import ChevronRightIcon from '@lucide/svelte/icons/chevron-right';
+	import LinkIcon from '@lucide/svelte/icons/link';
+	import PaperclipIcon from '@lucide/svelte/icons/paperclip';
+	import { Badge, Button } from 'flowbite-svelte';
 
 	interface Props {
 		touchscreen?: boolean;
 		message: InboxItemListingsMessageXML;
 		content?: string;
-		links?: string[];
+		links?: Set<string>;
 	}
 
-	let { touchscreen = false, message, content = '', links = [] }: Props = $props();
+	let { touchscreen = false, message, content = '', links = new Set() }: Props = $props();
 
 	let from = $derived(message.From.RecipientXML);
 	let recipients = $derived(
@@ -34,17 +34,12 @@
 	let showRecipients = $state(false);
 </script>
 
-<ol>
-	<li class="text-md text-white">
-		{message._SendDateTimeFormattedLong}
-	</li>
-	<li class="text-md text-white">
-		From: {from._Details1}
-		({from._Details2})
-	</li>
+<ol class="dark:text-white">
+	<li>{message._SendDateTimeFormattedLong}</li>
+	<li>From: {from._Details1} ({from._Details2})</li>
 
 	{#if recipients}
-		<li class="text-md text-white">
+		<li>
 			{#if recipients.length > 1}
 				<div class="flex gap-2">
 					To:
@@ -57,9 +52,9 @@
 						<Badge color="dark">
 							{recipients.length} Recipients
 							{#if showRecipients}
-								<ChevronDownOutline size="sm" />
+								<ChevronDownIcon class="h-4 w-4" />
 							{:else}
-								<ChevronRightOutline size="sm" />
+								<ChevronRightIcon class="h-4 w-4" />
 							{/if}
 						</Badge>
 					</button>
@@ -72,7 +67,7 @@
 						{/each}
 					</ul>
 				{/if}
-			{:else}
+			{:else if recipients[0]}
 				To: {recipients[0]._Details1} ({recipients[0]._Details2})
 			{/if}
 		</li>
@@ -135,33 +130,33 @@
 	title="Message Content"
 ></iframe>
 
-{#if attachments || links.length > 0}
+{#if attachments || links.size > 0}
 	<ul class="flex flex-wrap gap-2">
 		{#each links as link (link)}
 			<li class="max-w-full">
-				<Card
-					padding="xs"
-					horizontal={true}
-					class="flex w-fit max-w-full flex-row items-center gap-2 dark:text-white"
+				<Button
 					href={link}
+					target="_blank"
+					color="light"
+					class="flex w-fit max-w-full items-center gap-2 px-3 text-base dark:text-white"
 				>
-					<LinkOutline size="sm" />
+					<LinkIcon class="h-5 w-5 shrink-0" />
 					<span class="truncate">{new URL(link).hostname}</span>
-				</Card>
+				</Button>
 			</li>
 		{/each}
 
 		{#each attachments ?? [] as attachment (attachment._SmAttachmentGU)}
 			<li class="max-w-full">
-				<Card
-					padding="xs"
-					horizontal
-					class="flex w-fit max-w-full flex-row items-center gap-2 dark:text-white"
+				<Button
 					href="/mail/attachment?attachmentGU={attachment._SmAttachmentGU}"
+					target="_blank"
+					color="light"
+					class="flex w-fit max-w-full items-center gap-2 px-3 text-base dark:text-white"
 				>
-					<PaperClipOutline size="sm" />
+					<PaperclipIcon class="h-5 w-5 shrink-0" />
 					<span class="truncate">{attachment._DocumentName}</span>
-				</Card>
+				</Button>
 			</li>
 		{/each}
 	</ul>
