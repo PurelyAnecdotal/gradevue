@@ -44,7 +44,7 @@ export class StudentAccount {
 			.replaceAll('<', '&lt;')
 			.replaceAll('>', '&gt;');
 
-		const res = await fetch(`https://${this.domain}/Service/PXPCommunication.asmx?WSDL`, {
+		const res = await fetch(`https://${this.domain}/Service/PXPCommunication.asmx`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/soap+xml; charset=utf-8' },
 			body: `<?xml version="1.0" encoding="utf-8"?>
