@@ -15,17 +15,16 @@ const alwaysArray = [
 	'Attendance.Absences.Absence'
 ];
 
-const parser = new XMLParser({
+const envelopeParser = new XMLParser({ ignoreDeclaration: true });
+
+const resultParser = new XMLParser({
 	ignoreAttributes: false,
 	ignoreDeclaration: true,
 	attributeNamePrefix: '_',
 	isArray: (_name, jpath) => alwaysArray.includes(jpath)
 });
 
-const builder = new XMLBuilder({
-	ignoreAttributes: false,
-	attributeNamePrefix: '_'
-});
+const builder = new XMLBuilder({ ignoreAttributes: false, attributeNamePrefix: '_' });
 
 export class StudentAccount {
 	domain: string;
@@ -38,52 +37,55 @@ export class StudentAccount {
 		this.password = password;
 	}
 
-	async soapRequest(operation: string, methodName: string, params: unknown = {}) {
-		const paramStr = builder
-			.build({ Params: params })
-			.replaceAll('<', '&lt;')
-			.replaceAll('>', '&gt;');
-
+	async soapRequest(operation: string, methodName: string, params: Record<string, unknown> = {}) {
 		const res = await fetch(`https://${this.domain}/Service/PXPCommunication.asmx`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/soap+xml; charset=utf-8' },
-			body: `<?xml version="1.0" encoding="utf-8"?>
-            <soap12:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap12="http://www.w3.org/2003/05/soap-envelope">
-                <soap12:Body>
-                    <${operation} xmlns="http://edupoint.com/webservices/">
-                        <userID>${this.userID}</userID>
-                        <password>${this.password}</password>
-                        <skipLoginLog>true</skipLoginLog>
-                        <parent>false</parent>
-                        <webServiceHandleName>PXPWebServices</webServiceHandleName>
-                        <methodName>${methodName}</methodName>
-                        <paramStr>${paramStr}</paramStr>
-                    </${operation}>
-                </soap12:Body>
-            </soap12:Envelope>`
+			body: builder.build({
+				'soap12:Envelope': {
+					'_xmlns:soap12': 'http://www.w3.org/2003/05/soap-envelope',
+					'soap12:Body': {
+						[operation]: {
+							_xmlns: 'http://edupoint.com/webservices/',
+							userID: this.userID,
+							password: this.password,
+							skipLoginLog: true,
+							parent: false,
+							webServiceHandleName: 'PXPWebServices',
+							methodName,
+							paramStr: builder.build({ Params: params })
+						}
+					}
+				}
+			})
 		});
 
-		const result = parser.parse(
-			parser.parse(await res.text())['soap:Envelope']['soap:Body'][operation + 'Response'][
-				operation + 'Result'
-			]
-		);
+		if (res.status !== 200) throw new Error(`HTTP ${res.status} when requesting ${operation}`);
+
+		const envelopeStr = await res.text();
+
+		const envelope = envelopeParser.parse(envelopeStr);
+
+		const resultStr =
+			envelope['soap:Envelope']['soap:Body'][`${operation}Response`][`${operation}Result`];
+
+		const result = resultParser.parse(resultStr);
 
 		if (result.RT_ERROR) throw new Error(result.RT_ERROR._ERROR_MESSAGE);
 
 		return result;
 	}
 
-	request(methodName: string, params: unknown = {}) {
+	request(methodName: string, params: Record<string, unknown> = {}) {
 		return this.soapRequest('ProcessWebServiceRequest', methodName, params);
 	}
 
-	requestMultiWeb(methodName: string, params: unknown = {}) {
+	requestMultiWeb(methodName: string, params: Record<string, unknown> = {}) {
 		return this.soapRequest('ProcessWebServiceRequestMultiWeb', methodName, params);
 	}
 
-	checkLogin() {
-		return this.request('StudentInfo').then(() => {});
+	async checkLogin() {
+		await this.request('StudentInfo');
 	}
 
 	async getAuthToken(): Promise<AuthToken> {
