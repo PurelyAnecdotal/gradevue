@@ -4,14 +4,14 @@
 	"version": "0.0.1",
 	"type": "module",
 	"scripts": {
-		"dev": "vite dev",
-		"build": "vite build",
-		"preview": "vite preview",
+		"dev": "bun run -b vite dev --host gradecompass.localhost",
+		"build": "bun run -b vite build",
+		"preview": "bun run -b vite preview",
 		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
 		"format": "prettier --write .",
 		"lint": "prettier --check . && eslint .",
-		"generate-mocks": "bun run generate_mock_data.ts"
+		"generate-mocks": "bun run ./generate_mock_data.ts"
 	},
 	"devDependencies": {
 		"@eslint/compat": "^2.0.0",

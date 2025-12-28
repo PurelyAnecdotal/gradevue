@@ -1,3 +1,4 @@
+import { env } from '$env/dynamic/public';
 import { XMLParser } from 'fast-xml-parser';
 import { http, HttpResponse } from 'msw';
 
@@ -46,7 +47,7 @@ const soapHeaders = new Headers({
 
 export const handlers = [
 	http.post(
-		'https://ca-pleas-psv.edupoint.com/Service/PXPCommunication.asmx',
+		`${env.PUBLIC_MOCK_STUDENTVUE_ORIGIN}/Service/PXPCommunication.asmx`,
 		async ({ request }) => {
 			const body = await request.text();
 
