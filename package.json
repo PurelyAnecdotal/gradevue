@@ -4,13 +4,14 @@
 	"version": "0.0.1",
 	"type": "module",
 	"scripts": {
-		"dev": "vite dev",
-		"build": "vite build",
-		"preview": "vite preview",
+		"dev": "bun run -b vite dev --host gradecompass.localhost",
+		"build": "bun run -b vite build",
+		"preview": "bun run -b vite preview",
 		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
 		"format": "prettier --write .",
-		"lint": "prettier --check . && eslint ."
+		"lint": "prettier --check . && eslint .",
+		"generate-mocks": "bun run ./generate_mock_data.ts"
 	},
 	"devDependencies": {
 		"@eslint/compat": "^2.0.0",
@@ -29,6 +30,7 @@
 		"flowbite": "3.1.2",
 		"flowbite-svelte": "^0.48.6",
 		"globals": "^16.5.0",
+		"msw": "^2.12.4",
 		"prettier": "^3.7.4",
 		"prettier-plugin-organize-imports": "^4.3.0",
 		"prettier-plugin-svelte": "^3.4.0",
@@ -48,5 +50,10 @@
 		"chartjs-scale-timestack": "^1.0.1",
 		"fast-xml-parser": "^5.3.3",
 		"file-type": "^21.1.1"
+	},
+	"msw": {
+		"workerDirectory": [
+			"static"
+		]
 	}
 }
