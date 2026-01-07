@@ -1,10 +1,13 @@
 <script lang="ts">
+	import { bgColorVariants } from '$lib';
 	import { brand } from '$lib/brand';
 	import DateBadge from '$lib/components/DateBadge.svelte';
 	import LoadingBanner from '$lib/components/LoadingBanner.svelte';
 	import RefreshIndicator from '$lib/components/RefreshIndicator.svelte';
+	import { Badge } from '$lib/components/ui/badge';
+	import { Button } from '$lib/components/ui/button';
+	import * as Tabs from '$lib/components/ui/tabs';
 	import type { StudentDocumentData } from '$lib/types/Documents';
-	import { Badge, Card, TabItem, Tabs } from 'flowbite-svelte';
 	import { documentsState, loadDocuments } from './documents.svelte';
 
 	loadDocuments();
@@ -18,7 +21,7 @@
 			case 'MAP Growth Family Report':
 				return 'blue';
 			default:
-				return 'primary';
+				return 'green';
 		}
 	}
 
@@ -59,35 +62,54 @@
 {/if}
 
 {#if documentsState.data}
-	<Tabs class="m-4 mb-0" contentClass="p-4">
-		<TabItem title="All" open>
+	<Tabs.Root value="all" class="mx-4 gap-4">
+		<Tabs.List class="mx-auto h-12 max-w-full justify-start overflow-x-auto">
+			<Tabs.Trigger value="all">All</Tabs.Trigger>
+
+			{#each documentCategories as category (category)}
+				<Tabs.Trigger value={category}>
+					<div class={[bgColorVariants[getDocumentColor(category)], 'h-2 w-2 rounded-full']}></div>
+					{category}
+				</Tabs.Trigger>
+			{/each}
+		</Tabs.List>
+
+		<Tabs.Content value="all">
 			{@render documentsList(documentDatas)}
-		</TabItem>
+		</Tabs.Content>
+
 		{#each documentCategories as category (category)}
-			<TabItem title={category}>
+			<Tabs.Content value={category}>
 				{@render documentsList(
-					documentDatas.filter((documentData) => documentData._DocumentType === category)
+					documentDatas.filter((documentData) => documentData._DocumentType === category),
+					false
 				)}
-			</TabItem>
+			</Tabs.Content>
 		{/each}
-	</Tabs>
+	</Tabs.Root>
 {/if}
 
-{#snippet documentsList(documents: StudentDocumentData[])}
-	<ol class="space-y-4">
+{#snippet documentsList(documents: StudentDocumentData[], showCategory = true)}
+	<ol class="flex flex-col items-center gap-4">
 		{#each documents as documentData (documentData._DocumentGU)}
-			<li>
-				<Card
+			<li class="w-full max-w-3xl">
+				<Button
 					href="/documents/document?documentGU={documentData._DocumentGU}"
 					target="_blank"
-					class="flex max-w-none flex-row flex-wrap items-center gap-2 dark:text-white"
+					variant="card"
+					size="lg"
+					class="flex h-auto flex-col items-start gap-2 rounded-xl p-4"
 				>
-					<h2 class="text-md">{documentData._DocumentComment}</h2>
-					<DateBadge date={new Date(documentData._DocumentDate)} />
-					<Badge color={getDocumentColor(documentData._DocumentType)}>
-						{documentData._DocumentType}
-					</Badge>
-				</Card>
+					<h2 class="text-lg">{documentData._DocumentComment}</h2>
+					<div class="flex flex-wrap gap-1">
+						{#if showCategory}
+							<Badge color={getDocumentColor(documentData._DocumentType)}>
+								{documentData._DocumentType}
+							</Badge>
+						{/if}
+						<DateBadge date={new Date(documentData._DocumentDate)} />
+					</div>
+				</Button>
 			</li>
 		{/each}
 	</ol>

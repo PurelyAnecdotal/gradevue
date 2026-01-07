@@ -1,14 +1,12 @@
 <script lang="ts">
-	import { getColorForGrade, removeClassID } from '$lib';
 	import { parseSynergyAssignment } from '$lib/assignments';
 	import { brand } from '$lib/brand';
-	import type { AssignmentEntity, Mark } from '$lib/types/Gradebook';
-	import ChevronDownIcon from '@lucide/svelte/icons/chevron-down';
-	import ChevronUpIcon from '@lucide/svelte/icons/chevron-up';
+	import { Alert } from '$lib/components/ui/alert';
+	import { Button } from '$lib/components/ui/button';
+	import * as Select from '$lib/components/ui/select';
+	import type { Course } from '$lib/types/Gradebook';
 	import CircleXIcon from '@lucide/svelte/icons/circle-x';
-	import MapPinIcon from '@lucide/svelte/icons/map-pin';
-	import NumberFlow from '@number-flow/svelte';
-	import { Alert, Badge, Button, Card, Dropdown, DropdownItem, Progressbar } from 'flowbite-svelte';
+	import CourseButton from './CourseButton.svelte';
 	import {
 		getCurrentGradebookState,
 		getPeriodIndex,
@@ -16,10 +14,8 @@
 		seenAssignmentIDs,
 		showGradebook
 	} from './gradebook.svelte';
-
-	let dropdownOpen = $state(false);
-
 	const currentGradebookState = $derived(getCurrentGradebookState(gradebooksState));
+	import {removeCourseType} from '$lib';
 
 	const allPeriods = $derived(currentGradebookState?.data?.ReportingPeriods.ReportPeriod);
 
@@ -34,8 +30,32 @@
 			throw new Error('Could not find index of current reporting period');
 	});
 
-	const getUnseenAssignmentsCount = (assignments: AssignmentEntity[]) =>
-		assignments.map(parseSynergyAssignment).filter(({ id }) => !seenAssignmentIDs.has(id)).length;
+	function getCourseUnseenAssignmentsCount(course: Course) {
+		if (course.Marks === '') return 0;
+
+		const assignments = course.Marks.Mark.Assignments.Assignment;
+		if (!assignments) return 0;
+
+		return assignments.map(parseSynergyAssignment).filter(({ id }) => !seenAssignmentIDs.has(id))
+			.length;
+	}
+
+	function getCourseGrade(course: Course) {
+		if (course.Marks === '') return;
+
+		return {
+			letter: course.Marks.Mark._CalculatedScoreString,
+			percentage: parseFloat(course.Marks.Mark._CalculatedScoreRaw)
+		};
+	}
+
+	const hasNoGrades = $derived(
+		currentGradebookState?.data
+			? currentGradebookState.data.Courses.Course.map((course) =>
+					course.Marks === '' ? 'N/A' : course.Marks.Mark._CalculatedScoreString
+				).every((score) => score === 'N/A')
+			: false
+	);
 </script>
 
 <svelte:head>
@@ -43,91 +63,57 @@
 </svelte:head>
 
 {#if allPeriods && currentPeriod && currentPeriodIndex !== undefined && currentGradebookState?.data}
-	<main class="m-4 space-y-4">
-		<div class="flex flex-col justify-center">
-			<Button color="light" class="mx-auto flex items-center gap-2">
+	<div class="m-4 space-y-4">
+		<Select.Root
+			type="single"
+			value={currentPeriodIndex.toString()}
+			onValueChange={(value) => showGradebook(parseInt(value))}
+		>
+			<Select.Trigger class="mx-auto">
 				{currentGradebookState.data.ReportingPeriod._GradePeriod}
+			</Select.Trigger>
 
-				{#if dropdownOpen}
-					<ChevronUpIcon class="h-4 w-4" />
-				{:else}
-					<ChevronDownIcon class="h-4 w-4" />
-				{/if}
-			</Button>
+			<Select.Content>
+				<Select.Group>
+					<Select.Label>Reporting Periods</Select.Label>
 
-			<Dropdown bind:open={dropdownOpen}>
-				{#each allPeriods ?? [] as period, index (period._Index)}
-					<DropdownItem
-						onclick={() => {
-							dropdownOpen = false;
-							void showGradebook(index);
-						}}
-						class="flex items-center"
-					>
-						{#if period._GradePeriod === currentPeriod._GradePeriod}
-							<MapPinIcon class="mr-2 h-4 w-4" />
-						{/if}
-						{period._GradePeriod}
-					</DropdownItem>
-				{/each}
-			</Dropdown>
-		</div>
+					{#each allPeriods ?? [] as period, index (period._Index)}
+						<Select.Item value={index.toString()} label={period._GradePeriod}>
+							{period._GradePeriod}
+						</Select.Item>
+					{/each}
+				</Select.Group>
+			</Select.Content>
+		</Select.Root>
 
-		{#if currentGradebookState.data.Courses.Course.map( (course) => (course.Marks === '' ? 'N/A' : course.Marks.Mark._CalculatedScoreString) ).every((score) => score === 'N/A')}
-			<Alert class="mx-auto flex w-fit items-center" color="dark">
-				<CircleXIcon class="h-5 w-5" />
+		{#if hasNoGrades}
+			<Alert class="mx-auto flex w-fit items-center">
+				<CircleXIcon class="shrink-0"/>
 				It looks like you don't have any grades yet in this reporting period.
 
 				{#if currentPeriodIndex > 0}
-					<Button onclick={() => showGradebook(currentPeriodIndex - 1)} color="alternative" outline>
-						<span class="text-gray-300">
-							View {allPeriods[currentPeriodIndex - 1]?._GradePeriod}
-						</span>
+					<Button onclick={() => showGradebook(currentPeriodIndex - 1)} variant="outline">
+						View {allPeriods[currentPeriodIndex - 1]?._GradePeriod}
 					</Button>
 				{/if}
 			</Alert>
 		{/if}
 
-		<ol class="space-y-4">
-			{#each currentGradebookState.data.Courses.Course ?? [] as { _Title: title, Marks, _CourseID }, index (_CourseID)}
-				<li>
-					<Card
-						class="flex max-w-none flex-row items-center gap-2 text-xl dark:text-white"
-						href="/grades/{index.toString()}"
-					>
-						<span class="mr-auto line-clamp-1">{removeClassID(title)}</span>
-
-						{#if Marks !== ''}
-							{@render gradeInfo(Marks.Mark)}
-						{/if}
-					</Card>
+		<ol class="flex flex-col items-center gap-4">
+			{#each currentGradebookState.data.Courses.Course ?? [] as Course, index (Course._CourseID)}
+				<li class="w-full max-w-3xl">
+					<CourseButton
+						{index}
+						name={removeCourseType(Course._CourseName)}
+						period={Course._Period}
+						room={Course._Room}
+						teacher={Course._Staff}
+						teacherEmail={Course._StaffEMail}
+						unseenAssignmentsCount={getCourseUnseenAssignmentsCount(Course)}
+						grade={getCourseGrade(Course)}
+					/>
 				</li>
 			{/each}
 		</ol>
-	</main>
+	</div>
 {/if}
-
-{#snippet gradeInfo({
-	_CalculatedScoreString: grade,
-	_CalculatedScoreRaw: percent,
-	Assignments
-}: Mark)}
-	{#if Assignments.Assignment !== undefined && getUnseenAssignmentsCount(Assignments.Assignment) > 0}
-		<Badge color="green" class="shrink-0 text-center">
-			{getUnseenAssignmentsCount(Assignments.Assignment)} new
-		</Badge>
-	{/if}
-
-	<NumberFlow
-		prefix={grade + ' '}
-		value={parseFloat(percent) / 100}
-		format={{ style: 'percent', maximumFractionDigits: 3 }}
-	/>
-
-	<Progressbar
-		color={getColorForGrade(grade)}
-		progress={Math.min(isNaN(parseFloat(percent)) ? 0 : parseFloat(percent), 100)}
-		animate={true}
-		class="hidden w-1/3 shrink-0 sm:block"
-	/>
-{/snippet}

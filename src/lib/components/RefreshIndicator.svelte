@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { getRelativeTime } from '$lib';
 	import ClockIcon from '@lucide/svelte/icons/clock';
+	import { Badge } from '$lib/components/ui/badge';
 
 	interface Props {
 		lastRefresh: number;
@@ -10,8 +11,9 @@
 	let { lastRefresh, loaded, refresh }: Props = $props();
 </script>
 
-<div
-	class="mx-auto my-2 flex w-fit items-center gap-2 rounded-sm px-2 py-1 text-sm dark:bg-gray-800 dark:text-gray-400"
+<Badge
+	variant="secondary"
+	class="mx-auto my-2 text-sm p-1 px-3 text-tertiary-foreground"
 >
 	<ClockIcon class="h-4 w-4" />
 	Last updated {getRelativeTime(new Date(lastRefresh))}
@@ -20,4 +22,4 @@
 		onclick={refresh}
 		disabled={!loaded}>Refresh</button
 	>
-</div>
+</Badge>

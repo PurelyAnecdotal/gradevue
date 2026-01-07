@@ -4,8 +4,9 @@
 	import { acc } from '$lib/account.svelte';
 	import { brand } from '$lib/brand';
 	import LoadingBanner from '$lib/components/LoadingBanner.svelte';
+	import { Alert } from '$lib/components/ui/alert';
+	import { Button } from '$lib/components/ui/button';
 	import type { Attachment } from '$lib/types/Attachment';
-	import { Button, Card } from 'flowbite-svelte';
 	import { onMount } from 'svelte';
 
 	let attachmentURLPromise: Promise<string> | undefined = $state();
@@ -44,11 +45,10 @@
 		<LoadingBanner loadingMsg="Redirecting..." />
 	{:catch error}
 		<div class="flex min-h-screen items-center justify-center">
-			<Card class="space-y-4 text-sm leading-relaxed dark:text-gray-200">
-				<h1 class="text-2xl dark:text-white">{error}</h1>
-
-				<Button href="/mail" class="w-full">Return to Mail</Button>
-			</Card>
+			<Alert class="block w-fit space-y-2">
+				<h1 class="text-lg">{error}</h1>
+				<Button href="/mail" variant="outline">Return to Mail</Button>
+			</Alert>
 		</div>
 	{/await}
 {/if}

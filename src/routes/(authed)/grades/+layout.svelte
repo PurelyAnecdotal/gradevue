@@ -2,7 +2,11 @@
 	import BoundaryFailure from '$lib/components/BoundaryFailure.svelte';
 	import LoadingBanner from '$lib/components/LoadingBanner.svelte';
 	import RefreshIndicator from '$lib/components/RefreshIndicator.svelte';
-	import { Alert, Button } from 'flowbite-svelte';
+	import * as Alert from '$lib/components/ui/alert';
+	import { Button } from '$lib/components/ui/button';
+	import * as Item from '$lib/components/ui/item';
+	import AlertCircleIcon from '@lucide/svelte/icons/alert-circle';
+	import HistoryIcon from '@lucide/svelte/icons/history';
 	import {
 		getCurrentGradebookState,
 		gradebooksState,
@@ -42,23 +46,35 @@
 {/if}
 
 {#if loadingError !== undefined}
-	<Alert color="red" class="m-4">
-		An error occurred while loading grades: {loadingError instanceof Error
-			? loadingError.message
-			: JSON.stringify(loadingError)}
-	</Alert>
+	<Alert.Root variant="destructive" class="mx-auto w-fit min-w-sm">
+		<AlertCircleIcon />
+		<Alert.Title>An error occurred while loading grades.</Alert.Title>
+		<Alert.Description>
+			{loadingError instanceof Error ? loadingError.message : JSON.stringify(loadingError)}
+		</Alert.Description>
+	</Alert.Root>
 {/if}
 
 {#if gradebooksState.overrideIndex !== undefined && gradebooksState.records && gradebooksState.activeIndex !== undefined && currentGradebookState?.data}
-	<Alert class="mx-4 flex items-center justify-between" color="light" border>
-		<span class="text-white">
-			Viewing reporting period {currentGradebookState.data.ReportingPeriod._GradePeriod}
-		</span>
+	<div class="m-4 flex justify-center">
+		<Item.Root variant="outline" size="sm" class="w-full max-w-3xl">
+			<Item.Media>
+				<HistoryIcon class="size-5" />
+			</Item.Media>
 
-		<Button onclick={() => showGradebook()} color="light">
-			Return to {activeReportingPeriodName}
-		</Button>
-	</Alert>
+			<Item.Content>
+				<Item.Title class="whitespace-nowrap">
+					Viewing reporting period {currentGradebookState.data.ReportingPeriod._GradePeriod}
+				</Item.Title>
+			</Item.Content>
+
+			<Item.Actions>
+				<Button onclick={() => showGradebook()} variant="outline">
+					Return to {activeReportingPeriodName}
+				</Button>
+			</Item.Actions>
+		</Item.Root>
+	</div>
 {/if}
 
 <svelte:boundary>

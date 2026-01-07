@@ -1,29 +1,21 @@
 <script lang="ts">
-	import { getColorForGrade } from '$lib';
+	import { bgColorVariants, type BadgeColor } from '$lib';
 	import { calculateGradePercentage } from '$lib/assignments';
-	import { brand } from '$lib/brand';
 	import DateBadge from '$lib/components/DateBadge.svelte';
-	import NumberInput from '$lib/components/NumberInput.svelte';
-	import CustomPopover from '$lib/components/Popover.svelte';
-	import ChevronDownIcon from '@lucide/svelte/icons/chevron-down';
-	import ChevronUpIcon from '@lucide/svelte/icons/chevron-up';
-	import InfoIcon from '@lucide/svelte/icons/info';
+	import { Badge } from '$lib/components/ui/badge';
+	import { buttonVariants } from '$lib/components/ui/button';
+	import * as Card from '$lib/components/ui/card';
+	import { Checkbox } from '$lib/components/ui/checkbox';
+	import { Input, NumberInput } from '$lib/components/ui/input/index';
+	import { Label } from '$lib/components/ui/label';
+	import * as Popover from '$lib/components/ui/popover';
+	import { Progress } from '$lib/components/ui/progress';
+	import * as Select from '$lib/components/ui/select';
 	import MessageCircleIcon from '@lucide/svelte/icons/message-circle';
-	import {
-		Badge,
-		Button,
-		Card,
-		Checkbox,
-		Dropdown,
-		DropdownItem,
-		Input,
-		Popover,
-		Progressbar
-	} from 'flowbite-svelte';
-	import { fade } from 'svelte/transition';
 
-	interface Props {
+	type Props = {
 		name: string;
+		id: string;
 		pointsEarned?: number;
 		pointsPossible?: number;
 		unscaledPoints?: { pointsEarned: number; pointsPossible: number };
@@ -32,17 +24,27 @@
 		notForGrade?: boolean;
 		hidden?: boolean;
 		showHypotheticalLabel?: boolean;
-		category?: string | undefined;
-		categoryDropdownOptions?: string[];
+		categoryBadge?: { name: string; color: BadgeColor };
 		date?: Date | undefined;
 		editable?: boolean;
 		unseen?: boolean;
 		comments?: string;
 		recalculateGradePercentage?: () => void;
-	}
-
+	} & (
+		| {
+				editable?: false;
+				categoryDropdownSelected?: undefined;
+				categoryDropdown?: undefined;
+		  }
+		| {
+				editable: true;
+				categoryDropdownSelected?: string | undefined;
+				categoryDropdown?: { names: Set<string>; colors?: Map<string, BadgeColor> };
+		  }
+	);
 	let {
 		name = $bindable(),
+		id,
 		pointsEarned = $bindable(),
 		pointsPossible = $bindable(),
 		unscaledPoints = $bindable(),
@@ -51,8 +53,9 @@
 		notForGrade = $bindable(false),
 		hidden = false,
 		showHypotheticalLabel = false,
-		category = $bindable(undefined),
-		categoryDropdownOptions = [],
+		categoryBadge,
+		categoryDropdownSelected = $bindable(undefined),
+		categoryDropdown,
 		date = undefined,
 		editable = false,
 		unseen = false,
@@ -60,215 +63,236 @@
 		recalculateGradePercentage = () => {}
 	}: Props = $props();
 
-	let categoryDropdownOpen = $state(false);
-
-	const getCategoryColor = (category: string) => {
-		if (category.match(/final/i)) return 'red';
-		if (category.match(/test|quiz|assessment|performance/i)) return 'purple';
-		if (category.match(/homework|classwork|activity|activities|assignment|project/i))
-			return 'green';
-		return 'primary';
-	};
-
-	// For assignments with a zero, show the progress bar as full to allow you to see the red color
-	const isZero = $derived(pointsEarned === 0 && pointsPossible !== undefined && pointsPossible > 0);
-
 	const percentage = $derived(
 		pointsEarned !== undefined && pointsPossible !== undefined
 			? calculateGradePercentage(pointsEarned, pointsPossible)
 			: 0
 	);
 
-	const percentageChange = $derived(Math.round((gradePercentageChange ?? 0) * 100) / 100);
+	const progressValue = $derived.by(() => {
+		// For assignments with a zero, show the progress bar as full to allow you to see the red color
+		if (pointsEarned === 0 && pointsPossible !== undefined && pointsPossible > 0) return 100;
 
-	const border = $derived(unseen ? 'dark:border-l-green-600 border-l-4' : '');
+		if (percentage > 100 && pointsPossible && pointsEarned && !extraCredit)
+			return calculateGradePercentage(pointsPossible, pointsEarned);
 
-	let commentsVisible = $state(false);
-	const toggleComments = () => {
-		commentsVisible = !commentsVisible;
-	};
+		return Math.min(percentage, 100);
+	});
 
-	let commentsContainer: HTMLDivElement | undefined = $state();
+	const progressIndicatorColor = $derived.by(() => {
+		if (extraCredit) return 'indigo';
+		if (percentage >= 90) return 'green';
+		if (percentage >= 80) return 'yellow';
+		return 'red';
+	});
 
-	function handleClick(event: MouseEvent) {
-		if (
-			commentsVisible &&
-			event.target &&
-			event.target instanceof Node &&
-			commentsContainer &&
-			!commentsContainer.contains(event.target)
-		)
-			commentsVisible = false;
+	const gradePercentageChangeRounded = $derived(
+		Math.round((gradePercentageChange ?? 0) * 100) / 100
+	);
+
+	const borderClass = $derived(
+		unseen ? 'border-l-green-400 dark:border-l-green-600 border-l-4' : ''
+	);
+
+	const getCategory = () => categoryDropdownSelected ?? '';
+
+	function setCategory(newCategory: string) {
+		categoryDropdownSelected = newCategory === '' ? undefined : newCategory;
 	}
 </script>
 
-<svelte:window onclick={handleClick} />
+<Card.Root class="items-center gap-2 p-4 transition duration-500 sm:flex-row {borderClass}">
+	<div class="flex flex-1 flex-col gap-1 self-start sm:self-auto">
+		<div class="flex flex-wrap gap-1">
+			{#if editable}
+				<Input bind:value={name} class="inline w-32 sm:w-48" />
 
-<Card
-	class="flex max-w-none flex-row items-center transition duration-500 sm:p-4 dark:text-white {border}"
->
-	<div class="mr-2">
-		{#if editable}
-			<Input bind:value={name} class="inline w-48" />
-
-			{#if categoryDropdownOptions.length > 0}
-				<Button color="light">
-					{category ?? 'Select category'}
-					{#if categoryDropdownOpen}
-						<ChevronUpIcon class="ml-2 h-4 w-4" />
-					{:else}
-						<ChevronDownIcon class="ml-2 h-4 w-4" />
-					{/if}
-				</Button>
-
-				<Dropdown bind:open={categoryDropdownOpen}>
-					{#each categoryDropdownOptions as categoryOption (categoryOption)}
-						<DropdownItem
-							onclick={() => {
-								category = categoryOption;
-								categoryDropdownOpen = false;
-								recalculateGradePercentage();
-							}}
-						>
-							{categoryOption}
-						</DropdownItem>
-					{/each}
-				</Dropdown>
-			{/if}
-		{:else}
-			<span>{name}</span>
-		{/if}
-		{#if category !== undefined && (!editable || categoryDropdownOptions.length === 0)}
-			<Badge color={getCategoryColor(category)}>
-				{category}
-			</Badge>
-		{/if}
-		{#if unscaledPoints}
-			<Badge border color="dark">Scaled</Badge>
-		{/if}
-		{#if pointsEarned === undefined}
-			<Badge border color="purple">Not Graded</Badge>
-		{/if}
-		{#if notForGrade}
-			<Badge border color="pink">
-				{#if editable}
-					<Checkbox bind:checked={notForGrade} onchange={recalculateGradePercentage}>
-						<span class="text-xs">Not For Grade</span>
-					</Checkbox>
-				{:else}
-					Not For Grade
-				{/if}
-			</Badge>
-		{/if}
-		{#if extraCredit}
-			<Badge border color="indigo">
-				{#if editable}
-					<Checkbox bind:checked={extraCredit} onchange={recalculateGradePercentage}>
-						<span class="text-xs">Extra Credit</span>
-					</Checkbox>
-				{:else}
-					Extra Credit
-				{/if}
-			</Badge>
-		{/if}
-		{#if hidden}
-			<Popover triggeredBy=".hidden-badge" class="max-w-md">
-				Teachers can choose to have assignments hidden from the assignment list but still calculated
-				toward your grade. {brand} can reveal these assignments.
-			</Popover>
-			<Badge border color="dark" class="hidden-badge">
-				Hidden Assignments <InfoIcon class="ml-1 h-4 w-4" />
-			</Badge>
-		{/if}
-		{#if showHypotheticalLabel}
-			<Badge border color="dark">Hypothetical</Badge>
-		{/if}
-		{#if date}
-			<DateBadge {date} />
-		{/if}
-		{#if unseen}
-			<Badge border color="green">New</Badge>
-		{/if}
-	</div>
-
-	<div class="mr-2 ml-auto flex shrink-0 items-center gap-2">
-		{#if comments !== undefined}
-			<div class="relative" bind:this={commentsContainer}>
-				<button
-					onclick={toggleComments}
-					title="Teacher comments"
-					class="cursor-pointer rounded-lg p-2 text-sm transition-colors select-none hover:bg-slate-600 {commentsVisible
-						? 'bg-slate-600'
-						: 'bg-slate-700'}"
-				>
-					<MessageCircleIcon class="h-4 w-4"/>
-				</button>
-
-				{#if commentsVisible}
-					<div
-						class="absolute bottom-full left-1/2 mb-2 w-fit -translate-x-1/2"
-						transition:fade={{ duration: 100 }}
+				{#if categoryDropdown}
+					<Select.Root
+						type="single"
+						bind:value={getCategory, setCategory}
+						onValueChange={recalculateGradePercentage}
 					>
-						<CustomPopover>{comments}</CustomPopover>
-					</div>
+						<Select.Trigger>
+							{#if categoryDropdownSelected !== undefined && categoryDropdown.colors?.has(categoryDropdownSelected)}
+								<div
+									class={[
+										bgColorVariants[categoryDropdown.colors.get(categoryDropdownSelected)!],
+										'h-2 w-2 rounded-full'
+									]}
+								></div>
+							{/if}
+							{categoryDropdownSelected ?? 'Select category'}
+						</Select.Trigger>
+
+						<Select.Content>
+							<Select.Group>
+								<Select.Label>Category</Select.Label>
+
+								{#each categoryDropdown.names as dropdownCategory (dropdownCategory)}
+									<Select.Item value={dropdownCategory}>
+										{#if categoryDropdown.colors}
+											<div
+												class={[
+													bgColorVariants[categoryDropdown.colors.get(dropdownCategory)!],
+													'h-2 w-2 rounded-full'
+												]}
+											></div>
+										{/if}
+										{dropdownCategory}
+									</Select.Item>
+								{/each}
+							</Select.Group>
+						</Select.Content>
+					</Select.Root>
 				{/if}
-			</div>
-		{/if}
-
-		{#if gradePercentageChange !== undefined}
-			{#if percentageChange < 0}
-				<span class="text-red-500">
-					{percentageChange}%
-				</span>
-			{:else if percentageChange > 0}
-				<span class="text-green-500">
-					+{percentageChange}%
-				</span>
-			{:else if !notForGrade && pointsEarned !== undefined && !isNaN(pointsEarned)}
-				<span class="text-gray-500">+0%</span>
+			{:else}
+				{name}
 			{/if}
-		{/if}
+		</div>
 
-		{#if unscaledPoints}
-			<span class="text-gray-400">
-				({unscaledPoints.pointsEarned}/{unscaledPoints.pointsPossible})
-			</span>
-		{/if}
-
-		{#if editable}
-			<div class="flex w-32 items-center">
-				<NumberInput
-					title="Points earned"
-					type="number"
-					size="sm"
-					bind:value={pointsEarned}
-					oninput={recalculateGradePercentage}
-				/>
-				<span class="mx-1"> / </span>
-				<NumberInput
-					title="Points possible"
-					type="number"
-					size="sm"
-					bind:value={pointsPossible}
-					oninput={recalculateGradePercentage}
-				/>
-			</div>
-		{:else if pointsEarned === undefined}
-			{pointsPossible}
-		{:else}
-			{pointsEarned}/{pointsPossible}
-			{#if percentage && percentage !== Infinity}
-				{Math.round(percentage * 100) / 100}%
+		<div class="flex flex-wrap gap-1">
+			{#if categoryBadge}
+				<Badge color={categoryBadge.color} outline={false} title="Category">
+					{categoryBadge.name}
+				</Badge>
 			{/if}
-		{/if}
+
+			{#if pointsEarned === undefined}
+				<Badge color="purple" outline={true}>Not Graded</Badge>
+			{/if}
+
+			{#if notForGrade}
+				<Badge color="pink" outline={true} title="Not calculated in grade">
+					{#if editable}
+						<Checkbox
+							bind:checked={notForGrade}
+							onchange={recalculateGradePercentage}
+							id="{id}-not-for-grade"
+						/>
+						<Label for="{id}-not-for-grade" class="text-xs">Not For Grade</Label>
+					{:else}
+						Not For Grade
+					{/if}
+				</Badge>
+			{/if}
+
+			{#if extraCredit}
+				<Badge
+					color="indigo"
+					outline={true}
+					class="inline-flex"
+					title="Calculated as if zero points were possible"
+				>
+					{#if editable}
+						<Checkbox
+							bind:checked={extraCredit}
+							onchange={recalculateGradePercentage}
+							id="{id}-extra-credit"
+						/>
+						<Label for="{id}-extra-credit" class="text-xs">Extra Credit</Label>
+					{:else}
+						Extra Credit
+					{/if}
+				</Badge>
+			{/if}
+
+			{#if hidden}
+				<Badge variant="secondary" outline={true} class="hidden-badge">Hidden Assignments</Badge>
+			{/if}
+
+			{#if unscaledPoints}
+				<Badge variant="secondary" outline={true}>Scaled</Badge>
+			{/if}
+
+			{#if showHypotheticalLabel}
+				<Badge variant="outline">Hypothetical</Badge>
+			{/if}
+
+			{#if date}
+				<DateBadge {date} />
+			{/if}
+
+			{#if unseen}
+				<Badge color="green" outline={true}>New</Badge>
+			{/if}
+		</div>
 	</div>
 
-	{#if pointsEarned !== undefined || editable}
-		<Progressbar
-			color={extraCredit ? 'blue' : getColorForGrade(percentage)}
-			progress={isZero ? 100 : Math.min(percentage, 100)}
-			animate={true}
-			class="hidden w-1/3 shrink-0 sm:block"
-		/>
-	{/if}
-</Card>
+	<div class="flex w-full flex-col items-end gap-2 sm:w-auto">
+		<div class="flex items-center gap-2">
+			{#if comments !== undefined && !editable}
+				<Popover.Root>
+					<Popover.Trigger
+						class={buttonVariants({ variant: 'outline', size: 'icon' })}
+						title="Teacher comments"
+					>
+						<MessageCircleIcon />
+					</Popover.Trigger>
+					<Popover.Content>{comments}</Popover.Content>
+				</Popover.Root>
+			{/if}
+
+			{#if gradePercentageChange !== undefined}
+				{#if gradePercentageChangeRounded < 0}
+					<span class="text-red-500" title="Overall grade percentage change">
+						{gradePercentageChangeRounded}%
+					</span>
+				{:else if gradePercentageChangeRounded > 0}
+					<span class="text-green-500" title="Overall grade percentage change">
+						+{gradePercentageChangeRounded}%
+					</span>
+				{:else if !notForGrade && pointsEarned !== undefined && !isNaN(pointsEarned)}
+					<span class="text-slate-500" title="Overall grade percentage change">+0%</span>
+				{/if}
+			{/if}
+
+			{#if unscaledPoints}
+				<span class="text-gray-400" title="Points before scaling">
+					({unscaledPoints.pointsEarned}/{unscaledPoints.pointsPossible})
+				</span>
+			{/if}
+
+			{#if editable}
+				{#if percentage && percentage !== Infinity}
+					<span title="Assignment grade percentage">{Math.round(percentage * 100) / 100}%</span>
+				{/if}
+
+				<div class="flex w-40 items-center gap-1">
+					<NumberInput
+						title="Points earned"
+						bind:value={pointsEarned}
+						oninput={recalculateGradePercentage}
+					/>
+					/
+					<NumberInput
+						title="Points possible"
+						bind:value={pointsPossible}
+						oninput={recalculateGradePercentage}
+					/>
+				</div>
+			{:else if pointsEarned === undefined}
+				<span title="Points possible">{pointsPossible}</span>
+			{:else}
+				<span title="Points earned/Points possible">
+					{pointsEarned}/{#if extraCredit}
+						<span class="text-indigo-800 dark:text-indigo-400">{pointsPossible}</span>
+					{:else}
+						{pointsPossible}
+					{/if}
+				</span>
+				{#if percentage && percentage !== Infinity}
+					<span title="Assignment grade percentage">{Math.round(percentage * 100) / 100}%</span>
+				{/if}
+			{/if}
+		</div>
+
+		{#if pointsEarned !== undefined || editable}
+			<Progress
+				value={progressValue}
+				class={[percentage > 100 ? 'bg-indigo-700' : '', 'w-48 transition-all lg:w-64']}
+				indicatorClass={bgColorVariants[progressIndicatorColor]}
+			/>
+		{/if}
+	</div>
+</Card.Root>

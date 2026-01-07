@@ -26,6 +26,27 @@ const resultParser = new XMLParser({
 
 const builder = new XMLBuilder({ ignoreAttributes: false, attributeNamePrefix: '_' });
 
+export const unwrapEnvelope = (envelopeStr: string, operation = 'ProcessWebServiceRequest'): string =>
+	envelopeParser.parse(envelopeStr)['soap:Envelope']['soap:Body'][`${operation}Response`][
+		`${operation}Result`
+	];
+
+export const wrapEnvelope = (body: string, operation = 'ProcessWebServiceRequest'): string =>
+	builder.build({
+		'?xml': { _version: '1.0', _encoding: 'utf-8' },
+		'soap:Envelope': {
+			'_xmlns:soap': 'http://www.w3.org/2003/05/soap-envelope',
+			'_xmlns:xsi': 'http://www.w3.org/2001/XMLSchema-instance',
+			'_xmlns:xsd': 'http://www.w3.org/2001/XMLSchema',
+			'soap:Body': {
+				[`${operation}Response`]: {
+					_xmlns: 'http://edupoint.com/webservices/',
+					[`${operation}Result`]: body
+				}
+			}
+		}
+	});
+
 export class StudentAccount {
 	domain: string;
 	userID: string;
@@ -64,10 +85,7 @@ export class StudentAccount {
 
 		const envelopeStr = await res.text();
 
-		const envelope = envelopeParser.parse(envelopeStr);
-
-		const resultStr =
-			envelope['soap:Envelope']['soap:Body'][`${operation}Response`][`${operation}Result`];
+		const resultStr = unwrapEnvelope(envelopeStr, operation);
 
 		const result = resultParser.parse(resultStr);
 

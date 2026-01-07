@@ -1,9 +1,10 @@
 #!/usr/bin/env bun
 
-import { XMLParser } from 'fast-xml-parser';
+import { XMLBuilder, XMLParser } from 'fast-xml-parser';
 import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
 import * as readline from 'node:readline';
+import { unwrapEnvelope } from './src/lib/synergy';
 
 async function prompt(question: string): Promise<string> {
 	const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
@@ -16,6 +17,8 @@ async function prompt(question: string): Promise<string> {
 	});
 }
 
+const builder = new XMLBuilder({ ignoreAttributes: false, attributeNamePrefix: '_' });
+
 const parser = new XMLParser({
 	ignoreAttributes: false,
 	ignoreDeclaration: true,
@@ -27,58 +30,44 @@ async function soapRequest(
 	userID: string,
 	password: string,
 	methodName: string,
-	params: Map<string, unknown> = new Map()
-): Promise<string> {
-	let paramStr = '<Params>';
-	params.forEach((value, key) => {
-		paramStr += `<${key}>${value}</${key}>`;
-	});
-	paramStr += '</Params>';
-	paramStr = paramStr.replaceAll('<', '&lt;').replaceAll('>', '&gt;');
-
-	const body = `<?xml version="1.0" encoding="utf-8"?>
-    <soap12:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap12="http://www.w3.org/2003/05/soap-envelope">
-        <soap12:Body>
-            <ProcessWebServiceRequest xmlns="http://edupoint.com/webservices/">
-                <userID>${userID}</userID>
-                <password>${password}</password>
-                <skipLoginLog>true</skipLoginLog>
-                <parent>false</parent>
-                <webServiceHandleName>PXPWebServices</webServiceHandleName>
-                <methodName>${methodName}</methodName>
-                <paramStr>${paramStr}</paramStr>
-            </ProcessWebServiceRequest>
-        </soap12:Body>
-    </soap12:Envelope>`;
-
+	params: Map<string, unknown> = new Map(),
+	operation = 'ProcessWebServiceRequest'
+) {
 	const res = await fetch(`https://${domain}/Service/PXPCommunication.asmx`, {
 		method: 'POST',
 		headers: { 'Content-Type': 'application/soap+xml; charset=utf-8' },
-		body
+		body: builder.build({
+			'soap12:Envelope': {
+				'_xmlns:soap12': 'http://www.w3.org/2003/05/soap-envelope',
+				'soap12:Body': {
+					[operation]: {
+						_xmlns: 'http://edupoint.com/webservices/',
+						userID,
+						password,
+						skipLoginLog: true,
+						parent: false,
+						webServiceHandleName: 'PXPWebServices',
+						methodName,
+						paramStr: builder.build({ Params: Object.fromEntries(params) })
+					}
+				}
+			}
+		})
 	});
 
-	if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+	if (res.status !== 200) throw new Error(`HTTP ${res.status} when requesting ${operation}`);
 
-	const responseText = await res.text();
+	const envelopeStr = await res.text();
 
-	try {
-		const parsed = parser.parse(responseText);
-		const result =
-			parsed['soap:Envelope']['soap:Body']['ProcessWebServiceRequestResponse'][
-				'ProcessWebServiceRequestResult'
-			];
+	const resultStr = unwrapEnvelope(envelopeStr, operation);
 
-		const innerParsed = parser.parse(result);
-		if (innerParsed.RT_ERROR) throw new Error(innerParsed.RT_ERROR._ERROR_MESSAGE);
-	} catch (e) {
-		if (
-			e instanceof Error &&
-			e.message !== "Cannot read properties of undefined (reading '_ERROR_MESSAGE')"
-		)
-			throw e;
+	{
+		const result = parser.parse(resultStr);
+
+		if (result.RT_ERROR) throw new Error(result.RT_ERROR._ERROR_MESSAGE);
 	}
 
-	return responseText;
+	return resultStr;
 }
 
 async function generateMethodMockData(
@@ -87,10 +76,10 @@ async function generateMethodMockData(
 	params: Map<string, unknown> = new Map()
 ) {
 	try {
-		const response = await soapRequest(domain, username, password, methodName, params);
+		const resultStr = await soapRequest(domain, username, password, methodName, params);
 
 		const outputPath = path.join(process.cwd(), 'src', 'lib', 'mocks', 'data', fileName);
-		await fs.writeFile(outputPath, response, 'utf-8');
+		await fs.writeFile(outputPath, resultStr, 'utf-8');
 
 		console.log(`Saved ${fileName}`);
 	} catch (error) {
@@ -113,14 +102,19 @@ const documentGU =
 const attachmentGU =
 	process.env.STUDENTVUE_MOCK_ATTACHMENT_GU ?? (await prompt('Example AttachmentGU to mock: '));
 
+const reportPeriod = process.env.STUDENTVUE_MOCK_REPORT_PERIOD;
+
+const gradebookParams: Map<string, string> =
+	reportPeriod !== undefined ? new Map([['ReportPeriod', reportPeriod]]) : new Map();
+
 const resources: ([string, string] | [string, string, Map<string, unknown>])[] = [
-	['Gradebook', 'gradebook.xml'],
-	['Attendance', 'attendance.xml'],
-	['GetStudentDocumentInitialData', 'documents.xml'],
-	['GetReportCardDocumentData', 'document.xml', new Map([['DocumentGU', documentGU]])],
-	['SynergyMailGetData', 'mail.xml'],
-	['SynergyMailGetAttachment', 'attachment.xml', new Map([['SmAttachmentGU', attachmentGU]])],
-	['StudentInfo', 'studentinfo.xml']
+	['Gradebook', 'Gradebook.xml', gradebookParams],
+	// ['Attendance', 'Attendance.xml'],
+	// ['GetStudentDocumentInitialData', 'StudentDocuments.xml'],
+	// ['GetReportCardDocumentData', 'DocumentData.xml', new Map([['DocumentGU', documentGU]])],
+	// ['SynergyMailGetData', 'SynergyMailDataXML.xml'],
+	// ['SynergyMailGetAttachment', 'AttachmentXML.xml', new Map([['SmAttachmentGU', attachmentGU]])],
+	// ['StudentInfo', 'StudentInfo.xml']
 ];
 
 await Promise.allSettled(

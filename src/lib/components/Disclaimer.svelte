@@ -7,7 +7,7 @@
 	let { trademark = true }: Props = $props();
 </script>
 
-<p class="mx-auto p-4 text-center text-xs dark:text-gray-600">
+<p class="text-muted-foreground mx-auto p-4 text-center text-xs">
 	{#if trademark}StudentVUE is a registered trademark of Edupoint Educational Systems LLC.{/if}
 	{brand} is not affiliated with or endorsed by Edupoint Educational Systems LLC.
 </p>

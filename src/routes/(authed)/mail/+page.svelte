@@ -4,10 +4,9 @@
 	import LoadingBanner from '$lib/components/LoadingBanner.svelte';
 	import RefreshIndicator from '$lib/components/RefreshIndicator.svelte';
 	import type { InboxItemListingsMessageXML } from '$lib/types/MailData';
-	import { Modal } from 'flowbite-svelte';
 	import { SvelteSet } from 'svelte/reactivity';
-	import MessageCard from './MessageCard.svelte';
-	import MessageView from './MessageView.svelte';
+	import MessageButton from './MessageButton.svelte';
+	import MessageDialog from './MessageDialog.svelte';
 	import { loadMailData, mailDataState } from './mailData.svelte';
 
 	loadMailData();
@@ -58,36 +57,26 @@
 {/if}
 
 {#if mailDataState.data}
-	<h1 class="mx-4 text-2xl font-bold">Inbox</h1>
-
-	<ol class="space-y-4 p-4">
+	<ol class="m-4 flex flex-col items-center gap-4">
 		{#each mailDataState.data.InboxItemListings.MessageXML as message (message._SMMessageGU)}
 			<li
+				class="w-full max-w-3xl"
 				ontouchend={() => {
 					touchscreen = true;
 				}}
 			>
-				<button class="w-full" onclick={() => openMessage(message)}>
-					<MessageCard {message} />
-				</button>
+				<MessageButton {message} onclick={() => openMessage(message)} />
 			</li>
 		{/each}
 	</ol>
 
 	{#if openedMessage}
-		<Modal
+		<MessageDialog
 			bind:open={messageOpen}
-			title={openedMessage._Subject}
-			classHeader="dark:text-white"
-			size="lg"
-			outsideclose
-		>
-			<MessageView
-				message={openedMessage}
-				content={openedMessageContent}
-				links={openedMessageLinks}
-				{touchscreen}
-			/>
-		</Modal>
+			message={openedMessage}
+			content={openedMessageContent}
+			links={openedMessageLinks}
+			{touchscreen}
+		/>
 	{/if}
 {/if}

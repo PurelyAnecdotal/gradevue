@@ -1,14 +1,12 @@
 <script lang="ts">
 	import { page } from '$app/state';
-	import { numberFlowDefaultEasing, removeClassID } from '$lib';
+	import { numberFlowDefaultEasing, removeCourseType, tailwindColors } from '$lib';
 	import {
-		type Assignment,
 		calculateAssignmentGPCs,
 		calculateAssignmentGPCsFromCategories,
 		calculateAssignmentGPCsFromTotals,
 		calculateCourseGradePercentageFromCategories,
 		calculateCourseGradePercentageFromTotals,
-		calculateGradePercentage,
 		type Category,
 		type Flowed,
 		getCalculableAssignments,
@@ -26,29 +24,16 @@
 		type RealAssignment
 	} from '$lib/assignments';
 	import { brand } from '$lib/brand';
-	import ChevronDownIcon from '@lucide/svelte/icons/chevron-down';
-	import ChevronUpIcon from '@lucide/svelte/icons/chevron-up';
+	import * as Alert from '$lib/components/ui/alert';
+	import { Button } from '$lib/components/ui/button';
+	import { Checkbox } from '$lib/components/ui/checkbox';
+	import { Label } from '$lib/components/ui/label';
 	import CircleAlertIcon from '@lucide/svelte/icons/circle-alert';
 	import CircleXIcon from '@lucide/svelte/icons/circle-x';
 	import Columns3CogIcon from '@lucide/svelte/icons/columns-3-cog';
 	import Grid2x2PlusIcon from '@lucide/svelte/icons/grid-2x2-plus';
-	import InfoIcon from '@lucide/svelte/icons/info';
 	import RotateCCWIcon from '@lucide/svelte/icons/rotate-ccw';
 	import NumberFlow from '@number-flow/svelte';
-	import {
-		Alert,
-		Button,
-		Checkbox,
-		Popover,
-		TabItem,
-		Table,
-		TableBody,
-		TableBodyCell,
-		TableBodyRow,
-		TableHead,
-		TableHeadCell,
-		Tabs
-	} from 'flowbite-svelte';
 	import { untrack } from 'svelte';
 	import { fade } from 'svelte/transition';
 	import {
@@ -57,7 +42,9 @@
 		saveSeenAssignments,
 		seenAssignmentIDs
 	} from '../gradebook.svelte';
-	import AssignmentCard from './AssignmentCard.svelte';
+	import AssignmentTabs from './AssignmentTabs.svelte';
+	import CalculationError from './CalculationError.svelte';
+	import GradeCategoryTable from './GradeCategoryTable.svelte';
 	import GradeChart from './GradeChart.svelte';
 	import TargetGradeCalculator from './TargetGradeCalculator.svelte';
 
@@ -71,7 +58,7 @@
 
 	const mark = $derived(synergyCourse?.Marks !== '' ? synergyCourse?.Marks.Mark : undefined);
 
-	const courseName = $derived(synergyCourse ? removeClassID(synergyCourse._Title) : '');
+	const courseName = $derived(synergyCourse ? removeCourseType(synergyCourse._CourseName) : '');
 
 	const synergyGradePercentage = $derived(parseFloat(mark?._CalculatedScoreRaw ?? ''));
 
@@ -80,8 +67,6 @@
 	);
 
 	const gradeCategories = $derived(categories?.filter((category) => category.name !== 'TOTAL'));
-
-	const totalCategory = $derived(categories?.find((category) => category.name === 'TOTAL'));
 
 	const synergyAssignments = $derived(mark?.Assignments.Assignment ?? []);
 
@@ -165,17 +150,6 @@
 		getPointsByCategoryMap(getCalculableAssignmentsWithCategories(reactiveAssignments))
 	);
 
-	const categoryGradePercentages = $derived(
-		new Map(
-			pointsByCategory
-				.entries()
-				.map(([categoryName, { pointsEarned, pointsPossible }]) => [
-					categoryName,
-					calculateGradePercentage(pointsEarned, pointsPossible)
-				])
-		)
-	);
-
 	function addHypotheticalAssignment() {
 		const newHypotheticalAssignment: NewHypotheticalAssignment = $state({
 			name: 'Hypothetical Assignment',
@@ -195,8 +169,6 @@
 
 		reactiveAssignments = [newHypotheticalAssignment, ...reactiveAssignments];
 	}
-
-	let calcWarningOpen = $state(false);
 
 	const prefix = $derived(hypotheticalMode ? '' : mark?._CalculatedScoreString + ' ');
 
@@ -226,6 +198,26 @@
 	const roundedGradePercentage = $derived(
 		grade !== undefined ? Math.round(grade * 100 * 1000) / 1000 : undefined
 	);
+
+	const assignmentCategoryNames = $derived(
+		new Set(realAssignments.map((assignment) => assignment.category).toSorted())
+	);
+
+	const assignmentCategoryColors = $derived(
+		new Map(
+			[...assignmentCategoryNames].map((name, i) => [
+				name,
+				tailwindColors[(i * 4) % tailwindColors.length]!
+			])
+		)
+	);
+
+	let showCategoryTable = $state(false);
+
+	function markSeenAssignments() {
+		realAssignments.forEach(({ id }) => seenAssignmentIDs.add(id));
+		saveSeenAssignments();
+	}
 </script>
 
 <svelte:head>
@@ -233,12 +225,11 @@
 </svelte:head>
 
 {#if synergyCourse}
-	<div class="sticky top-0">
-		<div class="flex justify-between rounded-b-lg bg-gray-900 p-4">
-			<span class="line-clamp-1 text-2xl">
-				{courseName}
-			</span>
-			<span class="flex shrink-0 items-center text-2xl">
+	<div class={['bg-background sticky top-0 z-10 transition-all', !pinChart && 'md:bg-transparent']}>
+		<div class="flex justify-between rounded-b-lg">
+			<span class="bg-background truncate rounded-br-xl p-4 text-2xl">{courseName}</span>
+
+			<span class="bg-background flex shrink-0 items-center rounded-bl-xl p-4 text-2xl">
 				{#if hypotheticalMode && !categories && !rawGradeCalcMatches}
 					<CircleAlertIcon class="mr-2 h-5 w-5" />
 				{/if}
@@ -257,134 +248,64 @@
 		{/if}
 	</div>
 
+	{#if !rawGradeCalcMatches}
+		<div class="m-4 flex justify-center" in:fade>
+			<CalculationError {hypotheticalMode} />
+		</div>
+	{/if}
+
 	{#if !pinChart}
 		{@render chart()}
 	{/if}
 
 	{#snippet chart()}
-		{#if rawGradeCalcMatches}
-			<GradeChart
-				assignments={hypotheticalMode ? reactiveAssignments : realAssignments}
-				{gradeCategories}
-				animate={!hypotheticalMode}
-			/>
-		{/if}
+		<GradeChart
+			assignments={hypotheticalMode ? reactiveAssignments : realAssignments}
+			{gradeCategories}
+			animate={!hypotheticalMode}
+			error={!rawGradeCalcMatches}
+		/>
 	{/snippet}
 
-	{#if categories && gradeCategories && totalCategory}
-		<div class="sm:mx-4">
-			<Table shadow divClass="overflow-x-auto">
-				<TableHead>
-					<TableHeadCell>Category</TableHeadCell>
-					<TableHeadCell>Grade</TableHeadCell>
-					<TableHeadCell>Weight</TableHeadCell>
-					<TableHeadCell>Points</TableHeadCell>
-				</TableHead>
-				<TableBody>
-					{#each gradeCategories.toSorted() as category (category.name)}
-						<TableBodyRow>
-							<TableBodyCell>{category.name}</TableBodyCell>
-							<TableBodyCell>
-								{#if category.pointsEarned !== 0 || category.pointsPossible !== 0}
-									{#if !hypotheticalMode}
-										{category.gradeLetter}
-									{/if}
-									{#if rawGradeCalcMatches && (!hypotheticalMode || categoryGradePercentages.has(category.name))}
-										({Math.round(
-											(hypotheticalMode
-												? categoryGradePercentages.get(category.name)!
-												: calculateGradePercentage(
-														category.pointsEarned,
-														category.pointsPossible
-													)) * 1000
-										) / 1000}%)
-									{/if}
-								{/if}
-							</TableBodyCell>
-							<TableBodyCell>{category.weightPercentage}%</TableBodyCell>
-							<TableBodyCell>
-								{#if hypotheticalMode}
-									{pointsByCategory?.get(category.name)?.pointsEarned}
-									/
-									{pointsByCategory?.get(category.name)?.pointsPossible}
-								{:else}
-									{category.pointsEarned} / {category.pointsPossible}
-								{/if}
-							</TableBodyCell>
-						</TableBodyRow>
-					{/each}
-				</TableBody>
-			</Table>
+	<div class="m-4 flex min-h-9 flex-wrap items-center gap-4">
+		<div class="flex items-center gap-2">
+			<Checkbox
+				bind:checked={hypotheticalMode}
+				id="hypothetical-mode"
+				title="Hypothetical mode allows you to see what your grade would be if you got a certain score on an assignment."
+			/>
+			<Label for="hypothetical-mode">Hypothetical Mode</Label>
 		</div>
-	{/if}
 
-	{#if !rawGradeCalcMatches}
-		<Alert class="m-4" color="red" border>
-			<CircleAlertIcon slot="icon" class="h-5 w-5 shrink-0" />
-
-			<div class="flex flex-col gap-2">
-				<button
-					class="flex items-center gap-1"
-					onclick={() => {
-						calcWarningOpen = !calcWarningOpen;
-					}}
-				>
-					<span class="text-left font-bold">
-						{#if hypotheticalMode}
-							Grade calculations in Hypothetical Mode are inaccurate
-						{:else}
-							Grade calculation error
-						{/if}
-					</span>
-					{#if calcWarningOpen}
-						<ChevronUpIcon class="focus h-4 w-4" />
-					{:else}
-						<ChevronDownIcon class="focus h-4 w-4" />
-					{/if}
-				</button>
-
-				{#if calcWarningOpen}
-					<span>
-						Your class's official grade percentage does not match {brand}'s calculated grade
-						percentage. This could mean that there are hidden assignments that {brand} can't see, or that
-						{brand} isn't calculating your grade correctly. Your overall grade is still correct, but other
-						things might be off.
-					</span>
-				{/if}
+		{#if categories && gradeCategories}
+			<div class="flex items-center gap-2">
+				<Checkbox bind:checked={showCategoryTable} id="show-category-breakdown" />
+				<Label for="show-category-breakdown">Show category breakdown</Label>
 			</div>
-		</Alert>
-	{/if}
-
-	<div class="m-4 flex flex-wrap items-center gap-2">
-		<Checkbox bind:checked={hypotheticalMode}>
-			<div id="hypothetical-toggle" class="mr-2 flex items-center">
-				Hypothetical Mode <InfoIcon class="ml-2 h-4 w-4" />
-			</div>
-		</Checkbox>
-		<Popover triggeredBy="#hypothetical-toggle" class="max-w-md text-sm dark:text-gray-300">
-			Hypothetical mode allows you to see what your grade would be if you got a certain score on an
-			assignment.
-		</Popover>
-
-		{#if rawGradeCalcMatches}
-			<Checkbox bind:checked={pinChart}>Pin chart when scrolling</Checkbox>
 		{/if}
 
+		<div class="hidden items-center gap-2 sm:flex">
+			<Checkbox bind:checked={pinChart} id="pin-chart" />
+			<Label for="pin-chart">Pin chart to top of screen</Label>
+		</div>
+
 		{#if hypotheticalMode}
-			<div transition:fade={{ duration: 200 }} class="ml-auto">
-				<Button color="light" size="sm" onclick={initReactiveAssignments}>
+			<div transition:fade={{ duration: 200 }} class="ml-auto flex flex-wrap gap-1">
+				<Button variant="card" onclick={initReactiveAssignments}>
 					<RotateCCWIcon class="mr-2 h-4 w-4" />
 					Reset
 				</Button>
 
 				{#if !showTargetGradeCalculator}
-					<Button color="light" size="sm" onclick={toggleTargetGradeCalculator}>
+				<div transition:fade={{ duration: 200 }}>
+					<Button variant="card" onclick={toggleTargetGradeCalculator}>
 						<Columns3CogIcon class="mr-2 h-4 w-4" />
 						Target Grade Calculator
 					</Button>
+				</div>
 				{/if}
 
-				<Button color="light" size="sm" onclick={addHypotheticalAssignment}>
+				<Button variant="card" onclick={addHypotheticalAssignment}>
 					<Grid2x2PlusIcon class="mr-2 h-4 w-4" />
 					Add Hypothetical Assignment
 				</Button>
@@ -392,164 +313,55 @@
 		{/if}
 	</div>
 
+	{#if categories && gradeCategories && showCategoryTable}
+		<div class="m-4 flex justify-center" transition:fade={{ duration: 200 }}>
+			<GradeCategoryTable {gradeCategories} {hypotheticalMode} {pointsByCategory} />
+		</div>
+	{/if}
+
 	{#if hypotheticalMode && showTargetGradeCalculator}
-		<TargetGradeCalculator
-			initialGradePercentage={roundedGradePercentage}
-			assignments={reactiveAssignments}
-			{gradeCategoryWeightProportions}
-			onclose={toggleTargetGradeCalculator}
-		/>
+		<div class="m-4" transition:fade={{ duration: 200 }}>
+			<TargetGradeCalculator
+				initialGradePercentage={roundedGradePercentage}
+				assignments={reactiveAssignments}
+				categoryColors={assignmentCategoryColors}
+				{gradeCategoryWeightProportions}
+				onclose={toggleTargetGradeCalculator}
+			/>
+		</div>
 	{/if}
 
 	{#if synergyAssignments.length > 0 || hypotheticalMode}
 		<div transition:fade={{ duration: 200 }}>
-			<Tabs class="m-4 mb-0" contentClass="p-4">
-				<TabItem open title="All">
-					{@render assignmentList()}
-				</TabItem>
-
-				{#each [...new Set(realAssignments
-							.map((assignment) => assignment.category)
-							.toSorted())] as categoryName (categoryName)}
-					<TabItem title={categoryName}>
-						{@render assignmentList((assignment) => assignment.category === categoryName, false)}
-					</TabItem>
-				{/each}
-			</Tabs>
+			<AssignmentTabs
+				{assignments}
+				{reactiveAssignments}
+				{gradeCategories}
+				{assignmentCategoryNames}
+				{assignmentCategoryColors}
+				{hypotheticalMode}
+				{rawGradeCalcMatches}
+				{recalculateGradePercentage}
+			/>
 		</div>
 	{:else}
 		<div class="flex justify-center">
-			<Alert class="mx-4 flex w-fit items-center" color="dark">
-				<CircleXIcon class="h-4 w-4" />
+			<Alert.Root class="mx-4 flex w-fit items-center">
+				<CircleXIcon />
 
-				Looks like this this course doesn't have any grades yet.
-			</Alert>
+				<Alert.Title>Looks like this this course doesn't have any grades yet.</Alert.Title>
+			</Alert.Root>
 		</div>
 	{/if}
 
 	{#if unseenAssignments.length > 0 && !hypotheticalMode}
-		<div transition:fade={{ duration: 200 }} class="sticky bottom-8 flex justify-center">
-			<Alert
-				color="gray"
-				border
-				class="mx-4 flex w-fit items-center justify-between border p-2 pl-3 text-base shadow-lg/30 dark:border-gray-600"
-			>
-				{unseenAssignments.length} new assignments
-				<Button
-					color="green"
-					size="sm"
-					outline
-					class="cursor-pointer"
-					onclick={() => {
-						unseenAssignments.forEach(({ id }) => seenAssignmentIDs.add(id));
-						saveSeenAssignments();
-					}}
-				>
-					Mark as seen
-				</Button>
-			</Alert>
+		<div transition:fade={{ duration: 200 }} class="sticky bottom-8 mt-4 flex justify-center">
+			<Alert.Root class="flex w-fit items-center gap-4 shadow-lg/30">
+				<Alert.Title class="tracking-normal">
+					{unseenAssignments.length} new assignments
+				</Alert.Title>
+				<Button onclick={markSeenAssignments}>Mark as seen</Button>
+			</Alert.Root>
 		</div>
 	{/if}
 {/if}
-
-{#snippet assignmentList(filter?: (assignment: Assignment) => boolean, showCategory = true)}
-	<ol class="space-y-4">
-		{#if hypotheticalMode}
-			{#each reactiveAssignments as assignment, i (assignment.id)}
-				{#if (!filter || filter(assignment)) && reactiveAssignments[i]}
-					{@render boundAssignmentSnippet(assignment, reactiveAssignments, i, showCategory)}
-				{/if}
-			{/each}
-		{:else}
-			{#each assignments as assignment (assignment.id)}
-				{#if !filter || filter(assignment)}
-					{@render assignmentSnippet(assignment, showCategory)}
-				{/if}
-			{/each}
-		{/if}
-	</ol>
-{/snippet}
-
-{#snippet assignmentSnippet(
-	{
-		name,
-		id,
-		pointsEarned,
-		pointsPossible,
-		unscaledPoints,
-		extraCredit,
-		gradePercentageChange,
-		notForGrade,
-		hidden,
-		category,
-		comments,
-		date,
-		newHypothetical
-		// Flowed<RealAssignment | HiddenAssignment>
-	}: RealAssignment | Flowed<RealAssignment | HiddenAssignment>,
-	showCategory = true
-)}
-	<li>
-		<AssignmentCard
-			{name}
-			{pointsEarned}
-			{pointsPossible}
-			{unscaledPoints}
-			{extraCredit}
-			gradePercentageChange={rawGradeCalcMatches ? gradePercentageChange : undefined}
-			{notForGrade}
-			{hidden}
-			showHypotheticalLabel={newHypothetical}
-			category={showCategory ? category : undefined}
-			{date}
-			{comments}
-			unseen={id !== undefined ? !seenAssignmentIDs.has(id) : false}
-		/>
-	</li>
-{/snippet}
-
-{#snippet boundAssignmentSnippet(
-	{ gradePercentageChange, hidden, newHypothetical, date, comments }: ReactiveAssignment,
-	reactiveAssignments: ReactiveAssignment[],
-	i: number,
-	showCategory = true
-)}
-	{#if reactiveAssignments[i]}
-		<li>
-			{#if showCategory}
-				<AssignmentCard
-					bind:name={reactiveAssignments[i].name}
-					bind:pointsEarned={reactiveAssignments[i].pointsEarned}
-					bind:pointsPossible={reactiveAssignments[i].pointsPossible}
-					bind:extraCredit={reactiveAssignments[i].extraCredit}
-					gradePercentageChange={rawGradeCalcMatches ? gradePercentageChange : undefined}
-					bind:notForGrade={reactiveAssignments[i].notForGrade}
-					{hidden}
-					showHypotheticalLabel={newHypothetical}
-					bind:category={reactiveAssignments[i].category}
-					categoryDropdownOptions={gradeCategories?.map((category) => category.name)}
-					{date}
-					{comments}
-					editable={true}
-					{recalculateGradePercentage}
-				/>
-			{:else}
-				<AssignmentCard
-					bind:name={reactiveAssignments[i].name}
-					bind:pointsEarned={reactiveAssignments[i].pointsEarned}
-					bind:pointsPossible={reactiveAssignments[i].pointsPossible}
-					bind:extraCredit={reactiveAssignments[i].extraCredit}
-					gradePercentageChange={rawGradeCalcMatches ? gradePercentageChange : undefined}
-					bind:notForGrade={reactiveAssignments[i].notForGrade}
-					{hidden}
-					showHypotheticalLabel={newHypothetical}
-					categoryDropdownOptions={gradeCategories?.map((category) => category.name)}
-					{date}
-					{comments}
-					editable={true}
-					{recalculateGradePercentage}
-				/>
-			{/if}
-		</li>
-	{/if}
-{/snippet}

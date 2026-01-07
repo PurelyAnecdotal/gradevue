@@ -2,7 +2,7 @@
 	import { browser } from '$app/environment';
 	import { brand, contactEmail } from '$lib/brand';
 	import Disclaimer from '$lib/components/Disclaimer.svelte';
-	import { Card } from 'flowbite-svelte';
+	import * as Card from '$lib/components/ui/card';
 
 	let email = $state('[email protected]');
 	if (browser) email = contactEmail;
@@ -14,25 +14,29 @@
 
 <div class="flex min-h-screen flex-col items-center">
 	<main class="flex grow items-center">
-		<Card size="lg" class="m-4 gap-4 dark:text-gray-200">
-			<h1 class="text-2xl dark:text-white">About the privacy of {brand}</h1>
+		<Card.Root class="max-w-xl m-4">
+			<Card.Header>
+				<Card.Title>About the privacy of {brand}</Card.Title>
+			</Card.Header>
 
-			<p>
-				{brand} is designed to keep students' information private the entire time they use the service.
-			</p>
+			<Card.Content class="space-y-4">
+				<p>
+					{brand} is designed to keep students' information private the entire time they use the service.
+				</p>
 
-			<p>
-				When a student uses {brand}, their own device sends their username and password directly to
-				the offical student portal, and the portal returns their student information directly to
-				their device. {brand} servers do not receive or process any student information. All student information
-				is stored and processed on-device.
-			</p>
+				<p>
+					When a student uses {brand}, their own device sends their username and password directly
+					to the offical student portal, and the portal returns their student information directly
+					to their device. {brand} servers do not receive or process any student information. All student
+					information is stored and processed on-device.
+				</p>
 
-			<p>
-				If you have questions or concerns about {brand}, please contact us at
-				<a href="mailto:{email}" class="text-primary-600 underline">{email}</a>.
-			</p>
-		</Card>
+				<p>
+					If you have questions or concerns about {brand}, please contact us at
+					<a href="mailto:{email}" class="underline">{email}</a>.
+				</p>
+			</Card.Content>
+		</Card.Root>
 	</main>
 
 	<Disclaimer />
