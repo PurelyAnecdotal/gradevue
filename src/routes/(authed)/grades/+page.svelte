@@ -88,7 +88,7 @@
 
 		{#if hasNoGrades}
 			<Alert class="mx-auto flex w-fit items-center">
-				<CircleXIcon />
+				<CircleXIcon class="shrink-0"/>
 				It looks like you don't have any grades yet in this reporting period.
 
 				{#if currentPeriodIndex > 0}

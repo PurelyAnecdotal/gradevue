@@ -68,15 +68,15 @@
 				<UserIcon />
 				{teacher}
 			</Badge>
+
+			{#if unseenAssignmentsCount > 0}
+				<Badge color="green">{unseenAssignmentsCount} new</Badge>
+			{/if}
 		</div>
 	</div>
 
 	{#if grade}
 		<div class="flex flex-col items-center gap-2 self-end sm:flex-row sm:self-auto">
-			{#if unseenAssignmentsCount > 0}
-				<Badge color="green">{unseenAssignmentsCount} new</Badge>
-			{/if}
-
 			<NumberFlow
 				prefix={grade.letter + ' '}
 				value={grade.percentage / 100}
