@@ -1,16 +1,22 @@
 <script lang="ts">
 	import { removeCourseType } from '$lib';
 	import { brand } from '$lib/brand';
+	import { buttonVariants } from '$lib/components/ui/button';
+	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
 	import * as Sidebar from '$lib/components/ui/sidebar/index.js';
 	import { Spinner } from '$lib/components/ui/spinner';
 	import AppWindowMacIcon from '@lucide/svelte/icons/app-window-mac';
 	import BellIcon from '@lucide/svelte/icons/bell';
 	import CircleUserIcon from '@lucide/svelte/icons/circle-user';
+	import EllipsisVerticalIcon from '@lucide/svelte/icons/ellipsis-vertical';
 	import FolderOpenIcon from '@lucide/svelte/icons/folder-open';
 	import InboxIcon from '@lucide/svelte/icons/inbox';
 	import LogOutIcon from '@lucide/svelte/icons/log-out';
 	import MessageSquareWarningIcon from '@lucide/svelte/icons/message-square-warning';
+	import MoonIcon from '@lucide/svelte/icons/moon';
 	import NotebookTextIcon from '@lucide/svelte/icons/notebook-text';
+	import SunIcon from '@lucide/svelte/icons/sun';
+	import { mode, toggleMode } from 'mode-watcher';
 	import type { Component } from 'svelte';
 	import { fade } from 'svelte/transition';
 	import { installPrompt } from '../../hooks.client';
@@ -35,6 +41,11 @@
 	loadStudentInfo();
 
 	const data = {
+		grades: {
+			title: 'Grades',
+			url: '/grades',
+			icon: NotebookTextIcon
+		},
 		header: [
 			{
 				title: 'Attendance',
@@ -52,32 +63,25 @@
 				icon: InboxIcon
 			}
 		],
-		footer: [
-			{
-				title: 'Feedback',
-				url: '/feedback',
-				icon: MessageSquareWarningIcon
-			},
-			{
-				title: studentInfoState.data?.FormattedName ?? 'Student Info',
-				url: '/studentinfo',
-				icon: CircleUserIcon
-			},
-			{
-				title: 'Log Out',
-				onclick: logOut,
-				icon: LogOutIcon
-			}
-		],
-		grades: {
-			title: 'Grades',
-			url: '/grades',
-			icon: NotebookTextIcon
-		},
 		pwa: {
 			title: 'Install Web App',
 			icon: AppWindowMacIcon,
 			onclick: installWebApp
+		},
+		feedback: {
+			title: 'Feedback',
+			url: '/feedback',
+			icon: MessageSquareWarningIcon
+		},
+		user: {
+			title: studentInfoState.data?.FormattedName ?? 'Student Info',
+			url: '/studentinfo',
+			icon: CircleUserIcon
+		},
+		logout: {
+			title: 'Log Out',
+			onclick: logOut,
+			icon: LogOutIcon
 		}
 	};
 
@@ -174,9 +178,42 @@
 				</div>
 			{/if}
 
-			{#each data.footer as item (item.title)}
-				{@render menuItem(item)}
-			{/each}
+			{@render menuItem(data.feedback)}
+
+			<Sidebar.MenuItem>
+				<Sidebar.MenuButton class="h-10 text-base">
+					{#snippet child({ props })}
+						<div class="flex items-center gap-1">
+							<a href={data.user.url} {...props}>
+								<data.user.icon /> <span>{data.user.title}</span>
+							</a>
+
+							<DropdownMenu.Root>
+								<DropdownMenu.Trigger class={buttonVariants({ variant: 'ghost', size: 'icon-lg' })}>
+									<EllipsisVerticalIcon />
+								</DropdownMenu.Trigger>
+
+								<DropdownMenu.Content>
+									<DropdownMenu.Item onclick={toggleMode} class="h-9">
+										<MoonIcon
+											class="h-[1.2rem] w-[1.2rem] scale-100 rotate-0 transition-all dark:scale-0 dark:-rotate-90"
+										/>
+										<SunIcon
+											class="absolute h-[1.2rem] w-[1.2rem] scale-0 rotate-90 transition-all dark:scale-100 dark:rotate-0"
+										/>
+										{mode.current === 'light' ? 'Dark Mode' : 'Light Mode'}
+									</DropdownMenu.Item>
+
+									<DropdownMenu.Item onclick={data.logout.onclick} class="h-9">
+										<data.logout.icon />
+										{data.logout.title}
+									</DropdownMenu.Item>
+								</DropdownMenu.Content>
+							</DropdownMenu.Root>
+						</div>
+					{/snippet}
+				</Sidebar.MenuButton>
+			</Sidebar.MenuItem>
 		</Sidebar.Menu>
 	</Sidebar.Footer>
 </Sidebar.Root>
