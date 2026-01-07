@@ -1,4 +1,5 @@
 import { env } from '$env/dynamic/public';
+import { wrapEnvelope } from '$lib/synergy';
 import { XMLParser } from 'fast-xml-parser';
 import { http, HttpResponse } from 'msw';
 
@@ -12,30 +13,32 @@ let studentInfo: string;
 
 if (import.meta.env.DEV) {
 	const [
-		attachmentModule,
-		attendanceModule,
-		documentModule,
-		documentsModule,
-		gradebookModule,
-		mailModule,
-		studentInfoModule
-	] = await Promise.all([
-		import('./data/attachment.xml?raw'),
-		import('./data/attendance.xml?raw'),
-		import('./data/document.xml?raw'),
-		import('./data/documents.xml?raw'),
-		import('./data/gradebook.xml?raw'),
-		import('./data/mail.xml?raw'),
-		import('./data/studentinfo.xml?raw')
-	]);
+		AttachmentXML,
+		Attendance,
+		DocumentData,
+		Gradebook,
+		StudentDocuments,
+		StudentInfo,
+		SynergyMailDataXML
+	] = (
+		await Promise.all([
+			import('./data/AttachmentXML.xml?raw'),
+			import('./data/Attendance.xml?raw'),
+			import('./data/DocumentData.xml?raw'),
+			import('./data/Gradebook.xml?raw'),
+			import('./data/StudentDocuments.xml?raw'),
+			import('./data/StudentInfo.xml?raw'),
+			import('./data/SynergyMailDataXML.xml?raw')
+		])
+	).map((module) => wrapEnvelope(module.default));
 
-	attachment = attachmentModule.default;
-	attendance = attendanceModule.default;
-	document = documentModule.default;
-	documents = documentsModule.default;
-	gradebook = gradebookModule.default;
-	mail = mailModule.default;
-	studentInfo = studentInfoModule.default;
+	attachment = AttachmentXML!;
+	attendance = Attendance!;
+	document = DocumentData!;
+	documents = StudentDocuments!;
+	gradebook = Gradebook!;
+	mail = SynergyMailDataXML!;
+	studentInfo = StudentInfo!;
 }
 
 const xmlParser = new XMLParser();

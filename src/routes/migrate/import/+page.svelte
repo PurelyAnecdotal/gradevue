@@ -4,7 +4,8 @@
 	import { page } from '$app/state';
 	import { env } from '$env/dynamic/public';
 	import { LocalStorageKey } from '$lib';
-	import { Button, Card } from 'flowbite-svelte';
+	import { Button } from '$lib/components/ui/button';
+	import * as Card from '$lib/components/ui/card';
 
 	let sourceOrigin: string | null | undefined = $state(undefined);
 
@@ -40,27 +41,32 @@
 </script>
 
 <div class="flex min-h-screen min-w-screen items-center justify-center">
-	<Card class="space-y-4 dark:text-gray-200">
-		<h1 class="text-xl">
-			{#if env.PUBLIC_ALLOWED_MIGRATION_ORIGINS !== undefined}
-				{#if sourceOrigin !== null}
-					Migrating user data from {sourceOrigin}...
-				{:else}
-					Cannot migrate user data: source origin unspecified
-				{/if}
-			{:else}
-				Cannot migrate user data: no migration origins allowed
-			{/if}
-		</h1>
-		{#if env.PUBLIC_ALLOWED_MIGRATION_ORIGINS !== undefined && sourceOrigin !== null && hasExistingData}
-			<p>You already have data here. Would you like to overwrite it?</p>
+	<Card.Root>
+		<Card.Header>
+			<Card.Title>Migrate User Data</Card.Title>
+		</Card.Header>
 
-			<div class="flex gap-2">
-				<Button href="/grades" color="light" class="w-full">Cancel</Button>
-				<Button onclick={startMigration} color="red" class="w-full cursor-pointer">
-					Overwrite
-				</Button>
-			</div>
-		{/if}
-	</Card>
+		<Card.Content class="space-y-4">
+			<p>
+				{#if env.PUBLIC_ALLOWED_MIGRATION_ORIGINS !== undefined}
+					{#if sourceOrigin !== null}
+						Migrating user data from {sourceOrigin}...
+					{:else}
+						Cannot migrate user data: source origin unspecified
+					{/if}
+				{:else}
+					Cannot migrate user data: no migration origins allowed
+				{/if}
+			</p>
+
+			{#if (env.PUBLIC_ALLOWED_MIGRATION_ORIGINS !== undefined && sourceOrigin !== null && hasExistingData)}
+				<p>You already have data here. Would you like to overwrite it?</p>
+
+				<div class="flex gap-2">
+					<Button href="/grades" variant="outline" class="flex-1">Cancel</Button>
+					<Button onclick={startMigration} variant="destructive" class="flex-1 cursor-pointer">Overwrite</Button>
+				</div>
+			{/if}
+		</Card.Content>
+	</Card.Root>
 </div>

@@ -1,7 +1,8 @@
 <script lang="ts">
 	import { page } from '$app/state';
 	import { brand } from '$lib/brand';
-	import { Alert, Button } from 'flowbite-svelte';
+	import * as Alert from '$lib/components/ui/alert';
+	import { Button } from '$lib/components/ui/button';
 </script>
 
 <svelte:head>
@@ -9,9 +10,11 @@
 </svelte:head>
 
 <div class="flex min-h-screen items-center justify-center">
-	<Alert color="red" class="max-w-full min-w-sm space-y-4 border-t-4" rounded={false}>
-		<h1 class="text-lg font-bold">{page.status} {page.error?.message}</h1>
+	<Alert.Root variant="destructive" class="w-fit max-w-full min-w-sm gap-y-2">
+		<Alert.Title>{page.status} {page.error?.message}</Alert.Title>
 
-		<Button href="/" color="alternative" class="mx-auto">Go home</Button>
-	</Alert>
+		<Alert.Description>
+			<Button href="/" variant="outline">Go home</Button>
+		</Alert.Description>
+	</Alert.Root>
 </div>

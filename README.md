@@ -10,7 +10,7 @@ Make sure to have [Bun](https://bun.sh) installed, then run `bun install` to ins
 
 ### Mocking
 
-StudentVUE API requests are mocked in development mode, returning a cached copy of the API responses. You will need to generate this mocked data cache or you will get import errors at runtime. You should re-run this command whenever you would like to update it to reflect StudentVUE's current responses.
+StudentVUE API requests are mocked in development mode, returning a cached copy of your student portal data that can be easily inspected and modified. You will need to create this data by retrieving it from your student portal using the script or you will get import errors at runtime. You should re-run this command whenever you would like to update it to reflect StudentVUE's current data.
 
 ```bash
 bun run generate-mocks

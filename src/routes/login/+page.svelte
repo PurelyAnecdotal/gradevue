@@ -6,12 +6,16 @@
 	import { brand } from '$lib/brand';
 	import Disclaimer from '$lib/components/Disclaimer.svelte';
 	import LoadingBanner from '$lib/components/LoadingBanner.svelte';
+	import * as Alert from '$lib/components/ui/alert';
+	import { Button } from '$lib/components/ui/button';
+	import { Checkbox } from '$lib/components/ui/checkbox';
+	import * as Dialog from '$lib/components/ui/dialog';
+	import * as Field from '$lib/components/ui/field';
+	import { Input } from '$lib/components/ui/input';
+	import { Label } from '$lib/components/ui/label';
 	import { StudentAccount } from '$lib/synergy';
-	import CircleXIcon from '@lucide/svelte/icons/circle-x';
-	import FolderLockIcon from '@lucide/svelte/icons/folder-lock';
-	import InfoIcon from '@lucide/svelte/icons/info';
+	import AlertCircleIcon from '@lucide/svelte/icons/alert-circle';
 	import LogInIcon from '@lucide/svelte/icons/log-in';
-	import { Alert, Button, Card, Checkbox, Helper, Input, Label, Popover } from 'flowbite-svelte';
 	import { fly } from 'svelte/transition';
 
 	if (browser && localStorage.getItem(LocalStorageKey.token) !== null) {
@@ -67,7 +71,9 @@
 	function findDomain() {
 		if (convertedDomain === undefined) return;
 		domain = convertedDomain;
+		domainDialogOpen = false;
 	}
+	let domainDialogOpen = $state(false);
 </script>
 
 <svelte:head>
@@ -78,34 +84,42 @@
 
 {#if loginError}
 	<div in:fly={{ y: -50, duration: 200 }} class="fixed top-0 left-0 flex w-full justify-center p-4">
-		<Alert color="red">
-			<CircleXIcon slot="icon" class="h-5 w-5" />
-			<span class="font-bold">Couldn't log in</span>
-			<p>{loginError}</p>
-		</Alert>
+		<Alert.Root variant="destructive" class="w-fit">
+			<AlertCircleIcon />
+			<Alert.Title>Couldn't log in</Alert.Title>
+			<Alert.Description>{loginError}</Alert.Description>
+		</Alert.Root>
 	</div>
 {/if}
 
-<div class="flex min-h-screen flex-col items-center">
-	<main class="flex grow items-center">
-		<Card>
-			<form onsubmit={login} class="space-y-4">
-				<h1 class="text-xl dark:text-white">Sign in to {brand}</h1>
+<div class="flex min-h-screen flex-col">
+	<main class="flex grow items-center justify-center">
+		<form onsubmit={login} class="m-4 flex w-full max-w-sm flex-col gap-4">
+			<div class="mb-8 flex flex-col items-center gap-2">
+				<img src="/favicon.svg" class="h-8 w-8" alt={brand} />
 
-				<p class="space-y-2">
-					<Label for="username">StudentVUE Username</Label>
+				<h1 class="text-xl font-bold">Log in to {brand}</h1>
+
+				<Field.Description>
+					Never used {brand} before? <a href="/signup">Sign up</a>
+				</Field.Description>
+			</div>
+
+			<Field.Group>
+				<Field.Field>
+					<Field.Label for="username">StudentVUE Username</Field.Label>
 					<Input
-						type="text"
 						id="username"
+						type="text"
 						bind:value={username}
 						placeholder="student@school.net"
 						autocomplete="username"
 						required
 					/>
-				</p>
+				</Field.Field>
 
-				<p class="space-y-2">
-					<Label for="password">StudentVUE Password</Label>
+				<Field.Field>
+					<Field.Label for="password">StudentVUE Password</Field.Label>
 					<Input
 						type="password"
 						id="password"
@@ -113,68 +127,73 @@
 						autocomplete="current-password"
 						required
 					/>
-					<Helper class="flex items-center gap-2 text-xs dark:text-gray-400">
-						<FolderLockIcon class="h-4 w-4 shrink-0" />
+					<Field.Description>
 						Your device connects directly to StudentVUE. We can't see your password or your grades.
-					</Helper>
-					<Helper class="flex items-center gap-2 text-xs dark:text-gray-400">
-						<InfoIcon class="h-4 w-4 shrink-0" />
-						<span>
-							If you've never used {brand} before, you may need to
-							<a href="/signup" class="dark:text-primary-600 underline">create a password</a>.
-						</span>
-					</Helper>
-				</p>
+					</Field.Description>
+				</Field.Field>
 
-				<p class="space-y-2">
-					<Label for="domain" class="flex w-full justify-between">
-						StudentVUE Domain
-						<button class="text-primary-700 cursor-pointer text-xs underline">
-							Help me find my domain
-						</button>
-						<Popover
-							class="w-96"
-							title="Paste any link to your district's StudentVUE website"
-							trigger="click"
-						>
-							<div class="flex items-center gap-2">
-								<Input
-									type="url"
-									placeholder="https://[your-district]-psv.edupoint.com/Home_PXP2.aspx"
-									bind:value={pastedUrl}
-								/>
-								<Button
-									onclick={findDomain}
-									disabled={convertedDomain === undefined}
-									class={convertedDomain === undefined ? 'cursor-not-allowed' : 'cursor-pointer'}
-								>
-									Submit
-								</Button>
-							</div>
-						</Popover>
-					</Label>
+				<Field.Field>
+					<div class="flex items-center">
+						<Field.Label for="domain">StudentVUE Domain</Field.Label>
+
+						<Dialog.Root bind:open={domainDialogOpen}>
+							<Dialog.Trigger
+								class="text-tertiary-foreground ms-auto inline-block text-sm underline"
+								form="none"
+							>
+								Help me find my domain
+							</Dialog.Trigger>
+
+							<Dialog.Content>
+								<form onsubmit={findDomain} class="space-y-4">
+									<Label for="pastedUrl">
+										Paste any link to your district's StudentVUE website
+									</Label>
+
+									<div class="flex gap-2">
+										<Input
+											id="pastedUrl"
+											type="url"
+											placeholder="https://[your-district]-psv.edupoint.com/Home_PXP2.aspx"
+											bind:value={pastedUrl}
+											required
+										/>
+										<Button type="submit" disabled={convertedDomain === undefined}>Submit</Button>
+									</div>
+								</form>
+							</Dialog.Content>
+						</Dialog.Root>
+					</div>
+
 					<Input
 						type="text"
 						id="domain"
 						placeholder="[your-district]-psv.edupoint.com"
 						autocomplete="on"
+						autocorrect="off"
 						bind:value={domain}
 						required
 					/>
-				</p>
+				</Field.Field>
 
-				<Checkbox class="text-xs" required>
-					I understand that {brand} is an independent, unofficial application and is not affiliated with
-					or endorsed by Edupoint Educational Systems LLC. Use of StudentVUE is subject to Edupoint Educational
-					Systems LLC's terms of service, and I am responsible for ensuring my use complies with those
-					terms.
-				</Checkbox>
+				<Field.Field orientation="horizontal" class="items-center">
+					<Checkbox name="disclaimer" id="disclaimer" required />
 
-				<Button type="submit" class="flex w-full items-center gap-2">
-					<LogInIcon class="h-4 w-4" /> Log in
-				</Button>
-			</form>
-		</Card>
+					<Field.Label for="disclaimer" class="text-tertiary-foreground text-xs">
+						I understand that {brand} is an independent, unofficial tool and is not affiliated with or
+						endorsed by Edupoint Educational Systems LLC. Use of StudentVUE is subject to Edupoint Educational
+						Systems LLC's terms of service, and I am responsible for ensuring my use complies with those
+						terms.
+					</Field.Label>
+				</Field.Field>
+
+				<Field.Field>
+					<Button type="submit" class="w-full">
+						<LogInIcon class="h-4 w-4" /> Log in
+					</Button>
+				</Field.Field>
+			</Field.Group>
+		</form>
 	</main>
 
 	<Disclaimer />

@@ -1,17 +1,19 @@
 <script lang="ts">
-	import { fullDateFormatter, removeClassID } from '$lib';
+	import { fullDateFormatter, removeCourseType } from '$lib';
 	import { brand } from '$lib/brand';
 	import LoadingBanner from '$lib/components/LoadingBanner.svelte';
 	import RefreshIndicator from '$lib/components/RefreshIndicator.svelte';
+	import * as Accordion from '$lib/components/ui/accordion';
+	import { Alert } from '$lib/components/ui/alert';
+	import { Badge } from '$lib/components/ui/badge';
 	import type { Period } from '$lib/types/Attendance';
 	import CircleCheckIcon from '@lucide/svelte/icons/circle-check';
-	import { Accordion, AccordionItem, Alert, Badge } from 'flowbite-svelte';
 	import { attendanceState, loadAttendance } from './attendance.svelte';
 
 	loadAttendance();
 
 	const excusedReasonRegex =
-		/Field Trip|School Pass|Excused|Medical\/Dent|Comp Ed\/Court-Religi|Illness or Sickness|SB14 Wellness\/Illnes/;
+		/Field Trip|School Pass|Excused|Medical\/Dent|Comp Ed\/Court-Religi|Illness or Sickness|SB14 Wellness\/Illnes|Med. all day\/period/;
 
 	function getAbsenceType(periods: Period[]) {
 		const reasons = periods.map((period: Period) => period._Name);
@@ -37,7 +39,7 @@
 			case 'Present':
 				return 'green';
 			default:
-				return 'primary';
+				return 'orange';
 		}
 	}
 </script>
@@ -59,36 +61,37 @@
 {#if attendanceState.data && attendanceState.data.Absences.Absence}
 	<div class="mx-2 mt-8 md:mx-4">
 		{#if attendanceState.data.Absences.Absence?.length > 0}
-			<Accordion class="mx-auto max-w-2xl">
+			<Accordion.Root type="single" class="mx-auto max-w-2xl">
 				{#each attendanceState.data.Absences.Absence as absence (absence._AbsenceDate)}
-					<AccordionItem>
-						<div slot="header" class="flex w-full items-center justify-between text-white">
-							<span>
-								{fullDateFormatter.format(new Date(absence._AbsenceDate))}{#if absence._Note}
-									: {absence._Note}
-								{/if}
-							</span>
+					<Accordion.Item>
+						<Accordion.Trigger>
+							{fullDateFormatter.format(new Date(absence._AbsenceDate))}{#if absence._Note}
+								: {absence._Note}
+							{/if}
+
 							{#if getAbsenceType(absence.Periods.Period ?? [])}
 								<Badge
 									color={getAbsenceColor(getAbsenceType(absence.Periods.Period ?? []) ?? 'unknown')}
-									large
-									class="mr-4"
+									class="ml-auto"
 								>
 									{getAbsenceType(absence.Periods.Period ?? [])}
 								</Badge>
 							{/if}
-						</div>
-						<ol class="space-y-2 text-gray-300">
-							{#each absence.Periods.Period?.filter((course) => course._Name) ?? [] as period (period._Course)}
-								<li>{removeClassID(period._Course)}: {period._Name}</li>
-							{/each}
-						</ol>
-					</AccordionItem>
+						</Accordion.Trigger>
+
+						<Accordion.Content>
+							<ol class="text-muted-foreground space-y-2">
+								{#each absence.Periods.Period?.filter((course) => course._Name) ?? [] as period (period._Course)}
+									<li>{removeCourseType(period._Course)}: {period._Name}</li>
+								{/each}
+							</ol>
+						</Accordion.Content>
+					</Accordion.Item>
 				{/each}
-			</Accordion>
+			</Accordion.Root>
 		{:else}
-			<Alert class="mx-auto flex w-fit items-center" color="green">
-				<CircleCheckIcon class="h-5 w-5" /> Looks like you haven't had any attendence events yet.
+			<Alert class="mx-auto w-fit">
+				<CircleCheckIcon /> Looks like you haven't had any attendence events yet.
 			</Alert>
 		{/if}
 	</div>
