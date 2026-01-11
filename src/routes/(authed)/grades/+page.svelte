@@ -1,7 +1,8 @@
 <script lang="ts">
+	import { removeCourseType } from '$lib';
 	import { parseSynergyAssignment } from '$lib/assignments';
 	import { brand } from '$lib/brand';
-	import { Alert } from '$lib/components/ui/alert';
+	import * as Alert from '$lib/components/ui/alert';
 	import { Button } from '$lib/components/ui/button';
 	import * as Select from '$lib/components/ui/select';
 	import type { Course } from '$lib/types/Gradebook';
@@ -14,8 +15,8 @@
 		seenAssignmentIDs,
 		showGradebook
 	} from './gradebook.svelte';
+
 	const currentGradebookState = $derived(getCurrentGradebookState(gradebooksState));
-	import {removeCourseType} from '$lib';
 
 	const allPeriods = $derived(currentGradebookState?.data?.ReportingPeriods.ReportPeriod);
 
@@ -56,6 +57,26 @@
 				).every((score) => score === 'N/A')
 			: false
 	);
+
+	const totalUnseenAssignments = $derived.by(() => {
+		if (!currentGradebookState?.data) return 0;
+
+		return currentGradebookState.data.Courses.Course.reduce((total, course) => {
+			return total + getCourseUnseenAssignmentsCount(course);
+		}, 0);
+	});
+
+	function clearAllUnseenAssignments() {
+		if (!currentGradebookState?.data) return;
+
+		currentGradebookState.data.Courses.Course.forEach((course) => {
+			if (course.Marks === '') return;
+			const assignments = course.Marks.Mark.Assignments.Assignment;
+			if (!assignments) return;
+
+			assignments.map(parseSynergyAssignment).forEach(({ id }) => seenAssignmentIDs.add(id));
+		});
+	}
 </script>
 
 <svelte:head>
@@ -87,8 +108,8 @@
 		</Select.Root>
 
 		{#if hasNoGrades}
-			<Alert class="mx-auto flex w-fit items-center">
-				<CircleXIcon class="shrink-0"/>
+			<Alert.Root class="mx-auto flex w-fit items-center">
+				<CircleXIcon class="shrink-0" />
 				It looks like you don't have any grades yet in this reporting period.
 
 				{#if currentPeriodIndex > 0}
@@ -96,7 +117,7 @@
 						View {allPeriods[currentPeriodIndex - 1]?._GradePeriod}
 					</Button>
 				{/if}
-			</Alert>
+			</Alert.Root>
 		{/if}
 
 		<ol class="flex flex-col items-center gap-4">
@@ -115,5 +136,14 @@
 				</li>
 			{/each}
 		</ol>
+
+		{#if totalUnseenAssignments > 0}
+			<Alert.Root class="mx-auto flex w-fit items-center gap-4 shadow-lg/30">
+				<Alert.Title class="tracking-normal">
+					{totalUnseenAssignments} new assignment{totalUnseenAssignments === 1 ? '' : 's'}
+				</Alert.Title>
+				<Button variant="outline" onclick={clearAllUnseenAssignments}>Mark as seen</Button>
+			</Alert.Root>
+		{/if}
 	</div>
 {/if}
