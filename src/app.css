@@ -38,6 +38,10 @@
 	--sidebar-border: oklch(0.929 0.013 255.508);
 	--sidebar-ring: oklch(0.704 0.04 256.788);
 	--tertiary-foreground: oklch(0.37 0.03 257); /* not slate-700 */
+	--chart: oklch(0.7268 0.1683 33.34);
+	--chart-error: oklch(0.5701 0.2139 21.15);
+	--chart-bg: oklch(0.8 0.1773 35.14);
+	--chart-bg-error: oklch(0.5707 0.2141 21.18);
 }
 
 .dark {
@@ -73,6 +77,7 @@
 	--sidebar-border: oklch(1 0 0 / 10%);
 	--sidebar-ring: oklch(0.551 0.027 264.364);
 	--tertiary-foreground: oklch(0.83 0.03 256); /* not slate-200 */
+	--chart-bg: oklch(0.576 0.1773 35.14);
 }
 
 @theme inline {
@@ -112,6 +117,10 @@
 	--color-sidebar-border: var(--sidebar-border);
 	--color-sidebar-ring: var(--sidebar-ring);
 	--color-tertiary-foreground: var(--tertiary-foreground);
+	--color-chart: var(--chart);
+	--color-chart-error: var(--chart-error);
+	--color-chart-bg: var(--chart-bg);
+	--color-chart-bg-error: var(--chart-bg-error);
 }
 
 @layer base {

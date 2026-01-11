@@ -10,10 +10,10 @@
 		type CalculableWithCategory,
 		type Category
 	} from '$lib/assignments';
-	import type { ChartData, ChartOptions, Point } from 'chart.js';
-	import { mode } from 'mode-watcher';
+	import * as Chart from '$lib/components/ui/chart';
+	import { cn } from '$lib/utils';
+	import { Area, AreaChart, LinearGradient, Points } from 'layerchart';
 	import { SvelteMap } from 'svelte/reactivity';
-	import LineChart from './LineChart.svelte';
 
 	interface Props {
 		assignments: Assignment[];
@@ -21,17 +21,16 @@
 		animate: boolean;
 		error?: boolean;
 	}
-	let { assignments, gradeCategories, animate, error = false }: Props = $props();
+	let { assignments, gradeCategories, error = false }: Props = $props();
 
 	interface DataPointMetadata {
 		assignmentsOnDate: Assignment[];
 	}
 
-	const bgGradientColor = $derived(error ? '#d9203b44' : '#CC4522AA');
-	const pointColor = $derived(error ? 'oklch(0.5701 0.2139 21.15)' : 'oklch(0.7268 0.1683 33.34)');
-	const lineColor = $derived(pointColor);
-
-	const dataPoints = $derived.by(() => {
+	const chartData: {
+		date: Date;
+		grade: number;
+	}[] = $derived.by(() => {
 		if (gradeCategories) {
 			const assignmentsByDate: Map<number, CalculableWithCategory<Assignment>[]> = new SvelteMap();
 
@@ -61,7 +60,7 @@
 						assignmentsOnDate: assignments
 					};
 
-					return { x: ms, y: grade, metadata };
+					return { date: new Date(ms), grade, metadata };
 				})
 				.filter((x) => x !== null);
 		} else {
@@ -90,38 +89,10 @@
 						assignmentsOnDate: assignments
 					};
 
-					return { x: ms, y: grade, metadata };
+					return { date: new Date(ms), grade, metadata };
 				})
 				.filter((x) => x !== null);
 		}
-	});
-
-	const chartData: ChartData<'line', Point[], string> = $derived({
-		datasets: [
-			{
-				data: dataPoints,
-				fill: 'start',
-				borderColor: lineColor,
-				borderWidth: 2,
-				borderDash: error ? [6, 6] : undefined,
-				pointBackgroundColor: pointColor,
-				pointHoverBackgroundColor: pointColor,
-				pointBorderWidth: 0,
-				pointHoverBorderWidth: 0,
-				pointRadius: 4,
-				pointHoverRadius: 8,
-				pointHitRadius: 16,
-				gradient: {
-					backgroundColor: {
-						axis: 'y',
-						colors: {
-							0: mode.current === 'light' ? '#FFFFFF00' : '#02061800',
-							100: bgGradientColor
-						}
-					}
-				}
-			}
-		]
 	});
 
 	const dayFormatter = new Intl.DateTimeFormat('en-US', {
@@ -134,51 +105,41 @@
 		style: 'percent',
 		maximumFractionDigits: 3
 	});
-
-	const ticks = {
-		color: mode.current === 'light' ? 'oklch(55.4% 0.046 257.417)' : 'oklch(70.4% 0.04 256.788)' // slate-500 or slate-400
-	};
-
-	const chartOptions: ChartOptions<'line'> = $derived({
-		scales: {
-			x: {
-				// @ts-expect-error timestack is provided by chartjs-scale-timestack
-				type: 'timestack',
-				time: { unit: 'day' },
-				grid: { display: false },
-				ticks
-			},
-			y: {
-				grid: {
-					color:
-						mode.current === 'light' ? 'oklch(86.9% 0.022 252.894)' : 'oklch(37.2% 0.044 257.287)' // slate-300 or slate-700
-				},
-				ticks,
-				border: { display: false }
-			}
-		},
-		plugins: {
-			legend: { display: false },
-			tooltip: {
-				callbacks: {
-					title: (context) => dayFormatter.format(context[0]!.parsed.x!),
-					label: (context) => [
-						`${percentFormatter.format(context.parsed.y! / 100)}${error ? ' (may be inaccurate)' : ''}`,
-						...(context.raw as { metadata: DataPointMetadata }).metadata.assignmentsOnDate.map(
-							(assignment) => assignment.name
-						)
-					]
-				},
-				displayColors: false
-			}
-		},
-		maintainAspectRatio: false,
-		parsing: false,
-		normalized: true,
-		animation: animate ? undefined : false
-	});
 </script>
 
-<div class="m-4 h-64">
-	<LineChart data={chartData} options={chartOptions} class="h-64" />
-</div>
+<Chart.Container config={{}} class="m-4 h-64">
+	<!-- https://techniq-docs-v2.layerchart.pages.dev/docs -->
+	<AreaChart data={chartData} x="date" y="grade" yDomain={null}>
+		{#snippet tooltip()}
+			<Chart.Tooltip labelFormatter={dayFormatter.format} hideIndicator={true}>
+				{#snippet formatter({ value, item })}
+					<div>
+						<p>{percentFormatter.format(Number(value) / 100)}</p>
+						{#each (item.payload.metadata as DataPointMetadata).assignmentsOnDate as assignment (assignment.id)}
+							<p>{assignment.name}</p>
+						{/each}
+					</div>
+				{/snippet}
+			</Chart.Tooltip>
+		{/snippet}
+
+		{#snippet marks()}
+			<LinearGradient
+				stops={['var(--tw-gradient-from)', 'var(--tw-gradient-via)', 'var(--tw-gradient-to)']}
+				class={error
+					? 'from-chart-bg-error/50 via-chart-bg-error/15 to-chart-bg-error/1'
+					: 'from-chart-bg/50 via-chart-bg/15 to-chart-bg/1'}
+				vertical
+			>
+				{#snippet children({ gradient })}
+					<Area
+						line={{ class: cn(['stroke-2', error ? 'stroke-chart-error' : 'stroke-chart']) }}
+						fill={gradient}
+					/>
+				{/snippet}
+			</LinearGradient>
+
+			<Points r={4} class={error ? 'fill-chart-error' : 'fill-chart'} />
+		{/snippet}
+	</AreaChart>
+</Chart.Container>

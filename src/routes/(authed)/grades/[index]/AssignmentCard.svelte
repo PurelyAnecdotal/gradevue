@@ -90,10 +90,6 @@
 		Math.round((gradePercentageChange ?? 0) * 100) / 100
 	);
 
-	const borderClass = $derived(
-		unseen ? 'border-l-green-400 dark:border-l-green-600 border-l-4' : ''
-	);
-
 	const getCategory = () => categoryDropdownSelected ?? '';
 
 	function setCategory(newCategory: string) {
@@ -101,7 +97,12 @@
 	}
 </script>
 
-<Card.Root class="items-center gap-2 p-4 transition duration-500 sm:flex-row {borderClass}">
+<Card.Root
+	class={[
+		'items-center gap-2 p-4 transition duration-500 sm:flex-row max-w-full',
+		unseen && 'border-l-4 border-l-green-400 dark:border-l-green-600'
+	]}
+>
 	<div class="flex flex-1 flex-col gap-1 self-start sm:self-auto">
 		<div class="flex flex-wrap gap-1">
 			{#if editable}
