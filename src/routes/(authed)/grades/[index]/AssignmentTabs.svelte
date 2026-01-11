@@ -8,7 +8,6 @@
 		RealAssignment
 	} from '$lib/assignments';
 	import * as Tabs from '$lib/components/ui/tabs';
-	import { seenAssignmentIDs } from '../gradebook.svelte';
 	import AssignmentCard from './AssignmentCard.svelte';
 
 	interface Props {
@@ -20,6 +19,7 @@
 		assignmentCategoryColors: Map<string, BadgeColor>;
 		rawGradeCalcMatches: boolean;
 		recalculateGradePercentage: () => void;
+		seenAssignmentIDs?: Set<string>;
 	}
 	let {
 		hypotheticalMode,
@@ -29,7 +29,8 @@
 		assignmentCategoryNames,
 		assignmentCategoryColors,
 		rawGradeCalcMatches,
-		recalculateGradePercentage
+		recalculateGradePercentage,
+		seenAssignmentIDs
 	}: Props = $props();
 
 	const categoryDropdownOptions = $derived(
@@ -212,7 +213,7 @@
 				: undefined}
 			{date}
 			{comments}
-			unseen={!seenAssignmentIDs.has(id)}
+			unseen={seenAssignmentIDs && !seenAssignmentIDs.has(id)}
 		/>
 	</li>
 {/snippet}

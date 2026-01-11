@@ -26,7 +26,7 @@
 	<Sidebar.Provider>
 		<AppSidebar />
 
-		<Sidebar.Inset>
+		<Sidebar.Inset class="min-w-0">
 			<header class="sticky top-0 flex shrink-0 items-center p-2 md:hidden bg-background">
 				<Sidebar.Trigger />
 				<a

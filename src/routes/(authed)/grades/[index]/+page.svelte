@@ -297,12 +297,12 @@
 				</Button>
 
 				{#if !showTargetGradeCalculator}
-				<div transition:fade={{ duration: 200 }}>
-					<Button variant="card" onclick={toggleTargetGradeCalculator}>
-						<Columns3CogIcon class="mr-2 h-4 w-4" />
-						Target Grade Calculator
-					</Button>
-				</div>
+					<div transition:fade={{ duration: 200 }}>
+						<Button variant="card" onclick={toggleTargetGradeCalculator}>
+							<Columns3CogIcon class="mr-2 h-4 w-4" />
+							Target Grade Calculator
+						</Button>
+					</div>
 				{/if}
 
 				<Button variant="card" onclick={addHypotheticalAssignment}>
@@ -342,14 +342,14 @@
 				{hypotheticalMode}
 				{rawGradeCalcMatches}
 				{recalculateGradePercentage}
+				{seenAssignmentIDs}
 			/>
 		</div>
 	{:else}
 		<div class="flex justify-center">
-			<Alert.Root class="mx-4 flex w-fit items-center">
+			<Alert.Root class="mx-4 w-fit">
 				<CircleXIcon />
-
-				<Alert.Title>Looks like this this course doesn't have any grades yet.</Alert.Title>
+				<Alert.Title class="line-clamp-none">Looks like this this course doesn't have any assignments yet.</Alert.Title>
 			</Alert.Root>
 		</div>
 	{/if}
@@ -358,7 +358,7 @@
 		<div transition:fade={{ duration: 200 }} class="sticky bottom-8 mt-4 flex justify-center">
 			<Alert.Root class="flex w-fit items-center gap-4 shadow-lg/30">
 				<Alert.Title class="tracking-normal">
-					{unseenAssignments.length} new assignments
+					{unseenAssignments.length} new assignment{unseenAssignments.length === 1 ? '' : 's'}
 				</Alert.Title>
 				<Button onclick={markSeenAssignments}>Mark as seen</Button>
 			</Alert.Root>

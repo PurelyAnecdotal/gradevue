@@ -24,7 +24,7 @@ export const getCurrentGradebookState = (gradebooksState: GradebooksState) =>
 
 export const seenAssignmentIDs = new SvelteSet<string>();
 
-const cacheExpirationTime = 1000 * 60;
+const cacheExpirationTime = 1000 * 60 * 5;
 
 export const getPeriodIndex = (period: ReportPeriod, periods: ReportPeriod[]) =>
 	periods.map((period) => period._GradePeriod).findIndex((name) => name === period._GradePeriod);
