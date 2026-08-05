@@ -4,16 +4,19 @@
 	import { LocalStorageKey } from '$lib';
 	import { acc, loadStudentAccount } from '$lib/account.svelte';
 	import { brand, repoLink } from '$lib/brand';
-	import Disclaimer from '$lib/components/Disclaimer.svelte';
+	import * as Alert from '$lib/components/ui/alert';
 	import { Button } from '$lib/components/ui/button';
 	import * as Card from '$lib/components/ui/card';
+	import { demoState, openDemo } from '$lib/demo/demo.svelte';
 	import BellDotIcon from '@lucide/svelte/icons/bell-dot';
 	import CalculatorIcon from '@lucide/svelte/icons/calculator';
 	import ChartLineIcon from '@lucide/svelte/icons/chart-line';
 	import FolderLockIcon from '@lucide/svelte/icons/folder-lock';
 	import GithubIcon from '@lucide/svelte/icons/github';
+	import PlayIcon from '@lucide/svelte/icons/play';
+	import PowerIcon from '@lucide/svelte/icons/power';
 
-	if (browser && localStorage.getItem(LocalStorageKey.token) !== null) {
+	if (browser && localStorage.getItem(LocalStorageKey.token) !== null && !demoState.enabled) {
 		if (!acc.studentAccount) loadStudentAccount();
 
 		void goto('/grades');
@@ -24,22 +27,22 @@
 			icon: ChartLineIcon,
 			title: 'Grade Chart',
 			description:
-				'Visually see how your grade has changed over time, how each assignment affects your grade, how categories are broken down, and which new assignments have been put in.'
+				'You could visually see how your grade changed over time, how each assignment affected your grade, how categories were broken down, and which new assignments were put in.'
 		},
 		{
 			icon: CalculatorIcon,
 			title: 'Grade Calculator',
-			description: `${brand}'s powerful Hypothetical Mode let you calculate what your grade would be if you got a score on an assignment, what you need to get on your final, and much more.`
+			description: `${brand}'s powerful Hypothetical Mode let you calculate what your grade would be if you got a score on an assignment, what you needed to have gotten on your final, and much more.`
 		},
 		{
 			icon: BellDotIcon,
 			title: 'Attendance and more',
-			description: `${brand} breaks down your attendance by day and shows what periods you missed. It also shows your report cards, documents, and mail.`
+			description: `${brand} broke down your attendance by day and showed what periods you missed. It also showed your report cards, documents, and mail.`
 		},
 		{
 			icon: FolderLockIcon,
 			title: 'Private Login',
-			description: `${brand} does not have access to your data. When you use ${brand}, your device connects directly to your student portal. We never see your password or your grades! `,
+			description: `${brand} did not have access to your data. When you used ${brand}, your device connected directly to your student portal. We never saw your password or your grades! `,
 			link: { href: '/privacy', text: 'Learn more' }
 		}
 	];
@@ -66,17 +69,21 @@
 					</Card.Header>
 
 					<Card.Content>
-						<p>An advanced grade calculator designed to interface with StudentVUE®.</p>
+						<p>An advanced grade calculator.</p>
 
-						<p class="text-muted-foreground mt-2 text-xs">
-							StudentVUE is a registered trademark of Edupoint Educational Systems LLC. {brand} is not
-							affiliated with or endorsed by Edupoint Educational Systems LLC.
-						</p>
+						<Alert.Root variant="destructive" class="mt-4">
+							<PowerIcon />
+							<Alert.Title>GradeCompass is now obsolete.</Alert.Title>
+							<Alert.Description>
+								<a href="/obsolete" class="underline">Learn more</a>
+							</Alert.Description>
+						</Alert.Root>
 					</Card.Content>
 
 					<Card.Footer class="flex gap-2">
-						<Button href="/login" size="lg" variant="card" class="flex-1">Log in</Button>
-						<Button href="/signup" size="lg" class="flex-1">Sign up</Button>
+						<Button size="lg" variant="card" class="flex-1" onclick={openDemo}>
+							<PlayIcon /> Try demo
+						</Button>
 					</Card.Footer>
 				</Card.Root>
 
@@ -122,6 +129,4 @@
 			{/each}
 		</div>
 	</div>
-
-	<Disclaimer />
 </div>

@@ -1,7 +1,7 @@
 # Assignment Edge Cases
 
 > [!NOTE]
-> The Score field appears to be a recent addition to StudentVUE. For some rare edge cases, we do not have data on what the expected value is.
+> The Score field appears to be a recent addition. For some rare edge cases, we do not have data on what the expected value is.
 
 ## Normal
 
@@ -9,7 +9,7 @@ GradeCompass points earned: 3<br>
 GradeCompass points possible: 4<br>
 Included in GradeCompass grade calculations: yes
 
-- Score: "25"
+- Score: "3"
 - DisplayScore: "3 out of 4"
 - ScoreCalValue: "3"
 - ScoreMaxValue: "4"
@@ -98,18 +98,15 @@ Included in GradeCompass grade calculations: yes
 
 ## Not For Grading
 
-> [!NOTE]
-> Recent example needed
-
 GradeCompass points earned: 3<br>
 GradeCompass points possible: 4<br>
 Included in GradeCompass grade calculations: no
 
-- Score: ?
+- Score: "3"
 - DisplayScore: "3 out of 4"
 - ScoreCalValue: "3"
 - ScoreMaxValue: "4"
 - Points: "3 / 4"
 - Point: "3"
 - PointPossible: "4"
-- Notes: "(Not For Grading) "
+- Notes: "(Not For Grading) " with any note appended

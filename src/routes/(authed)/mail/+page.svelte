@@ -33,7 +33,13 @@
 		links.forEach((link) => {
 			link.setAttribute('target', '_blank');
 
-			if (new URL(link.href).hostname) openedMessageLinks.add(link.href);
+			try {
+				if (new URL(link.href).hostname) {
+					openedMessageLinks.add(link.href);
+				}
+			} catch (error) {
+				console.warn('Invalid URL in email body:', link.href, error);
+			}
 		});
 
 		openedMessageContent = doc.body.innerHTML;

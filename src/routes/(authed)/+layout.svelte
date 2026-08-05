@@ -6,14 +6,14 @@
 	import { acc, loadStudentAccount } from '$lib/account.svelte';
 	import { brand } from '$lib/brand';
 	import BoundaryFailure from '$lib/components/BoundaryFailure.svelte';
-	import Disclaimer from '$lib/components/Disclaimer.svelte';
 	import * as Sidebar from '$lib/components/ui/sidebar/index.js';
 	import { Spinner } from '$lib/components/ui/spinner';
+	import { demoState } from '$lib/demo/demo.svelte';
 	import AppSidebar from './AppSidebar.svelte';
 
 	let { children } = $props();
 
-	if (browser && !acc.studentAccount) {
+	if (browser && !acc.studentAccount && !demoState.enabled) {
 		if (localStorage.getItem(LocalStorageKey.token) !== null) {
 			loadStudentAccount();
 		} else {
@@ -27,14 +27,19 @@
 		<AppSidebar />
 
 		<Sidebar.Inset class="min-w-0">
-			<header class="bg-background z-20 sticky top-0 flex shrink-0 items-center p-2 md:hidden">
+			<header class="bg-background sticky top-0 z-20 flex shrink-0 items-center p-2 md:hidden">
 				<Sidebar.Trigger />
 				<a
 					href="/grades"
 					class="mr-auto ml-1 flex items-center gap-2 text-xl font-semibold tracking-tight whitespace-nowrap"
 				>
 					<img src="/favicon.svg" class="size-6" alt={brand} />
-					{brand}
+					<span>
+						{brand}
+						{#if demoState.enabled}
+							<span class="text-muted-foreground">Demo</span>
+						{/if}
+					</span>
 				</a>
 			</header>
 
@@ -61,8 +66,6 @@
 						<a href="/feedback" class="text-tertiary-foreground">Suggest a feature</a> •
 						<a href="/feedback" class="text-tertiary-foreground">Provide feedback</a>
 					</div>
-
-					<Disclaimer trademark={false} />
 				</div>
 			{/if}
 		</Sidebar.Inset>

@@ -1,5 +1,6 @@
-import { browser, dev } from '$app/environment';
-import { env } from '$env/dynamic/public';
+import { browser } from '$app/environment';
+import { LocalStorageKey } from '$lib';
+import { demoMockDomain } from '$lib/demo/demo.svelte';
 import type { ClientInit } from '@sveltejs/kit';
 import { writable, type Writable } from 'svelte/store';
 
@@ -26,11 +27,11 @@ export const init: ClientInit = () => {
 };
 
 // https://github.com/mswjs/examples/blob/main/examples/with-svelte/src/hooks.client.ts
-if (dev && browser && env.PUBLIC_DISABLE_MSW !== 'true') {
-	const { worker } = await import('$lib/mocks/browser');
+if (browser && localStorage.getItem(LocalStorageKey.demo) === 'true') {
+	const { worker } = await import('$lib/demo/browser');
 
 	// @ts-ignore
-	window.msw = worker;
+	window.demoMsw = worker;
 
 	await worker.start({
 		onUnhandledRequest(request, print) {
@@ -38,7 +39,7 @@ if (dev && browser && env.PUBLIC_DISABLE_MSW !== 'true') {
 			// Those are not meant to be mocked.
 			if (request.url.includes('svelte')) return;
 
-			if (new URL(request.url).origin !== env.PUBLIC_MOCK_STUDENTVUE_ORIGIN) return;
+			if (new URL(request.url).hostname !== demoMockDomain) return;
 
 			print.warning();
 		}

@@ -19,7 +19,16 @@
 
 	const linkCount = $derived(
 		new Set(
-			[...doc.querySelectorAll('a')].filter((a) => new URL(a.href).hostname).map((a) => a.href)
+			[...doc.querySelectorAll('a')]
+				.filter((a) => {
+					try {
+						return new URL(a.href).hostname;
+					} catch (error) {
+						console.warn('Invalid URL in email body:', a.href, error);
+						return false;
+					}
+				})
+				.map((a) => a.href)
 		).size
 	);
 

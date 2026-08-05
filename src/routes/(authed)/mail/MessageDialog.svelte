@@ -43,6 +43,15 @@
 			? 'Tap and hold the link to open it in a new tab'
 			: 'Ctrl+click or right-click the link to open it in a new tab'
 	);
+
+	function extractHostname(url: string) {
+		try {
+			return new URL(url).hostname;
+		} catch (error) {
+			console.warn('Invalid URL in email body:', url, error);
+			return '';
+		}
+	}
 </script>
 
 <Dialog.Root bind:open>
@@ -83,7 +92,7 @@
 				{#each links as link (link)}
 					<Button href={link} target="_blank" variant="outline" title="Link">
 						<LinkIcon class="h-5 w-5 shrink-0" />
-						<span class="truncate">{new URL(link).hostname}</span>
+						<span class="truncate">{extractHostname(link)}</span>
 					</Button>
 				{/each}
 
@@ -91,7 +100,7 @@
 					<Button
 						href="/mail/attachment?attachmentGU={attachment._SmAttachmentGU}"
 						target="_blank"
-						variant="outline"
+						variant="default"
 						title="Attachment"
 					>
 						<PaperclipIcon class="h-5 w-5 shrink-0" />

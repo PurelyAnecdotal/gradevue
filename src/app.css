@@ -35,7 +35,7 @@
 	--sidebar-primary-foreground: oklch(0.984 0.003 247.858);
 	--sidebar-accent: oklch(0.968 0.007 247.896);
 	--sidebar-accent-foreground: oklch(0.208 0.042 265.755);
-	--sidebar-border: oklch(0.929 0.013 255.508);
+	--sidebar-border: oklch(0.829 0.013 255.508); /* originally 0.929 0.013 255.508 */
 	--sidebar-ring: oklch(0.704 0.04 256.788);
 	--tertiary-foreground: oklch(0.37 0.03 257); /* not slate-700 */
 	--chart: oklch(0.7268 0.1683 33.34);
@@ -121,6 +121,7 @@
 	--color-chart-error: var(--chart-error);
 	--color-chart-bg: var(--chart-bg);
 	--color-chart-bg-error: var(--chart-bg-error);
+	--animate-underline-in: underlineIn 1s ease forwards 0.5s;
 }
 
 @layer base {
@@ -140,4 +141,13 @@ html {
 
 @theme {
 	--breakpoint-xs: 30rem;
+}
+
+@keyframes underlineIn {
+  from {
+    text-decoration-color: transparent;
+  }
+  to {
+    text-decoration-color: var(--color-chart);
+  }
 }

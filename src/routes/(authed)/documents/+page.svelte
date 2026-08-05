@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { bgColorVariants } from '$lib';
+	import { bgColorVariants, tailwindColors } from '$lib';
 	import { brand } from '$lib/brand';
 	import DateBadge from '$lib/components/DateBadge.svelte';
 	import LoadingBanner from '$lib/components/LoadingBanner.svelte';
@@ -11,19 +11,6 @@
 	import { documentsState, loadDocuments } from './documents.svelte';
 
 	loadDocuments();
-
-	function getDocumentColor(documentType: string) {
-		switch (documentType) {
-			case 'Report Card':
-				return 'yellow';
-			case 'Transcript':
-				return 'red';
-			case 'MAP Growth Family Report':
-				return 'blue';
-			default:
-				return 'green';
-		}
-	}
 
 	let documentDatas = $derived(
 		documentsState.data?.StudentDocumentDatas?.StudentDocumentData ?? []
@@ -43,6 +30,12 @@
 					if (bPriority === -1) return -1;
 					return aPriority - bPriority;
 				})
+		)
+	);
+
+	const documentCategoryColors = $derived(
+		new Map(
+			[...documentCategories].map((name, i) => [name, tailwindColors[(i * 4) % tailwindColors.length]!])
 		)
 	);
 </script>
@@ -70,7 +63,7 @@
 
 			{#each documentCategories as category (category)}
 				<Tabs.Trigger value={category}>
-					<div class={[bgColorVariants[getDocumentColor(category)], 'h-2 w-2 rounded-full']}></div>
+					<div class={[bgColorVariants[documentCategoryColors.get(category)!], 'h-2 w-2 rounded-full']}></div>
 					{category}
 				</Tabs.Trigger>
 			{/each}
@@ -105,7 +98,7 @@
 					<h2 class="text-lg">{documentData._DocumentComment}</h2>
 					<div class="flex flex-wrap gap-1">
 						{#if showCategory}
-							<Badge color={getDocumentColor(documentData._DocumentType)}>
+							<Badge color={documentCategoryColors.get(documentData._DocumentType)}>
 								{documentData._DocumentType}
 							</Badge>
 						{/if}

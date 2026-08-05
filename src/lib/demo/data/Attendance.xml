@@ -1,0 +1,397 @@
+<Attendance xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" Type="Period" StartPeriod="0"
+     EndPeriod="10" PeriodCount="11" SchoolName="GradeCompass High School">
+     <Absences>
+          <Absence AbsenceDate="11/18/2025" Reason="" Note="" DailyIconName=""
+               CodeAllDayReasonType="" CodeAllDayDescription="">
+               <Periods>
+                    <Period Number="1" Name="Med. all day/period" Reason="" Course="Spanish 1 (P)"
+                         Staff="Teacher One" StaffEMail="teacherone@demo.gradecompass.org"
+                         IconName="icon_excused.gif" SchoolName="GradeCompass High School"
+                         StaffGU="00000000-0000-0000-0000-000000000000"
+                         OrgYearGU="00000000-0000-0000-0000-000000000000" />
+                    <Period Number="2" Name="" Reason="" Course="Algebra 2 (P)" Staff="Teacher Two"
+                         StaffEMail="teachertwo@demo.gradecompass.org" IconName=""
+                         SchoolName="GradeCompass High School"
+                         StaffGU="00000000-0000-0000-0000-000000000000"
+                         OrgYearGU="00000000-0000-0000-0000-000000000000" />
+                    <Period Number="3" Name="" Reason="" Course="Biology (P)" Staff="Teacher Three"
+                         StaffEMail="teacherthree@demo.gradecompass.org" IconName=""
+                         SchoolName="GradeCompass High School"
+                         StaffGU="00000000-0000-0000-0000-000000000000"
+                         OrgYearGU="00000000-0000-0000-0000-000000000000" />
+                    <Period Number="4" Name="" Reason="" Course="World History (P)"
+                         Staff="Teacher Four" StaffEMail="teacherfour@demo.gradecompass.org"
+                         IconName="" SchoolName="GradeCompass High School"
+                         StaffGU="00000000-0000-0000-0000-000000000000"
+                         OrgYearGU="00000000-0000-0000-0000-000000000000" />
+                    <Period Number="5" Name="" Reason="" Course="English (P)" Staff="Teacher Five"
+                         StaffEMail="teacherfive@demo.gradecompass.org" IconName=""
+                         SchoolName="GradeCompass High School"
+                         StaffGU="00000000-0000-0000-0000-000000000000"
+                         OrgYearGU="00000000-0000-0000-0000-000000000000" />
+                    <Period Number="6" Name="" Reason="" Course="PE Course 1" Staff="Teacher Six"
+                         StaffEMail="teachersix@demo.gradecompass.org" IconName=""
+                         SchoolName="GradeCompass High School"
+                         StaffGU="00000000-0000-0000-0000-000000000000"
+                         OrgYearGU="00000000-0000-0000-0000-000000000000" />
+               </Periods>
+          </Absence>
+          <Absence AbsenceDate="11/07/2025" Reason="" Note="" DailyIconName=""
+               CodeAllDayReasonType="" CodeAllDayDescription="">
+               <Periods>
+                    <Period Number="1" Name="Med. all day/period" Reason="" Course="Spanish 1 (P)"
+                         Staff="Teacher One" StaffEMail="teacherone@demo.gradecompass.org"
+                         IconName="icon_excused.gif" SchoolName="GradeCompass High School"
+                         StaffGU="00000000-0000-0000-0000-000000000000"
+                         OrgYearGU="00000000-0000-0000-0000-000000000000" />
+                    <Period Number="2" Name="" Reason="" Course="Algebra 2 (P)" Staff="Teacher Two"
+                         StaffEMail="teachertwo@demo.gradecompass.org" IconName=""
+                         SchoolName="GradeCompass High School"
+                         StaffGU="00000000-0000-0000-0000-000000000000"
+                         OrgYearGU="00000000-0000-0000-0000-000000000000" />
+                    <Period Number="3" Name="" Reason="" Course="Biology (P)" Staff="Teacher Three"
+                         StaffEMail="teacherthree@demo.gradecompass.org" IconName=""
+                         SchoolName="GradeCompass High School"
+                         StaffGU="00000000-0000-0000-0000-000000000000"
+                         OrgYearGU="00000000-0000-0000-0000-000000000000" />
+                    <Period Number="4" Name="" Reason="" Course="World History (P)"
+                         Staff="Teacher Four" StaffEMail="teacherfour@demo.gradecompass.org"
+                         IconName="" SchoolName="GradeCompass High School"
+                         StaffGU="00000000-0000-0000-0000-000000000000"
+                         OrgYearGU="00000000-0000-0000-0000-000000000000" />
+                    <Period Number="5" Name="" Reason="" Course="English (P)" Staff="Teacher Five"
+                         StaffEMail="teacherfive@demo.gradecompass.org" IconName=""
+                         SchoolName="GradeCompass High School"
+                         StaffGU="00000000-0000-0000-0000-000000000000"
+                         OrgYearGU="00000000-0000-0000-0000-000000000000" />
+                    <Period Number="6" Name="" Reason="" Course="PE Course 1" Staff="Teacher Six"
+                         StaffEMail="teachersix@demo.gradecompass.org" IconName=""
+                         SchoolName="GradeCompass High School"
+                         StaffGU="00000000-0000-0000-0000-000000000000"
+                         OrgYearGU="00000000-0000-0000-0000-000000000000" />
+               </Periods>
+          </Absence>
+          <Absence AbsenceDate="10/31/2025" Reason="" Note="Competition" DailyIconName=""
+               CodeAllDayReasonType="" CodeAllDayDescription="">
+               <Periods>
+                    <Period Number="1" Name="Field Trip" Reason="" Course="Spanish 1 (P)"
+                         Staff="Teacher One" StaffEMail="teacherone@demo.gradecompass.org"
+                         IconName="icon_activity.gif" SchoolName="GradeCompass High School"
+                         StaffGU="00000000-0000-0000-0000-000000000000"
+                         OrgYearGU="00000000-0000-0000-0000-000000000000" />
+                    <Period Number="2" Name="Field Trip" Reason="" Course="Algebra 2 (P)"
+                         Staff="Teacher Two" StaffEMail="teachertwo@demo.gradecompass.org"
+                         IconName="icon_activity.gif" SchoolName="GradeCompass High School"
+                         StaffGU="00000000-0000-0000-0000-000000000000"
+                         OrgYearGU="00000000-0000-0000-0000-000000000000" />
+                    <Period Number="3" Name="Field Trip" Reason="" Course="Biology (P)"
+                         Staff="Teacher Three" StaffEMail="teacherthree@demo.gradecompass.org"
+                         IconName="icon_activity.gif" SchoolName="GradeCompass High School"
+                         StaffGU="00000000-0000-0000-0000-000000000000"
+                         OrgYearGU="00000000-0000-0000-0000-000000000000" />
+                    <Period Number="4" Name="Field Trip" Reason="" Course="World History (P)"
+                         Staff="Teacher Four" StaffEMail="teacherfour@demo.gradecompass.org"
+                         IconName="icon_activity.gif" SchoolName="GradeCompass High School"
+                         StaffGU="00000000-0000-0000-0000-000000000000"
+                         OrgYearGU="00000000-0000-0000-0000-000000000000" />
+                    <Period Number="5" Name="Field Trip" Reason="" Course="English (P)"
+                         Staff="Teacher Five" StaffEMail="teacherfive@demo.gradecompass.org"
+                         IconName="icon_activity.gif" SchoolName="GradeCompass High School"
+                         StaffGU="00000000-0000-0000-0000-000000000000"
+                         OrgYearGU="00000000-0000-0000-0000-000000000000" />
+                    <Period Number="6" Name="Field Trip" Reason="" Course="PE Course 1"
+                         Staff="Teacher Six" StaffEMail="teachersix@demo.gradecompass.org"
+                         IconName="icon_activity.gif" SchoolName="GradeCompass High School"
+                         StaffGU="00000000-0000-0000-0000-000000000000"
+                         OrgYearGU="00000000-0000-0000-0000-000000000000" />
+               </Periods>
+          </Absence>
+          <Absence AbsenceDate="10/27/2025" Reason="" Note="" DailyIconName=""
+               CodeAllDayReasonType="" CodeAllDayDescription="">
+               <Periods>
+                    <Period Number="1" Name="Med. all day/period" Reason="" Course="Spanish 1 (P)"
+                         Staff="Teacher One" StaffEMail="teacherone@demo.gradecompass.org"
+                         IconName="icon_excused.gif" SchoolName="GradeCompass High School"
+                         StaffGU="00000000-0000-0000-0000-000000000000"
+                         OrgYearGU="00000000-0000-0000-0000-000000000000" />
+                    <Period Number="2" Name="" Reason="" Course="Algebra 2 (P)" Staff="Teacher Two"
+                         StaffEMail="teachertwo@demo.gradecompass.org" IconName=""
+                         SchoolName="GradeCompass High School"
+                         StaffGU="00000000-0000-0000-0000-000000000000"
+                         OrgYearGU="00000000-0000-0000-0000-000000000000" />
+                    <Period Number="3" Name="" Reason="" Course="Biology (P)" Staff="Teacher Three"
+                         StaffEMail="teacherthree@demo.gradecompass.org" IconName=""
+                         SchoolName="GradeCompass High School"
+                         StaffGU="00000000-0000-0000-0000-000000000000"
+                         OrgYearGU="00000000-0000-0000-0000-000000000000" />
+                    <Period Number="4" Name="" Reason="" Course="World History (P)"
+                         Staff="Teacher Four" StaffEMail="teacherfour@demo.gradecompass.org"
+                         IconName="" SchoolName="GradeCompass High School"
+                         StaffGU="00000000-0000-0000-0000-000000000000"
+                         OrgYearGU="00000000-0000-0000-0000-000000000000" />
+                    <Period Number="5" Name="" Reason="" Course="English (P)" Staff="Teacher Five"
+                         StaffEMail="teacherfive@demo.gradecompass.org" IconName=""
+                         SchoolName="GradeCompass High School"
+                         StaffGU="00000000-0000-0000-0000-000000000000"
+                         OrgYearGU="00000000-0000-0000-0000-000000000000" />
+                    <Period Number="6" Name="" Reason="" Course="PE Course 1" Staff="Teacher Six"
+                         StaffEMail="teachersix@demo.gradecompass.org" IconName=""
+                         SchoolName="GradeCompass High School"
+                         StaffGU="00000000-0000-0000-0000-000000000000"
+                         OrgYearGU="00000000-0000-0000-0000-000000000000" />
+               </Periods>
+          </Absence>
+          <Absence AbsenceDate="10/24/2025" Reason="" Note="" DailyIconName=""
+               CodeAllDayReasonType="" CodeAllDayDescription="">
+               <Periods>
+                    <Period Number="1" Name="Unex Tardy less 30" Reason="" Course="Spanish 1 (P)"
+                         Staff="Teacher One" StaffEMail="teacherone@demo.gradecompass.org"
+                         IconName="icon_unxtardy.gif" SchoolName="GradeCompass High School"
+                         StaffGU="00000000-0000-0000-0000-000000000000"
+                         OrgYearGU="00000000-0000-0000-0000-000000000000" />
+                    <Period Number="2" Name="" Reason="" Course="Algebra 2 (P)" Staff="Teacher Two"
+                         StaffEMail="teachertwo@demo.gradecompass.org" IconName=""
+                         SchoolName="GradeCompass High School"
+                         StaffGU="00000000-0000-0000-0000-000000000000"
+                         OrgYearGU="00000000-0000-0000-0000-000000000000" />
+                    <Period Number="3" Name="" Reason="" Course="Biology (P)" Staff="Teacher Three"
+                         StaffEMail="teacherthree@demo.gradecompass.org" IconName=""
+                         SchoolName="GradeCompass High School"
+                         StaffGU="00000000-0000-0000-0000-000000000000"
+                         OrgYearGU="00000000-0000-0000-0000-000000000000" />
+                    <Period Number="4" Name="" Reason="" Course="World History (P)"
+                         Staff="Teacher Four" StaffEMail="teacherfour@demo.gradecompass.org"
+                         IconName="" SchoolName="GradeCompass High School"
+                         StaffGU="00000000-0000-0000-0000-000000000000"
+                         OrgYearGU="00000000-0000-0000-0000-000000000000" />
+                    <Period Number="5" Name="" Reason="" Course="English (P)" Staff="Teacher Five"
+                         StaffEMail="teacherfive@demo.gradecompass.org" IconName=""
+                         SchoolName="GradeCompass High School"
+                         StaffGU="00000000-0000-0000-0000-000000000000"
+                         OrgYearGU="00000000-0000-0000-0000-000000000000" />
+                    <Period Number="6" Name="" Reason="" Course="PE Course 1" Staff="Teacher Six"
+                         StaffEMail="teachersix@demo.gradecompass.org" IconName=""
+                         SchoolName="GradeCompass High School"
+                         StaffGU="00000000-0000-0000-0000-000000000000"
+                         OrgYearGU="00000000-0000-0000-0000-000000000000" />
+               </Periods>
+          </Absence>
+          <Absence AbsenceDate="10/21/2025" Reason="" Note="" DailyIconName=""
+               CodeAllDayReasonType="" CodeAllDayDescription="">
+               <Periods>
+                    <Period Number="1" Name="Unex Tardy less 30" Reason="" Course="Spanish 1 (P)"
+                         Staff="Teacher One" StaffEMail="teacherone@demo.gradecompass.org"
+                         IconName="icon_unxtardy.gif" SchoolName="GradeCompass High School"
+                         StaffGU="00000000-0000-0000-0000-000000000000"
+                         OrgYearGU="00000000-0000-0000-0000-000000000000" />
+                    <Period Number="2" Name="" Reason="" Course="Algebra 2 (P)" Staff="Teacher Two"
+                         StaffEMail="teachertwo@demo.gradecompass.org" IconName=""
+                         SchoolName="GradeCompass High School"
+                         StaffGU="00000000-0000-0000-0000-000000000000"
+                         OrgYearGU="00000000-0000-0000-0000-000000000000" />
+                    <Period Number="3" Name="" Reason="" Course="Biology (P)" Staff="Teacher Three"
+                         StaffEMail="teacherthree@demo.gradecompass.org" IconName=""
+                         SchoolName="GradeCompass High School"
+                         StaffGU="00000000-0000-0000-0000-000000000000"
+                         OrgYearGU="00000000-0000-0000-0000-000000000000" />
+                    <Period Number="4" Name="" Reason="" Course="World History (P)"
+                         Staff="Teacher Four" StaffEMail="teacherfour@demo.gradecompass.org"
+                         IconName="" SchoolName="GradeCompass High School"
+                         StaffGU="00000000-0000-0000-0000-000000000000"
+                         OrgYearGU="00000000-0000-0000-0000-000000000000" />
+                    <Period Number="5" Name="" Reason="" Course="English (P)" Staff="Teacher Five"
+                         StaffEMail="teacherfive@demo.gradecompass.org" IconName=""
+                         SchoolName="GradeCompass High School"
+                         StaffGU="00000000-0000-0000-0000-000000000000"
+                         OrgYearGU="00000000-0000-0000-0000-000000000000" />
+                    <Period Number="6" Name="" Reason="" Course="PE Course 1" Staff="Teacher Six"
+                         StaffEMail="teachersix@demo.gradecompass.org" IconName=""
+                         SchoolName="GradeCompass High School"
+                         StaffGU="00000000-0000-0000-0000-000000000000"
+                         OrgYearGU="00000000-0000-0000-0000-000000000000" />
+               </Periods>
+          </Absence>
+          <Absence AbsenceDate="10/13/2025" Reason="" Note="Field Trip" DailyIconName=""
+               CodeAllDayReasonType="" CodeAllDayDescription="">
+               <Periods>
+                    <Period Number="1" Name="Field Trip" Reason="" Course="Spanish 1 (P)"
+                         Staff="Teacher One" StaffEMail="teacherone@demo.gradecompass.org"
+                         IconName="icon_activity.gif" SchoolName="GradeCompass High School"
+                         StaffGU="00000000-0000-0000-0000-000000000000"
+                         OrgYearGU="00000000-0000-0000-0000-000000000000" />
+                    <Period Number="2" Name="Field Trip" Reason="" Course="Algebra 2 (P)"
+                         Staff="Teacher Two" StaffEMail="teachertwo@demo.gradecompass.org"
+                         IconName="icon_activity.gif" SchoolName="GradeCompass High School"
+                         StaffGU="00000000-0000-0000-0000-000000000000"
+                         OrgYearGU="00000000-0000-0000-0000-000000000000" />
+                    <Period Number="3" Name="Field Trip" Reason="" Course="Biology (P)"
+                         Staff="Teacher Three" StaffEMail="teacherthree@demo.gradecompass.org"
+                         IconName="icon_activity.gif" SchoolName="GradeCompass High School"
+                         StaffGU="00000000-0000-0000-0000-000000000000"
+                         OrgYearGU="00000000-0000-0000-0000-000000000000" />
+                    <Period Number="4" Name="Field Trip" Reason="" Course="World History (P)"
+                         Staff="Teacher Four" StaffEMail="teacherfour@demo.gradecompass.org"
+                         IconName="icon_activity.gif" SchoolName="GradeCompass High School"
+                         StaffGU="00000000-0000-0000-0000-000000000000"
+                         OrgYearGU="00000000-0000-0000-0000-000000000000" />
+                    <Period Number="5" Name="Field Trip" Reason="" Course="English (P)"
+                         Staff="Teacher Five" StaffEMail="teacherfive@demo.gradecompass.org"
+                         IconName="icon_activity.gif" SchoolName="GradeCompass High School"
+                         StaffGU="00000000-0000-0000-0000-000000000000"
+                         OrgYearGU="00000000-0000-0000-0000-000000000000" />
+                    <Period Number="6" Name="Field Trip" Reason="" Course="PE Course 1"
+                         Staff="Teacher Six" StaffEMail="teachersix@demo.gradecompass.org"
+                         IconName="icon_activity.gif" SchoolName="GradeCompass High School"
+                         StaffGU="00000000-0000-0000-0000-000000000000"
+                         OrgYearGU="00000000-0000-0000-0000-000000000000" />
+               </Periods>
+          </Absence>
+          <Absence AbsenceDate="09/15/2025" Reason="" Note="" DailyIconName=""
+               CodeAllDayReasonType="" CodeAllDayDescription="">
+               <Periods>
+                    <Period Number="1" Name="Absent" Reason="" Course="Spanish 1 (P)"
+                         Staff="Teacher One" StaffEMail="teacherone@demo.gradecompass.org"
+                         IconName="icon_unexcused.gif" SchoolName="GradeCompass High School"
+                         StaffGU="00000000-0000-0000-0000-000000000000"
+                         OrgYearGU="00000000-0000-0000-0000-000000000000" />
+                    <Period Number="2" Name="Unex Tardy less 30" Reason="" Course="Algebra 2 (P)"
+                         Staff="Teacher Two" StaffEMail="teachertwo@demo.gradecompass.org"
+                         IconName="icon_unxtardy.gif" SchoolName="GradeCompass High School"
+                         StaffGU="00000000-0000-0000-0000-000000000000"
+                         OrgYearGU="00000000-0000-0000-0000-000000000000" />
+                    <Period Number="3" Name="" Reason="" Course="Biology (P)" Staff="Teacher Three"
+                         StaffEMail="teacherthree@demo.gradecompass.org" IconName=""
+                         SchoolName="GradeCompass High School"
+                         StaffGU="00000000-0000-0000-0000-000000000000"
+                         OrgYearGU="00000000-0000-0000-0000-000000000000" />
+                    <Period Number="4" Name="" Reason="" Course="World History (P)"
+                         Staff="Teacher Four" StaffEMail="teacherfour@demo.gradecompass.org"
+                         IconName="" SchoolName="GradeCompass High School"
+                         StaffGU="00000000-0000-0000-0000-000000000000"
+                         OrgYearGU="00000000-0000-0000-0000-000000000000" />
+                    <Period Number="5" Name="" Reason="" Course="English (P)" Staff="Teacher Five"
+                         StaffEMail="teacherfive@demo.gradecompass.org" IconName=""
+                         SchoolName="GradeCompass High School"
+                         StaffGU="00000000-0000-0000-0000-000000000000"
+                         OrgYearGU="00000000-0000-0000-0000-000000000000" />
+                    <Period Number="6" Name="" Reason="" Course="PE Course 1" Staff="Teacher Six"
+                         StaffEMail="teachersix@demo.gradecompass.org" IconName=""
+                         SchoolName="GradeCompass High School"
+                         StaffGU="00000000-0000-0000-0000-000000000000"
+                         OrgYearGU="00000000-0000-0000-0000-000000000000" />
+               </Periods>
+          </Absence>
+          <Absence AbsenceDate="09/09/2025" Reason="" Note="" DailyIconName=""
+               CodeAllDayReasonType="" CodeAllDayDescription="">
+               <Periods>
+                    <Period Number="1" Name="Unex Tardy less 30" Reason="" Course="Spanish 1 (P)"
+                         Staff="Teacher One" StaffEMail="teacherone@demo.gradecompass.org"
+                         IconName="icon_unxtardy.gif" SchoolName="GradeCompass High School"
+                         StaffGU="00000000-0000-0000-0000-000000000000"
+                         OrgYearGU="00000000-0000-0000-0000-000000000000" />
+                    <Period Number="2" Name="" Reason="" Course="Algebra 2 (P)" Staff="Teacher Two"
+                         StaffEMail="teachertwo@demo.gradecompass.org" IconName=""
+                         SchoolName="GradeCompass High School"
+                         StaffGU="00000000-0000-0000-0000-000000000000"
+                         OrgYearGU="00000000-0000-0000-0000-000000000000" />
+                    <Period Number="3" Name="" Reason="" Course="Biology (P)" Staff="Teacher Three"
+                         StaffEMail="teacherthree@demo.gradecompass.org" IconName=""
+                         SchoolName="GradeCompass High School"
+                         StaffGU="00000000-0000-0000-0000-000000000000"
+                         OrgYearGU="00000000-0000-0000-0000-000000000000" />
+                    <Period Number="4" Name="" Reason="" Course="World History (P)"
+                         Staff="Teacher Four" StaffEMail="teacherfour@demo.gradecompass.org"
+                         IconName="" SchoolName="GradeCompass High School"
+                         StaffGU="00000000-0000-0000-0000-000000000000"
+                         OrgYearGU="00000000-0000-0000-0000-000000000000" />
+                    <Period Number="5" Name="" Reason="" Course="English (P)" Staff="Teacher Five"
+                         StaffEMail="teacherfive@demo.gradecompass.org" IconName=""
+                         SchoolName="GradeCompass High School"
+                         StaffGU="00000000-0000-0000-0000-000000000000"
+                         OrgYearGU="00000000-0000-0000-0000-000000000000" />
+                    <Period Number="6" Name="" Reason="" Course="PE Course 1" Staff="Teacher Six"
+                         StaffEMail="teachersix@demo.gradecompass.org" IconName=""
+                         SchoolName="GradeCompass High School"
+                         StaffGU="00000000-0000-0000-0000-000000000000"
+                         OrgYearGU="00000000-0000-0000-0000-000000000000" />
+               </Periods>
+          </Absence>
+          <Absence AbsenceDate="09/05/2025" Reason="" Note="Performance" DailyIconName=""
+               CodeAllDayReasonType="" CodeAllDayDescription="">
+               <Periods>
+                    <Period Number="1" Name="Field Trip" Reason="" Course="Spanish 1 (P)"
+                         Staff="Teacher One" StaffEMail="teacherone@demo.gradecompass.org"
+                         IconName="icon_activity.gif" SchoolName="GradeCompass High School"
+                         StaffGU="00000000-0000-0000-0000-000000000000"
+                         OrgYearGU="00000000-0000-0000-0000-000000000000" />
+                    <Period Number="2" Name="Field Trip" Reason="" Course="Algebra 2 (P)"
+                         Staff="Teacher Two" StaffEMail="teachertwo@demo.gradecompass.org"
+                         IconName="icon_activity.gif" SchoolName="GradeCompass High School"
+                         StaffGU="00000000-0000-0000-0000-000000000000"
+                         OrgYearGU="00000000-0000-0000-0000-000000000000" />
+                    <Period Number="3" Name="Field Trip" Reason="" Course="Biology (P)"
+                         Staff="Teacher Three" StaffEMail="teacherthree@demo.gradecompass.org"
+                         IconName="icon_activity.gif" SchoolName="GradeCompass High School"
+                         StaffGU="00000000-0000-0000-0000-000000000000"
+                         OrgYearGU="00000000-0000-0000-0000-000000000000" />
+                    <Period Number="4" Name="Field Trip" Reason="" Course="World History (P)"
+                         Staff="Teacher Four" StaffEMail="teacherfour@demo.gradecompass.org"
+                         IconName="icon_activity.gif" SchoolName="GradeCompass High School"
+                         StaffGU="00000000-0000-0000-0000-000000000000"
+                         OrgYearGU="00000000-0000-0000-0000-000000000000" />
+                    <Period Number="5" Name="Field Trip" Reason="" Course="English (P)"
+                         Staff="Teacher Five" StaffEMail="teacherfive@demo.gradecompass.org"
+                         IconName="icon_activity.gif" SchoolName="GradeCompass High School"
+                         StaffGU="00000000-0000-0000-0000-000000000000"
+                         OrgYearGU="00000000-0000-0000-0000-000000000000" />
+                    <Period Number="6" Name="Field Trip" Reason="" Course="PE Course 1"
+                         Staff="Teacher Six" StaffEMail="teachersix@demo.gradecompass.org"
+                         IconName="icon_activity.gif" SchoolName="GradeCompass High School"
+                         StaffGU="00000000-0000-0000-0000-000000000000"
+                         OrgYearGU="00000000-0000-0000-0000-000000000000" />
+               </Periods>
+          </Absence>
+     </Absences>
+     <TotalExcused>
+          <PeriodTotal Number="1" Total="3" />
+          <PeriodTotal Number="2" Total="0" />
+          <PeriodTotal Number="3" Total="0" />
+          <PeriodTotal Number="4" Total="0" />
+          <PeriodTotal Number="5" Total="0" />
+          <PeriodTotal Number="6" Total="0" />
+     </TotalExcused>
+     <TotalTardies>
+          <PeriodTotal Number="1" Total="0" />
+          <PeriodTotal Number="2" Total="0" />
+          <PeriodTotal Number="3" Total="0" />
+          <PeriodTotal Number="4" Total="0" />
+          <PeriodTotal Number="5" Total="0" />
+          <PeriodTotal Number="6" Total="0" />
+     </TotalTardies>
+     <TotalUnexcused>
+          <PeriodTotal Number="1" Total="1" />
+          <PeriodTotal Number="2" Total="0" />
+          <PeriodTotal Number="3" Total="0" />
+          <PeriodTotal Number="4" Total="0" />
+          <PeriodTotal Number="5" Total="0" />
+          <PeriodTotal Number="6" Total="0" />
+     </TotalUnexcused>
+     <TotalActivities>
+          <PeriodTotal Number="1" Total="3" />
+          <PeriodTotal Number="2" Total="3" />
+          <PeriodTotal Number="3" Total="3" />
+          <PeriodTotal Number="4" Total="3" />
+          <PeriodTotal Number="5" Total="3" />
+          <PeriodTotal Number="6" Total="3" />
+     </TotalActivities>
+     <TotalUnexcusedTardies>
+          <PeriodTotal Number="1" Total="3" />
+          <PeriodTotal Number="2" Total="1" />
+          <PeriodTotal Number="3" Total="0" />
+          <PeriodTotal Number="4" Total="0" />
+          <PeriodTotal Number="5" Total="0" />
+          <PeriodTotal Number="6" Total="0" />
+     </TotalUnexcusedTardies>
+     <ConcurrentSchoolsLists />
+</Attendance>

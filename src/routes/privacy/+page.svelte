@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { browser } from '$app/environment';
 	import { brand, contactEmail } from '$lib/brand';
-	import Disclaimer from '$lib/components/Disclaimer.svelte';
 	import * as Card from '$lib/components/ui/card';
 
 	let email = $state('[email protected]');
@@ -21,18 +20,18 @@
 
 			<Card.Content class="text-tertiary-foreground space-y-4">
 				<p>
-					{brand} is designed to keep students' information private.
+					{brand} was designed to keep students' information private.
 				</p>
 
 				<p>
-					When a student uses the {brand} interface, their own device transmits their username and password
-					directly to the official student portal, which returns their student information directly to
+					When a student used the {brand} interface, their own device transmitted their username and password
+					directly to the official student portal, which returned their student information directly to
 					their device.
 				</p>
 
 				<p>
-					{brand} servers do not receive any student data or login information. The GradeCompass interface
-					is purely client-side: all data is retrieved, processed, and stored on-device.
+					{brand} servers did not receive any student data or login information. The GradeCompass interface
+					was purely client-side: all data was retrieved, processed, and stored on-device.
 				</p>
 
 				<p>
@@ -42,6 +41,4 @@
 			</Card.Content>
 		</Card.Root>
 	</main>
-
-	<Disclaimer trademark={false} />
 </div>

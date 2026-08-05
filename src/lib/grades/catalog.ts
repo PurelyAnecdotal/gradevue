@@ -56,7 +56,7 @@ export function saveGradebookCatalogToLocalStorage(gradebookCatalog: GradebookCa
 
 export async function getGradebookRecord(onReceivingData?: () => void, reportPeriod?: number) {
 	const { studentAccount } = acc;
-	if (!studentAccount) throw new Error('Cannot get synergy gradebook: student account not loaded');
+	if (!studentAccount) throw new Error('Cannot get gradebook: student account not loaded');
 
 	const res = await studentAccount.gradebookRequest(reportPeriod);
 
