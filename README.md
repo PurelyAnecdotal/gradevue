@@ -1,11 +1,9 @@
 # GradeCompass
 
-An advanced grade calculator for a certain student portal software.
+An advanced grade calculator.
 
 > [!WARNING]
 > GradeCompass is now obsolete. It is not compatible with the new API and cannot be updated to support it.
-
-<sub>GradeCompass is not affiliated with or endorsed by Edupoint Educational Systems LLC.</sub>
 
 ## Developing
 
