@@ -34,7 +34,9 @@ const alwaysArray = [
 	'Gradebook.Courses.Course.Marks.Mark.Assignments.Assignment',
 	'Gradebook.Courses.Course.Marks.Mark.Assignments.Assignment.Resources.Resource',
 	'Gradebook.ReportingPeriods.ReportPeriod',
-	'Attendance.Absences.Absence'
+	'Attendance.Absences.Absence',
+	'SynergyMailDataXML.InboxItemListings.MessageXML',
+	'StudentDocuments.StudentDocumentDatas.StudentDocumentData',
 ];
 
 const envelopeParser = new XMLParser({ ignoreDeclaration: true });

@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { page } from '$app/state';
 	import { removeCourseType } from '$lib';
 	import { brand } from '$lib/brand';
 	import { buttonVariants } from '$lib/components/ui/button';
@@ -6,6 +7,7 @@
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
 	import * as Sidebar from '$lib/components/ui/sidebar/index.js';
 	import { Spinner } from '$lib/components/ui/spinner';
+	import { closeDemo, demoState } from '$lib/demo/demo.svelte';
 	import { initializeGradebookCatalog } from '$lib/grades/catalog.svelte';
 	import { getActiveGradebook } from '$lib/grades/gradebook';
 	import AppWindowMacIcon from '@lucide/svelte/icons/app-window-mac';
@@ -61,10 +63,10 @@
 				icon: InboxIcon
 			}
 		],
-		pwa: {
+		pwaPrompt: {
 			title: 'Install Web App',
-			icon: AppWindowMacIcon,
-			onclick: installWebApp
+			onclick: installWebApp,
+			icon: AppWindowMacIcon
 		},
 		feedback: {
 			title: 'Feedback',
@@ -76,9 +78,14 @@
 			url: '/studentinfo',
 			icon: CircleUserIcon
 		},
-		logout: {
+		logOut: {
 			title: 'Log Out',
 			onclick: logOut,
+			icon: LogOutIcon
+		},
+		exitDemo: {
+			title: 'Exit Demo',
+			onclick: closeDemo,
 			icon: LogOutIcon
 		}
 	};
@@ -121,7 +128,12 @@
 		<Sidebar.MenuItem>
 			<div class="m-2 flex flex-row items-center">
 				<img src="/favicon.svg" class="size-6" alt={brand} />
-				<span class="ml-2 text-lg font-bold tracking-tight">{brand}</span>
+				<span class="ml-2 text-lg font-bold tracking-tight">
+					{brand}
+					{#if demoState.enabled}
+						<span class="text-muted-foreground">Demo</span>
+					{/if}
+				</span>
 			</div>
 		</Sidebar.MenuItem>
 	</Sidebar.Header>
@@ -142,7 +154,11 @@
 						<Sidebar.MenuSub>
 							{#each courses as Course, index (Course._CourseID)}
 								<Sidebar.MenuSubItem>
-									<Sidebar.MenuSubButton class="h-8 truncate text-base">
+									<Sidebar.MenuSubButton
+										class="h-8 truncate text-base {page.params.index === index.toString()
+											? 'font-bold'
+											: ''}"
+									>
 										{#snippet child({ props })}
 											<a href={`${data.grades.url}/${index.toString()}`} {...props}>
 												{removeCourseType(Course._CourseName)}
@@ -169,7 +185,7 @@
 			{/each}
 		</Sidebar.Menu>
 
-		<Sidebar.MenuItem class="mt-auto mx-2">
+		<Sidebar.MenuItem class="mx-2 mt-auto">
 			<Button
 				href="/privacy"
 				variant="ghost"
@@ -184,7 +200,7 @@
 		<Sidebar.Menu class="gap-2">
 			{#if $installPrompt.prompt}
 				<div transition:fade>
-					{@render menuItem(data.pwa)}
+					{@render menuItem(data.pwaPrompt)}
 				</div>
 			{/if}
 
@@ -214,13 +230,25 @@
 										{mode.current === 'light' ? 'Dark Mode' : 'Light Mode'}
 									</DropdownMenu.Item>
 
-									<DropdownMenu.Item onclick={data.logout.onclick} class="h-9">
-										<data.logout.icon />
-										{data.logout.title}
-									</DropdownMenu.Item>
+									{#if !demoState.enabled}
+										<DropdownMenu.Item onclick={data.logOut.onclick} class="h-9">
+											<data.logOut.icon />
+											{data.logOut.title}
+										</DropdownMenu.Item>
+									{/if}
 								</DropdownMenu.Content>
 							</DropdownMenu.Root>
 						</div>
+					{/snippet}
+				</Sidebar.MenuButton>
+			</Sidebar.MenuItem>
+
+			<Sidebar.MenuItem>
+				<Sidebar.MenuButton class="text-muted-foreground h-10 text-base">
+					{#snippet child({ props })}
+						<button onclick={data.exitDemo.onclick} {...props}>
+							<data.exitDemo.icon /> <span>{data.exitDemo.title}</span>
+						</button>
 					{/snippet}
 				</Sidebar.MenuButton>
 			</Sidebar.MenuItem>

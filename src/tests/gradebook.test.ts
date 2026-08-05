@@ -4,8 +4,8 @@ import { expect, test } from 'bun:test';
 
 test('Normal Assignment', () => {
 	const synergyAssignment: AssignmentEntity = {
-		Resources: '',
-		Standards: '',
+		Resources: null,
+		Standards: null,
 		_GradebookID: '123456',
 		_Measure: 'Ch. 3 Quiz',
 		_Type: 'Quiz',
@@ -24,7 +24,7 @@ test('Normal Assignment', () => {
 		_TeacherID: '11111',
 		_StudentID: '22222',
 		_MeasureDescription: '',
-		_HasDropBox: 'false',
+		_HasDropBox: false,
 		_DropStartDate: '1/1/2024',
 		_DropEndDate: '1/1/2024'
 	};
@@ -47,8 +47,8 @@ test('Normal Assignment', () => {
 
 test('Normal Assignment - _Point is empty string', () => {
 	const synergyAssignment: AssignmentEntity = {
-		Resources: '',
-		Standards: '',
+		Resources: null,
+		Standards: null,
 		_GradebookID: '123456',
 		_Measure: 'Ch. 3 Quiz',
 		_Type: 'Quiz',
@@ -67,7 +67,7 @@ test('Normal Assignment - _Point is empty string', () => {
 		_TeacherID: '11111',
 		_StudentID: '22222',
 		_MeasureDescription: '',
-		_HasDropBox: 'false',
+		_HasDropBox: false,
 		_DropStartDate: '1/1/2024',
 		_DropEndDate: '1/1/2024'
 	};
@@ -90,8 +90,8 @@ test('Normal Assignment - _Point is empty string', () => {
 
 test('Not Graded Assignment - Points Possible', () => {
 	const synergyAssignment: AssignmentEntity = {
-		Resources: '',
-		Standards: '',
+		Resources: null,
+		Standards: null,
 		_GradebookID: '123456',
 		_Measure: 'Ch. 3 Quiz',
 		_Type: 'Quiz',
@@ -107,7 +107,7 @@ test('Not Graded Assignment - Points Possible', () => {
 		_TeacherID: '11111',
 		_StudentID: '22222',
 		_MeasureDescription: '',
-		_HasDropBox: 'false',
+		_HasDropBox: false,
 		_DropStartDate: '1/1/2024',
 		_DropEndDate: '1/1/2024'
 	};
@@ -136,8 +136,8 @@ test('Not Graded Assignment - Points Possible', () => {
 
 test('Not Graded Assignment - No Points Possible', () => {
 	const synergyAssignment: AssignmentEntity = {
-		Resources: '',
-		Standards: '',
+		Resources: null,
+		Standards: null,
 		_GradebookID: '123456',
 		_Measure: 'Ch. 3 Quiz',
 		_Type: 'Quiz',
@@ -152,7 +152,7 @@ test('Not Graded Assignment - No Points Possible', () => {
 		_TeacherID: '11111',
 		_StudentID: '22222',
 		_MeasureDescription: '',
-		_HasDropBox: 'false',
+		_HasDropBox: false,
 		_DropStartDate: '1/1/2024',
 		_DropEndDate: '1/1/2024'
 	};
@@ -175,8 +175,8 @@ test('Not Graded Assignment - No Points Possible', () => {
 
 test('Extra Credit Assignment', () => {
 	const synergyAssignment: AssignmentEntity = {
-		Resources: '',
-		Standards: '',
+		Resources: null,
+		Standards: null,
 		_GradebookID: '123456',
 		_Measure: 'Ch. 3 Quiz',
 		_Type: 'Quiz',
@@ -195,7 +195,7 @@ test('Extra Credit Assignment', () => {
 		_TeacherID: '11111',
 		_StudentID: '22222',
 		_MeasureDescription: '',
-		_HasDropBox: 'false',
+		_HasDropBox: false,
 		_DropStartDate: '1/1/2024',
 		_DropEndDate: '1/1/2024'
 	};
@@ -218,8 +218,8 @@ test('Extra Credit Assignment', () => {
 
 test('Not For Grading Assignment', () => {
 	const synergyAssignment: AssignmentEntity = {
-		Resources: '',
-		Standards: '',
+		Resources: null,
+		Standards: null,
 		_GradebookID: '123456',
 		_Measure: 'Ch. 3 Quiz',
 		_Type: 'Quiz',
@@ -238,7 +238,7 @@ test('Not For Grading Assignment', () => {
 		_TeacherID: '11111',
 		_StudentID: '22222',
 		_MeasureDescription: '',
-		_HasDropBox: 'false',
+		_HasDropBox: false,
 		_DropStartDate: '1/1/2024',
 		_DropEndDate: '1/1/2024'
 	};
@@ -261,8 +261,8 @@ test('Not For Grading Assignment', () => {
 
 test('Scaled Assignment', () => {
 	const synergyAssignment: AssignmentEntity = {
-		Resources: '',
-		Standards: '',
+		Resources: null,
+		Standards: null,
 		_GradebookID: '123456',
 		_Measure: 'Ch. 3 Quiz',
 		_Type: 'Quiz',
@@ -281,7 +281,7 @@ test('Scaled Assignment', () => {
 		_TeacherID: '11111',
 		_StudentID: '22222',
 		_MeasureDescription: '',
-		_HasDropBox: 'false',
+		_HasDropBox: false,
 		_DropStartDate: '1/1/2024',
 		_DropEndDate: '1/1/2024'
 	};

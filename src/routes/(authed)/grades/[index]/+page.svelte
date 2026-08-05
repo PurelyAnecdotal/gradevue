@@ -1,11 +1,12 @@
 <script lang="ts">
 	import { page } from '$app/state';
-	import { numberFlowDefaultEasing, removeCourseType, tailwindColors } from '$lib';
+	import { LocalStorageKey, numberFlowDefaultEasing, removeCourseType, tailwindColors } from '$lib';
 	import { brand } from '$lib/brand';
 	import * as Alert from '$lib/components/ui/alert';
 	import { Button } from '$lib/components/ui/button';
 	import { Checkbox } from '$lib/components/ui/checkbox';
 	import { Label } from '$lib/components/ui/label';
+	import { demoState } from '$lib/demo/demo.svelte';
 	import {
 		calculateAssignmentGPCs,
 		calculateAssignmentGPCsFromCategories,
@@ -213,6 +214,14 @@
 		realAssignments.forEach(({ id }) => seenAssignmentIDs.add(id));
 		saveSeenAssignmentsToLocalStorage(seenAssignmentIDs);
 	}
+
+	let triedHypotheticalMode = $state(
+		localStorage.getItem(LocalStorageKey.triedHypotheticalMode) === 'true'
+	);
+	function markHypotheticalModeTried() {
+		triedHypotheticalMode = true;
+		localStorage.setItem(LocalStorageKey.triedHypotheticalMode, 'true');
+	}
 </script>
 
 <svelte:head>
@@ -275,10 +284,18 @@
 		<div class="flex items-center gap-2">
 			<Checkbox
 				bind:checked={hypotheticalMode}
+				onclick={markHypotheticalModeTried}
 				id="hypothetical-mode"
 				title="Hypothetical mode allows you to see what your grade would be if you got a certain score on an assignment."
 			/>
-			<Label for="hypothetical-mode">Hypothetical Mode</Label>
+			<Label
+				for="hypothetical-mode"
+				class={demoState.enabled && !triedHypotheticalMode
+					? 'animate-underline-in decoration-transparent font-bold underline decoration-2 underline-offset-3'
+					: ''}
+			>
+				Hypothetical Mode
+			</Label>
 		</div>
 
 		{#if categories && gradeCategories}
