@@ -17,7 +17,7 @@
 	);
 </script>
 
-<div class="m-4 flex flex-col gap-4 h-full items-center">
+<div class="m-4 flex h-full flex-col items-center gap-4">
 	{#if gradebookCatalog && gradebook}
 		<ReportPeriodSwitcher
 			activeName={gradebook?.ReportingPeriod._GradePeriod}
@@ -32,6 +32,11 @@
 	{/if}
 
 	{#if gradebookRecord}
-		<Textarea value={gradebookRecord.xml} class="h-full" />
+		<Textarea
+			value={gradebookRecord.gradebook
+				? JSON.stringify(gradebookRecord.gradebook, null, 2)
+				: (gradebookRecord.xml ?? '')}
+			class="h-full"
+		/>
 	{/if}
 </div>

@@ -11,6 +11,9 @@ const gitignorePath = fileURLToPath(new URL('./.gitignore', import.meta.url));
 
 export default tseslint.config(
 	includeIgnoreFile(gitignorePath),
+	{
+		ignores: ['extension/dist/**', 'extension/vite.config.ts', 'extension/content.js']
+	},
 	eslint.configs.recommended,
 	...tseslint.configs.recommendedTypeChecked,
 	...svelte.configs['flat/recommended'],

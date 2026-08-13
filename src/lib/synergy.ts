@@ -36,7 +36,7 @@ const alwaysArray = [
 	'Gradebook.ReportingPeriods.ReportPeriod',
 	'Attendance.Absences.Absence',
 	'SynergyMailDataXML.InboxItemListings.MessageXML',
-	'StudentDocuments.StudentDocumentDatas.StudentDocumentData',
+	'StudentDocuments.StudentDocumentDatas.StudentDocumentData'
 ];
 
 const envelopeParser = new XMLParser({ ignoreDeclaration: true });
@@ -167,15 +167,27 @@ const webServiceRequestMultiWeb = <T>(
 export const parseGradebookXML = (resultStr: string) =>
 	convertEmptyElementToNull(parseResult<GradebookResult>(resultStr).Gradebook);
 
+export type AccountMode = 'soap' | 'pxp2';
+
+function pxp2Unavailable(feature: string): Error {
+	return new Error(`${feature} is not available with the companion extension yet`);
+}
+
 export class StudentAccount {
 	domain: string;
 	userID: string;
 	password: string;
+	mode: AccountMode;
 
-	constructor(domain: string, userID: string, password: string) {
+	constructor(domain: string, userID: string, password: string, mode: AccountMode = 'soap') {
 		this.domain = domain;
 		this.userID = userID;
 		this.password = password;
+		this.mode = mode;
+	}
+
+	static fromPxp2(domain: string) {
+		return new StudentAccount(domain, '', '', 'pxp2');
 	}
 
 	get credentials(): Credentials {
@@ -187,32 +199,75 @@ export class StudentAccount {
 	}
 
 	async checkLogin() {
+		if (this.mode === 'pxp2') {
+			const { bridgeRequest } = await import('$lib/bridge');
+			await bridgeRequest({ type: 'beginLogin', domain: this.domain }, 6 * 60 * 1000);
+			return;
+		}
+
 		await webServiceRequest<StudentInfoResult>('StudentInfo', this.credentials);
 	}
 
+	async fetchPxp2Gradebook(reportPeriod?: number) {
+		const { bridgeRequest } = await import('$lib/bridge');
+		return await bridgeRequest<import('$lib/types/Gradebook').Gradebook>({
+			type: 'gradebook',
+			domain: this.domain,
+			reportPeriod
+		});
+	}
+
 	async gradebookRequest(reportPeriod?: number) {
+		if (this.mode === 'pxp2') throw pxp2Unavailable('SOAP gradebook');
+
 		// When a specific report period is requested, if it is not available Synergy returns the current report period
-		const params = reportPeriod ? { ReportPeriod: reportPeriod } : undefined;
+		const params = reportPeriod !== undefined ? { ReportPeriod: reportPeriod } : undefined;
 
 		return await fetchSoap(Operation.Request, MethodName.Gradebook, this.credentials, params);
 	}
 
 	async attendance() {
+		if (this.mode === 'pxp2') throw pxp2Unavailable('Attendance');
+
 		return (await webServiceRequest<AttendanceResult>(MethodName.Attendance, this.credentials))
 			.Attendance;
 	}
 
 	async studentInfo() {
+		if (this.mode === 'pxp2') {
+			const { bridgeRequest } = await import('$lib/bridge');
+			const info = await bridgeRequest<import('$lib/pxp2/protocol').Pxp2StudentInfo>({
+				type: 'studentInfo',
+				domain: this.domain
+			});
+
+			return {
+				FormattedName: info.name,
+				PermID: Number.parseInt(info.sisNumber, 10) || 0,
+				Gender: '',
+				Grade: 0,
+				Photo: '',
+				'_xmlns:xsd': '',
+				'_xmlns:xsi': '',
+				_Type: '',
+				_ShowPhysicianAndDentistInfo: 'false'
+			};
+		}
+
 		return (await webServiceRequest<StudentInfoResult>(MethodName.StudentInfo, this.credentials))
 			.StudentInfo;
 	}
 
 	async documents() {
+		if (this.mode === 'pxp2') throw pxp2Unavailable('Documents');
+
 		return (await webServiceRequest<DocumentsResult>(MethodName.Documents, this.credentials))
 			.StudentDocuments;
 	}
 
 	async reportCard(documentGU: string) {
+		if (this.mode === 'pxp2') throw pxp2Unavailable('Report cards');
+
 		return (
 			await webServiceRequest<ReportCardResult>(MethodName.ReportCard, this.credentials, {
 				DocumentGU: documentGU
@@ -221,11 +276,15 @@ export class StudentAccount {
 	}
 
 	async mailData() {
+		if (this.mode === 'pxp2') throw pxp2Unavailable('Mail');
+
 		return (await webServiceRequest<MailResult>(MethodName.Mail, this.credentials))
 			.SynergyMailDataXML;
 	}
 
 	async attachment(attachmentGU: string) {
+		if (this.mode === 'pxp2') throw pxp2Unavailable('Mail attachments');
+
 		return (
 			await webServiceRequest<AttachmentResult>(MethodName.Attachment, this.credentials, {
 				SmAttachmentGU: attachmentGU
@@ -234,6 +293,8 @@ export class StudentAccount {
 	}
 
 	async getAuthToken() {
+		if (this.mode === 'pxp2') throw pxp2Unavailable('Auth tokens');
+
 		return (
 			await webServiceRequestMultiWeb<AuthTokenResult>('GenerateAuthToken', this.credentials, {
 				Username: this.userID,

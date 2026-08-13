@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { page } from '$app/state';
 	import { removeCourseType } from '$lib';
+	import { acc } from '$lib/account.svelte';
 	import { brand } from '$lib/brand';
 	import { buttonVariants } from '$lib/components/ui/button';
 	import Button from '$lib/components/ui/button/button.svelte';
@@ -181,7 +182,9 @@
 			</Sidebar.MenuItem>
 
 			{#each data.header as item (item.title)}
-				{@render menuItem(item)}
+				{#if acc.studentAccount?.mode !== 'pxp2'}
+					{@render menuItem(item)}
+				{/if}
 			{/each}
 		</Sidebar.Menu>
 
@@ -191,7 +194,7 @@
 				variant="ghost"
 				class="text-muted-foreground h-auto border py-3 text-xs whitespace-normal"
 			>
-				Your password and grades are private and stored on-device.
+				Your grades are private and stored on-device.
 			</Button>
 		</Sidebar.MenuItem>
 	</Sidebar.Content>

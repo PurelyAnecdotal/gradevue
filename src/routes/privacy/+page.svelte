@@ -24,14 +24,14 @@
 				</p>
 
 				<p>
-					When a student used the {brand} interface, their own device transmitted their username and password
-					directly to the official student portal, which returned their student information directly to
-					their device.
+					When a student uses the {brand} interface with the companion extension, they log in on the official
+					student portal. The extension reads gradebook data using the browser's cookies and returns it
+					to this page. {brand} servers do not receive student data or login information.
 				</p>
 
 				<p>
-					{brand} servers did not receive any student data or login information. The GradeCompass interface
-					was purely client-side: all data was retrieved, processed, and stored on-device.
+					Without the extension, {brand} can only run its on-device demo. The website cannot talk to the
+					new StudentVUE protocol by itself.
 				</p>
 
 				<p>

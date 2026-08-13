@@ -1,10 +1,11 @@
 import { LocalStorageKey } from '$lib';
 import { acc } from '$lib/account.svelte';
 import { Operation, parseGradebookXML, unwrapEnvelope } from '$lib/synergy';
-import type { ReportPeriod } from '$lib/types/Gradebook';
+import type { Gradebook, ReportPeriod } from '$lib/types/Gradebook';
 
-interface GradebookRecord {
-	xml: string;
+export interface GradebookRecord {
+	xml?: string;
+	gradebook?: Gradebook;
 	lastRefresh: number;
 }
 
@@ -23,16 +24,22 @@ export interface GradebookCatalog {
 	canonicalReportPeriodEntries?: ReportPeriod[];
 }
 
+export function parseGradebookRecord(record: GradebookRecord): Gradebook {
+	if (record.gradebook !== undefined) return record.gradebook;
+	if (record.xml !== undefined && record.xml.length > 0) return parseGradebookXML(record.xml);
+	throw new Error('Gradebook record is empty');
+}
+
 export function getGradebookCatalogFromLocalStorage() {
 	const cacheStr = localStorage.getItem(LocalStorageKey.gradebook);
 	if (cacheStr === null) return undefined;
 
-	const cache: GradebookCatalogLocalStorageCache = JSON.parse(cacheStr);
+	const cache = JSON.parse(cacheStr) as GradebookCatalogLocalStorageCache;
 
 	const defaultRecord = cache.recordCache[cache.defaultIndex];
 
 	const canonicalReportPeriodEntries = defaultRecord
-		? parseGradebookXML(defaultRecord.xml).ReportingPeriods.ReportPeriod
+		? parseGradebookRecord(defaultRecord).ReportingPeriods.ReportPeriod
 		: undefined;
 
 	const gradebookCatalog: GradebookCatalog = {
@@ -58,6 +65,16 @@ export async function getGradebookRecord(onReceivingData?: () => void, reportPer
 	const { studentAccount } = acc;
 	if (!studentAccount) throw new Error('Cannot get gradebook: student account not loaded');
 
+	if (studentAccount.mode === 'pxp2') {
+		onReceivingData?.();
+		const gradebook = await studentAccount.fetchPxp2Gradebook(reportPeriod);
+		const record: GradebookRecord = {
+			gradebook,
+			lastRefresh: Date.now()
+		};
+		return record;
+	}
+
 	const res = await studentAccount.gradebookRequest(reportPeriod);
 
 	onReceivingData?.();
@@ -74,13 +91,13 @@ export async function getGradebookRecord(onReceivingData?: () => void, reportPer
 export async function getInitialGradebookCatalog() {
 	const defaultGradebookRecord = await getGradebookRecord();
 
-	const defaultGradebook = parseGradebookXML(defaultGradebookRecord.xml);
+	const defaultGradebook = parseGradebookRecord(defaultGradebookRecord);
 
 	const canonicalReportPeriodEntries = defaultGradebook.ReportingPeriods.ReportPeriod;
 
-	const reportingPeriods: (undefined | GradebookRecord)[] = Array(
-		canonicalReportPeriodEntries.length
-	).fill(undefined);
+	const reportingPeriods: (undefined | GradebookRecord)[] = Array.from({
+		length: canonicalReportPeriodEntries.length
+	});
 
 	const defaultIndex = parseInt(defaultGradebook.ReportingPeriod._Index);
 

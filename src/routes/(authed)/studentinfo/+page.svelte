@@ -87,15 +87,21 @@
 				<div class="space-y-2">
 					<p>{studentInfoState.data.FormattedName}</p>
 					<p class="text-muted-foreground">{studentInfoState.data.PermID}</p>
-					<p class="text-muted-foreground">Grade {studentInfoState.data.Grade}</p>
-					<p class="text-muted-foreground">{studentInfoState.data.Gender}</p>
+					{#if studentInfoState.data.Grade > 0}
+						<p class="text-muted-foreground">Grade {studentInfoState.data.Grade}</p>
+					{/if}
+					{#if studentInfoState.data.Gender.length > 0}
+						<p class="text-muted-foreground">{studentInfoState.data.Gender}</p>
+					{/if}
 				</div>
 
-				<img
-					src="data:image/png;base64,{studentInfoState.data.Photo}"
-					class="h-full rounded-sm"
-					alt="Student Portrait"
-				/>
+				{#if studentInfoState.data.Photo.length > 0}
+					<img
+						src="data:image/png;base64,{studentInfoState.data.Photo}"
+						class="h-full rounded-sm"
+						alt="Student Portrait"
+					/>
+				{/if}
 			</Card.Content>
 		</Card.Root>
 	{/if}
@@ -109,36 +115,38 @@
 
 			<Card.Content>
 				<dl>
-					<dt>Username</dt>
-					<dd class="flex items-center justify-end gap-2">
-						{acc.studentAccount.userID}
-						<Button onclick={copyUsername} variant="outline" size="icon-sm" title="Copy username">
-							<CopyIcon />
-						</Button>
-					</dd>
-					<dt>Password</dt>
-					<dd class="flex items-center justify-end gap-2">
-						<span class="{showPassword ? '' : 'blur select-none'} transition-all">
-							{#if showPassword}
-								{acc.studentAccount.password}
-							{:else}
-								#Wa5$^yB%4R#6K^C
-							{/if}
-						</span>
-						{#if !showPassword}
-							<Button
-								onclick={togglePassword}
-								variant="outline"
-								size="icon-sm"
-								title="Show password"
-							>
-								<EyeIcon />
+					{#if acc.studentAccount.mode !== 'pxp2'}
+						<dt>Username</dt>
+						<dd class="flex items-center justify-end gap-2">
+							{acc.studentAccount.userID}
+							<Button onclick={copyUsername} variant="outline" size="icon-sm" title="Copy username">
+								<CopyIcon />
 							</Button>
-						{/if}
-						<Button onclick={copyPassword} variant="outline" size="icon-sm" title="Copy password">
-							<CopyIcon />
-						</Button>
-					</dd>
+						</dd>
+						<dt>Password</dt>
+						<dd class="flex items-center justify-end gap-2">
+							<span class="{showPassword ? '' : 'blur select-none'} transition-all">
+								{#if showPassword}
+									{acc.studentAccount.password}
+								{:else}
+									#Wa5$^yB%4R#6K^C
+								{/if}
+							</span>
+							{#if !showPassword}
+								<Button
+									onclick={togglePassword}
+									variant="outline"
+									size="icon-sm"
+									title="Show password"
+								>
+									<EyeIcon />
+								</Button>
+							{/if}
+							<Button onclick={copyPassword} variant="outline" size="icon-sm" title="Copy password">
+								<CopyIcon />
+							</Button>
+						</dd>
+					{/if}
 					<dt>Domain</dt>
 					<dd class="flex items-center justify-end gap-2">
 						{acc.studentAccount.domain}

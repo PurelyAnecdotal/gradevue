@@ -1,5 +1,5 @@
-import { parseGradebookXML } from '$lib/synergy';
 import type { Gradebook } from '$lib/types/Gradebook';
+import { parseGradebookRecord } from './catalog';
 import { gradebookState } from './catalog.svelte';
 
 let parsedGradebook: { index: number; lastRefresh: number; gradebook: Gradebook } | undefined =
@@ -23,7 +23,7 @@ export function getActiveGradebook() {
 	parsedGradebook = {
 		index,
 		lastRefresh: record.lastRefresh,
-		gradebook: parseGradebookXML(record.xml)
+		gradebook: parseGradebookRecord(record)
 	};
 	return parsedGradebook.gradebook;
 }

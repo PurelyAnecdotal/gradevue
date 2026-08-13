@@ -13,8 +13,9 @@
 	import ChartLineIcon from '@lucide/svelte/icons/chart-line';
 	import FolderLockIcon from '@lucide/svelte/icons/folder-lock';
 	import GithubIcon from '@lucide/svelte/icons/github';
+	import LogInIcon from '@lucide/svelte/icons/log-in';
 	import PlayIcon from '@lucide/svelte/icons/play';
-	import PowerIcon from '@lucide/svelte/icons/power';
+	import PuzzleIcon from '@lucide/svelte/icons/puzzle';
 
 	if (browser && localStorage.getItem(LocalStorageKey.token) !== null && !demoState.enabled) {
 		if (!acc.studentAccount) loadStudentAccount();
@@ -42,7 +43,7 @@
 		{
 			icon: FolderLockIcon,
 			title: 'Private Login',
-			description: `${brand} did not have access to your data. When you used ${brand}, your device connected directly to your student portal. We never saw your password or your grades! `,
+			description: `${brand} does not have access to your data. You log in on the official student portal; the companion extension keeps cookies in the browser and GradeCompass processes grades on-device.`,
 			link: { href: '/privacy', text: 'Learn more' }
 		}
 	];
@@ -71,17 +72,24 @@
 					<Card.Content>
 						<p>An advanced grade calculator.</p>
 
-						<Alert.Root variant="destructive" class="mt-4">
-							<PowerIcon />
-							<Alert.Title>GradeCompass is now obsolete.</Alert.Title>
+						<Alert.Root class="mt-4">
+							<PuzzleIcon />
+							<Alert.Title>StudentVUE login needs the companion extension</Alert.Title>
 							<Alert.Description>
-								<a href="/obsolete" class="underline">Learn more</a>
+								The old portal protocol is gone. Install the companion extension to log in
+								on-device, or try the demo.
+								<p>
+									<a href="/obsolete" class="underline">Learn more</a>
+								</p>
 							</Alert.Description>
 						</Alert.Root>
 					</Card.Content>
 
 					<Card.Footer class="flex gap-2">
-						<Button size="lg" variant="card" class="flex-1" onclick={openDemo}>
+						<Button size="lg" variant="card" class="flex-1" href="/login">
+							<LogInIcon /> Log in
+						</Button>
+						<Button size="lg" variant="outline" class="flex-1" onclick={openDemo}>
 							<PlayIcon /> Try demo
 						</Button>
 					</Card.Footer>

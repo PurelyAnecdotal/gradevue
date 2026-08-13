@@ -1,12 +1,12 @@
 import { LocalStorageKey } from '$lib';
 import { loadStudentAccount } from '$lib/account.svelte';
-import { parseGradebookXML } from '$lib/synergy';
 import { toast } from 'svelte-sonner';
 import {
 	getGradebookCatalogFromLocalStorage,
 	getGradebookRecord,
 	getInitialGradebookCatalog,
 	gradebookRefreshNeeded,
+	parseGradebookRecord,
 	saveGradebookCatalogToLocalStorage,
 	type GradebookCatalog
 } from './catalog';
@@ -48,7 +48,7 @@ export async function switchReportPeriod({
 		gradebookState.gradebookCatalog.receivingData = false;
 		const gradebookRecord = await getGradebookRecord(onReceivingData, overrideIndex);
 
-		const gradebook = parseGradebookXML(gradebookRecord.xml);
+		const gradebook = parseGradebookRecord(gradebookRecord);
 
 		const receivedIndex = parseInt(gradebook.ReportingPeriod._Index);
 
@@ -121,7 +121,7 @@ export async function initializeGradebookCatalog() {
 		if (seenAssignmentIDs.size === 0) {
 			gradebookState.gradebookCatalog.recordCache
 				.filter((record) => record !== undefined)
-				.flatMap((record) => parseGradebookXML(record.xml).Courses.Course)
+				.flatMap((record) => parseGradebookRecord(record).Courses.Course)
 				.map((course) => course.Marks?.Mark[0]?.Assignments?.Assignment)
 				.filter((assignments) => assignments !== undefined)
 				.flat()

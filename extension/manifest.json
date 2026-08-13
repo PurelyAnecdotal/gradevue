@@ -1,0 +1,30 @@
+{
+	"manifest_version": 3,
+	"name": "GradeCompass Companion",
+	"version": "0.1.0",
+	"description": "Lets GradeCompass read your StudentVUE gradebook on-device after you log in on the official portal.",
+	"background": {
+		"service_worker": "background.js",
+		"type": "module"
+	},
+	"content_scripts": [
+		{
+			"matches": [
+				"https://gradecompass.org/*",
+				"https://*.gradecompass.org/*",
+				"http://gradecompass.localhost/*",
+				"http://gradecompass.localhost:*/*",
+				"https://gradecompass.localhost/*",
+				"https://gradecompass.localhost:*/*",
+				"http://localhost/*",
+				"http://localhost:*/*",
+				"http://127.0.0.1/*",
+				"http://127.0.0.1:*/*"
+			],
+			"js": ["content.js"],
+			"run_at": "document_start"
+		}
+	],
+	"permissions": ["tabs"],
+	"optional_host_permissions": ["https://*/*", "http://*/*"]
+}
