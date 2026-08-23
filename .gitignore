@@ -24,3 +24,6 @@ vite.config.ts.timestamp-*
 
 # Mocked data
 src/lib/mocks/data
+
+# Scratch files
+scratch/

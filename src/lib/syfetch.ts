@@ -168,16 +168,17 @@ export class SyResponse {
 }
 
 // =========================================================================
-// TLS 1.3 & E2EE Record Layer Engine (Native WebCrypto)
+// TLS 1.3 & E2EE Record Layer Engine (RFC 8446 Native WebCrypto)
 // =========================================================================
 
 const TLS_CONSTANTS = {
-	REC_HANDSHAKE: 0x16,
-	REC_ALERT: 0x15,
-	REC_APP_DATA: 0x17,
 	REC_CHANGE_CIPHER_SPEC: 0x14,
+	REC_ALERT: 0x15,
+	REC_HANDSHAKE: 0x16,
+	REC_APP_DATA: 0x17,
 	HS_CLIENT_HELLO: 0x01,
 	HS_SERVER_HELLO: 0x02,
+	HS_NEW_SESSION_TICKET: 0x04,
 	HS_ENCRYPTED_EXTENSIONS: 0x08,
 	HS_CERTIFICATE: 0x0b,
 	HS_CERTIFICATE_VERIFY: 0x0f,
@@ -188,14 +189,16 @@ const TLS_CONSTANTS = {
 	GROUP_SECP256R1: 0x0017
 };
 
-function u8Concat(...arrays: any[]): any {
+function u8Concat(...arrays: (Uint8Array<ArrayBufferLike> | ArrayLike<number> | null | undefined)[]): Uint8Array<ArrayBuffer> {
 	let totalLen = 0;
-	for (const a of arrays) totalLen += a.length;
+	for (const a of arrays) if (a) totalLen += a.length;
 	const out = new Uint8Array(totalLen);
 	let offset = 0;
 	for (const a of arrays) {
-		out.set(a, offset);
-		offset += a.length;
+		if (a) {
+			out.set(a, offset);
+			offset += a.length;
+		}
 	}
 	return out;
 }
@@ -212,15 +215,36 @@ function readU16(u8: Uint8Array, offset: number): number {
 	return ((u8[offset] ?? 0) << 8) | (u8[offset + 1] ?? 0);
 }
 
-async function hkdfExtract(salt: Uint8Array, ikm: Uint8Array): Promise<Uint8Array> {
+function readU24(u8: Uint8Array, offset: number): number {
+	return (
+		((u8[offset] ?? 0) << 16) |
+		((u8[offset + 1] ?? 0) << 8) |
+		(u8[offset + 2] ?? 0)
+	);
+}
+
+async function sha256(data: Uint8Array): Promise<Uint8Array> {
 	const subtle = crypto.subtle;
-	const hash = 'SHA-256';
+	const buf = await subtle.digest('SHA-256', data as BufferSource);
+	return new Uint8Array(buf);
+}
+
+async function hmacSha256(keyBytes: Uint8Array, dataBytes: Uint8Array): Promise<Uint8Array> {
+	const subtle = crypto.subtle;
+	const key = await subtle.importKey(
+		'raw',
+		keyBytes as BufferSource,
+		{ name: 'HMAC', hash: 'SHA-256' },
+		false,
+		['sign']
+	);
+	const sig = await subtle.sign('HMAC', key, dataBytes as BufferSource);
+	return new Uint8Array(sig);
+}
+
+async function hkdfExtract(salt: Uint8Array, ikm: Uint8Array): Promise<Uint8Array> {
 	const actualSalt = salt && salt.length > 0 ? salt : new Uint8Array(32);
-	const saltKey = await subtle.importKey('raw', actualSalt as BufferSource, { name: 'HMAC', hash }, false, [
-		'sign'
-	]);
-	const prk = await subtle.sign('HMAC', saltKey, ikm as BufferSource);
-	return new Uint8Array(prk);
+	return hmacSha256(actualSalt, ikm);
 }
 
 async function hkdfExpandLabel(
@@ -229,10 +253,8 @@ async function hkdfExpandLabel(
 	contextU8: Uint8Array,
 	length: number
 ): Promise<Uint8Array> {
-	const subtle = crypto.subtle;
 	const fullLabelStr = 'tls13 ' + labelStr;
 	const fullLabelBytes = new TextEncoder().encode(fullLabelStr);
-
 	const hkdfLabel = u8Concat(
 		writeU16(length),
 		new Uint8Array([fullLabelBytes.length]),
@@ -240,18 +262,22 @@ async function hkdfExpandLabel(
 		new Uint8Array([contextU8.length]),
 		contextU8
 	);
-
-	const prkKey = await subtle.importKey('raw', prk as BufferSource, { name: 'HMAC', hash: 'SHA-256' }, false, [
-		'sign'
-	]);
-
-	const t1 = await subtle.sign('HMAC', prkKey, u8Concat(hkdfLabel, new Uint8Array([0x01])) as BufferSource);
-	return new Uint8Array(t1).slice(0, length);
+	const info = u8Concat(hkdfLabel, new Uint8Array([0x01]));
+	const t1 = await hmacSha256(prk, info);
+	return t1.slice(0, length);
 }
 
-async function sha256(data: Uint8Array): Promise<Uint8Array> {
-	const buf = await crypto.subtle.digest('SHA-256', data as BufferSource);
-	return new Uint8Array(buf);
+function getRecordIV(baseIV: Uint8Array, seq: bigint): Uint8Array {
+	const iv = new Uint8Array(baseIV);
+	let s = seq;
+	for (let i = 0; i < 8; i++) {
+		const idx = iv.length - 1 - i;
+		if (idx >= 0 && iv[idx] !== undefined) {
+			iv[idx] = (iv[idx] as number) ^ Number(s & 0xffn);
+		}
+		s >>= 8n;
+	}
+	return iv;
 }
 
 async function buildClientHello(
@@ -287,11 +313,17 @@ async function buildClientHello(
 
 	// Signature Algorithms
 	const sigAlgs = new Uint8Array([
-		0x08, 0x04, // rsa_pss_rsae_sha256
 		0x04, 0x03, // ecdsa_secp256r1_sha256
-		0x04, 0x01 // rsa_pkcs1_sha256
+		0x08, 0x04, // rsa_pss_rsae_sha256
+		0x04, 0x01, // rsa_pkcs1_sha256
+		0x02, 0x01  // rsa_pkcs1_sha1
 	]);
-	const extSigAlgs = u8Concat(writeU16(0x000d), writeU16(sigAlgs.length + 2), writeU16(sigAlgs.length), sigAlgs);
+	const extSigAlgs = u8Concat(
+		writeU16(0x000d),
+		writeU16(sigAlgs.length + 2),
+		writeU16(sigAlgs.length),
+		sigAlgs
+	);
 
 	// Key Share Extension
 	const keyShareData = u8Concat(
@@ -317,7 +349,8 @@ async function buildClientHello(
 	const legacySessionId = new Uint8Array(32);
 	crypto.getRandomValues(legacySessionId);
 
-	const cipherSuites = new Uint8Array([0x13, 0x01]); // TLS_AES_128_GCM_SHA256
+	// Cipher suites: TLS_AES_128_GCM_SHA256 (0x1301)
+	const cipherSuites = new Uint8Array([0x13, 0x01]);
 
 	const hsBody = u8Concat(
 		writeU16(TLS_CONSTANTS.VERSION_TLS12),
@@ -351,12 +384,25 @@ export function normalizeSyfetchUrl(proxyUrl: string, targetHostPort: string): s
 	let wsUrl = (proxyUrl || '').trim();
 	if (!wsUrl) wsUrl = DEFAULT_SYFETCH_URL;
 
-	if (wsUrl.startsWith('http://')) {
+	if (wsUrl.startsWith('ws://') || wsUrl.startsWith('wss://')) {
+		// Scheme already provided, keep it
+	} else if (wsUrl.startsWith('http://')) {
 		wsUrl = 'ws://' + wsUrl.slice(7);
 	} else if (wsUrl.startsWith('https://')) {
 		wsUrl = 'wss://' + wsUrl.slice(8);
-	} else if (!wsUrl.startsWith('ws://') && !wsUrl.startsWith('wss://')) {
-		wsUrl = 'wss://' + wsUrl;
+	} else {
+		// No scheme provided: default to ws:// for localhost/IP, wss:// otherwise
+		const lower = wsUrl.toLowerCase();
+		if (
+			lower.startsWith('localhost') ||
+			lower.startsWith('127.0.0.1') ||
+			lower.startsWith('0.0.0.0') ||
+			lower.includes('.localhost')
+		) {
+			wsUrl = 'ws://' + wsUrl;
+		} else {
+			wsUrl = 'wss://' + wsUrl;
+		}
 	}
 
 	if (!wsUrl.includes('/ws')) {
@@ -454,7 +500,10 @@ async function performBlindFetch(
 	init: RequestInit = {},
 	proxyUrl?: string
 ): Promise<SyResponse> {
-	const targetUrl = new URL(targetUrlStr, typeof window !== 'undefined' ? window.location.href : 'http://localhost');
+	const targetUrl = new URL(
+		targetUrlStr,
+		typeof window !== 'undefined' ? window.location.href : 'http://localhost'
+	);
 	if (targetUrl.protocol !== 'https:') {
 		throw new Error(`syfetch currently supports end-to-end encrypted https:// requests`);
 	}
@@ -472,111 +521,278 @@ async function performBlindFetch(
 	await tunnel.connect();
 
 	// 2. Generate Client-Side Ephemeral ECDH Key Pair (P-256)
-	const ecdhKeys = await crypto.subtle.generateKey(
+	const subtle = crypto.subtle;
+	const ecdhKeys = await subtle.generateKey(
 		{ name: 'ECDH', namedCurve: 'P-256' },
 		true,
 		['deriveKey', 'deriveBits']
 	);
-	const clientPubKeyRaw = await crypto.subtle.exportKey('raw', ecdhKeys.publicKey);
+	const clientPubKeyRaw = new Uint8Array(await subtle.exportKey('raw', ecdhKeys.publicKey));
 	const clientRandom = new Uint8Array(32);
 	crypto.getRandomValues(clientRandom);
 
 	// 3. Build & Send TLS 1.3 ClientHello
 	const { record: clientHelloRecord, clientHelloHS } = await buildClientHello(
 		hostname,
-		new Uint8Array(clientPubKeyRaw),
+		clientPubKeyRaw,
 		clientRandom
 	);
 	tunnel.send(clientHelloRecord);
 
-	// 4. Read Server Response records from Blind Tunnel
+	// 4. Record buffer reader
 	let serverBuffer = new Uint8Array(0);
-	const readChunk = async () => {
-		const chunk = await tunnel.readNext();
-		if (chunk) {
+	const readBytes = async (minLen: number) => {
+		while (serverBuffer.length < minLen) {
+			const chunk = await tunnel.readNext();
+			if (!chunk) throw new Error(`Connection to ${hostname} closed prematurely during TLS handshake`);
 			serverBuffer = u8Concat(serverBuffer, chunk);
 		}
-		return chunk;
 	};
 
-	while (serverBuffer.length < 5) {
-		const chunk = await readChunk();
-		if (!chunk) throw new Error('Proxy connection closed before receiving ServerHello');
+	const readRecord = async () => {
+		await readBytes(5);
+		const recType = serverBuffer[0];
+		const recVersion = readU16(serverBuffer, 1);
+		const recLen = readU16(serverBuffer, 3);
+		await readBytes(5 + recLen);
+		const recordBytes = serverBuffer.slice(0, 5 + recLen);
+		serverBuffer = serverBuffer.slice(5 + recLen);
+		return {
+			recType,
+			recVersion,
+			recLen,
+			payload: recordBytes.slice(5),
+			fullRecord: recordBytes
+		};
+	};
+
+	// 5. Read ServerHello record (skipping optional middlebox ChangeCipherSpec records)
+	let shRecord = await readRecord();
+	while (shRecord.recType === TLS_CONSTANTS.REC_CHANGE_CIPHER_SPEC) {
+		shRecord = await readRecord();
 	}
 
-	const recLen = readU16(serverBuffer, 3);
-	while (serverBuffer.length < 5 + recLen) {
-		await readChunk();
+	if (shRecord.recType !== TLS_CONSTANTS.REC_HANDSHAKE) {
+		tunnel.close();
+		throw new Error(`Expected TLS Handshake record from ${hostname}, got record type: ${shRecord.recType}`);
 	}
 
-	const serverHelloRecord = serverBuffer.slice(0, 5 + recLen);
-	serverBuffer = serverBuffer.slice(5 + recLen);
+	const serverHelloHS = shRecord.payload;
+	const shMsgType = serverHelloHS[0];
+	if (shMsgType !== TLS_CONSTANTS.HS_SERVER_HELLO) {
+		tunnel.close();
+		throw new Error(`Expected TLS ServerHello from ${hostname}, got handshake type: ${shMsgType}`);
+	}
 
 	// Extract Server Key Share from ServerHello
-	const shMsg = serverHelloRecord.slice(5);
-	const shHandshakeType = shMsg[0];
-	if (shHandshakeType !== TLS_CONSTANTS.HS_SERVER_HELLO) {
-		throw new Error(`Unexpected handshake message: ${shHandshakeType}`);
-	}
-
-	let ptr = 4 + 2 + 32;
-	const sessIdLen = shMsg[ptr] ?? 0;
-	ptr += 1 + sessIdLen + 2 + 1;
-	const extTotalLen = readU16(shMsg, ptr);
+	let ptr = 4 + 2 + 32; // skip type(1) + len(3) + version(2) + random(32)
+	const sessIdLen = serverHelloHS[ptr] ?? 0;
+	ptr += 1 + sessIdLen + 2 + 1; // sessIdLen + cipherSuite(2) + compression(1)
+	const extTotalLen = readU16(serverHelloHS, ptr);
 	ptr += 2;
 	const extEnd = ptr + extTotalLen;
 
 	let serverPubKeyRaw: Uint8Array | null = null;
 	while (ptr < extEnd) {
-		const extType = readU16(shMsg, ptr);
-		const extLen = readU16(shMsg, ptr + 2);
+		const extType = readU16(serverHelloHS, ptr);
+		const extLen = readU16(serverHelloHS, ptr + 2);
 		ptr += 4;
 		if (extType === 0x0033) {
-			// key_share
-			const keyLen = readU16(shMsg, ptr + 2);
-			serverPubKeyRaw = shMsg.slice(ptr + 4, ptr + 4 + keyLen);
+			// key_share extension
+			const keyLen = readU16(serverHelloHS, ptr + 2);
+			serverPubKeyRaw = serverHelloHS.slice(ptr + 4, ptr + 4 + keyLen);
 		}
 		ptr += extLen;
 	}
 
 	if (!serverPubKeyRaw) {
-		throw new Error('Target server did not provide a valid TLS 1.3 Key Share');
+		tunnel.close();
+		throw new Error(`Target server ${hostname} did not provide a valid TLS 1.3 Key Share`);
 	}
 
-	// 5. Derive TLS 1.3 Shared Secret & Traffic Secrets
-	const serverKey = await crypto.subtle.importKey(
+	// 6. Derive TLS 1.3 Handshake Secrets (RFC 8446)
+	const serverKey = await subtle.importKey(
 		'raw',
 		serverPubKeyRaw as BufferSource,
 		{ name: 'ECDH', namedCurve: 'P-256' },
 		false,
 		[]
 	);
-	const sharedSecret = await crypto.subtle.deriveBits(
-		{ name: 'ECDH', public: serverKey },
-		ecdhKeys.privateKey,
-		256
+	const sharedSecret = new Uint8Array(
+		await subtle.deriveBits(
+			{ name: 'ECDH', public: serverKey },
+			ecdhKeys.privateKey,
+			256
+		)
 	);
 
 	const zero32 = new Uint8Array(32);
+	const emptyHash = await sha256(new Uint8Array(0));
 	const earlySecret = await hkdfExtract(zero32, zero32);
-	const derivedSecret = await hkdfExpandLabel(earlySecret, 'derived', await sha256(new Uint8Array(0)), 32);
-	const handshakeSecret = await hkdfExtract(derivedSecret, new Uint8Array(sharedSecret));
+	const derivedSecret = await hkdfExpandLabel(earlySecret, 'derived', emptyHash, 32);
+	const handshakeSecret = await hkdfExtract(derivedSecret, sharedSecret);
 
-	const serverHelloHS = shMsg;
-	const transcriptHash1 = await sha256(u8Concat(clientHelloHS, serverHelloHS));
+	const transcript1 = u8Concat(clientHelloHS, serverHelloHS);
+	const transcriptHash1 = await sha256(transcript1);
 
-	const masterDerived = await hkdfExpandLabel(handshakeSecret, 'derived', await sha256(new Uint8Array(0)), 32);
+	const clientHsTrafficSecret = await hkdfExpandLabel(handshakeSecret, 'c hs traffic', transcriptHash1, 32);
+	const serverHsTrafficSecret = await hkdfExpandLabel(handshakeSecret, 's hs traffic', transcriptHash1, 32);
+
+	const clientHsKeyRaw = await hkdfExpandLabel(clientHsTrafficSecret, 'key', new Uint8Array(0), 16);
+	const clientHsIV = await hkdfExpandLabel(clientHsTrafficSecret, 'iv', new Uint8Array(0), 12);
+	const serverHsKeyRaw = await hkdfExpandLabel(serverHsTrafficSecret, 'key', new Uint8Array(0), 16);
+	const serverHsIV = await hkdfExpandLabel(serverHsTrafficSecret, 'iv', new Uint8Array(0), 12);
+
+	const cryptoKeyServerHs = await subtle.importKey(
+		'raw',
+		serverHsKeyRaw as BufferSource,
+		{ name: 'AES-GCM' },
+		false,
+		['decrypt']
+	);
+	const cryptoKeyClientHs = await subtle.importKey(
+		'raw',
+		clientHsKeyRaw as BufferSource,
+		{ name: 'AES-GCM' },
+		false,
+		['encrypt']
+	);
+
+	// 7. Decrypt and Process Encrypted Server Handshake Records
+	let serverHsSeq = 0n;
+	let handshakeBuffer = new Uint8Array(0);
+	let transcriptHandshake = transcript1;
+	let serverFinishedReceived = false;
+
+	while (!serverFinishedReceived) {
+		const rec = await readRecord();
+		if (rec.recType === TLS_CONSTANTS.REC_CHANGE_CIPHER_SPEC) {
+			continue;
+		}
+		if (rec.recType !== TLS_CONSTANTS.REC_APP_DATA) {
+			tunnel.close();
+			throw new Error(`Unexpected record type ${rec.recType} during TLS handshake with ${hostname}`);
+		}
+
+		const iv = getRecordIV(serverHsIV, serverHsSeq++);
+		let dec: ArrayBuffer;
+		try {
+			dec = await subtle.decrypt(
+				{ name: 'AES-GCM', iv: iv as BufferSource, additionalData: rec.fullRecord.slice(0, 5) as BufferSource, tagLength: 128 },
+				cryptoKeyServerHs,
+				rec.payload as BufferSource
+			);
+		} catch (err: any) {
+			tunnel.close();
+			throw new Error(`Failed to decrypt TLS handshake record from ${hostname}: ${err.message || err}`);
+		}
+
+		const decU8 = new Uint8Array(dec);
+		let endPtr = decU8.length - 1;
+		while (endPtr >= 0 && decU8[endPtr] === 0) endPtr--;
+		const innerType = decU8[endPtr];
+		const innerData = decU8.slice(0, endPtr);
+
+		if (innerType !== TLS_CONSTANTS.REC_HANDSHAKE) {
+			tunnel.close();
+			throw new Error(`Unexpected inner TLS record type: ${innerType} (expected handshake 0x16)`);
+		}
+
+		handshakeBuffer = u8Concat(handshakeBuffer, innerData);
+
+		while (handshakeBuffer.length >= 4) {
+			const hsType = handshakeBuffer[0];
+			const hsLen = readU24(handshakeBuffer, 1);
+			if (handshakeBuffer.length < 4 + hsLen) break;
+
+			const hsMsg = handshakeBuffer.slice(0, 4 + hsLen);
+			handshakeBuffer = handshakeBuffer.slice(4 + hsLen);
+
+			if (hsType === TLS_CONSTANTS.HS_FINISHED) {
+				const serverFinishedKey = await hkdfExpandLabel(serverHsTrafficSecret, 'finished', new Uint8Array(0), 32);
+				const th = await sha256(transcriptHandshake);
+				const expectedVerifyData = await hmacSha256(serverFinishedKey, th);
+				const actualVerifyData = hsMsg.slice(4);
+
+				let match = true;
+				if (actualVerifyData.length !== expectedVerifyData.length) match = false;
+				for (let i = 0; i < actualVerifyData.length; i++) {
+					if (actualVerifyData[i] !== expectedVerifyData[i]) match = false;
+				}
+				if (!match) {
+					tunnel.close();
+					throw new Error(`TLS 1.3 Server Finished verification failed for ${hostname}`);
+				}
+
+				transcriptHandshake = u8Concat(transcriptHandshake, hsMsg);
+				serverFinishedReceived = true;
+				break;
+			} else {
+				transcriptHandshake = u8Concat(transcriptHandshake, hsMsg);
+			}
+		}
+	}
+
+	// 8. Send Client ChangeCipherSpec (Middlebox compat) & Client Finished
+	const ccsRecord = new Uint8Array([TLS_CONSTANTS.REC_CHANGE_CIPHER_SPEC, 0x03, 0x03, 0x00, 0x01, 0x01]);
+	tunnel.send(ccsRecord);
+
+	const clientFinishedKey = await hkdfExpandLabel(clientHsTrafficSecret, 'finished', new Uint8Array(0), 32);
+	const transcriptHash3 = await sha256(transcriptHandshake);
+	const clientVerifyData = await hmacSha256(clientFinishedKey, transcriptHash3);
+	const clientFinishedMsg = u8Concat(
+		new Uint8Array([TLS_CONSTANTS.HS_FINISHED]),
+		writeU24(clientVerifyData.length),
+		clientVerifyData
+	);
+
+	const clientFinishedInner = u8Concat(clientFinishedMsg, new Uint8Array([TLS_CONSTANTS.REC_HANDSHAKE]));
+	const clientFinishedHdr = new Uint8Array([
+		TLS_CONSTANTS.REC_APP_DATA,
+		0x03,
+		0x03,
+		(clientFinishedInner.length + 16) >> 8,
+		(clientFinishedInner.length + 16) & 0xff
+	]);
+
+	const clientFinishedEnc = new Uint8Array(
+		await subtle.encrypt(
+			{ name: 'AES-GCM', iv: getRecordIV(clientHsIV, 0n) as BufferSource, additionalData: clientFinishedHdr as BufferSource, tagLength: 128 },
+			cryptoKeyClientHs,
+			clientFinishedInner as BufferSource
+		)
+	);
+
+	tunnel.send(u8Concat(clientFinishedHdr, clientFinishedEnc));
+
+	// 9. Derive Application Traffic Keys
+	const masterDerived = await hkdfExpandLabel(handshakeSecret, 'derived', emptyHash, 32);
 	const masterSecret = await hkdfExtract(masterDerived, zero32);
 
-	const clientAppTrafficSecret = await hkdfExpandLabel(masterSecret, 'c ap traffic', transcriptHash1, 32);
-	const serverAppTrafficSecret = await hkdfExpandLabel(masterSecret, 's ap traffic', transcriptHash1, 32);
+	const clientApTrafficSecret = await hkdfExpandLabel(masterSecret, 'c ap traffic', transcriptHash3, 32);
+	const serverApTrafficSecret = await hkdfExpandLabel(masterSecret, 's ap traffic', transcriptHash3, 32);
 
-	const clientAppKey = await hkdfExpandLabel(clientAppTrafficSecret, 'key', new Uint8Array(0), 16);
-	const clientAppIV = await hkdfExpandLabel(clientAppTrafficSecret, 'iv', new Uint8Array(0), 12);
-	const serverAppKey = await hkdfExpandLabel(serverAppTrafficSecret, 'key', new Uint8Array(0), 16);
-	const serverAppIV = await hkdfExpandLabel(serverAppTrafficSecret, 'iv', new Uint8Array(0), 12);
+	const clientApKeyRaw = await hkdfExpandLabel(clientApTrafficSecret, 'key', new Uint8Array(0), 16);
+	const clientApIV = await hkdfExpandLabel(clientApTrafficSecret, 'iv', new Uint8Array(0), 12);
+	const serverApKeyRaw = await hkdfExpandLabel(serverApTrafficSecret, 'key', new Uint8Array(0), 16);
+	const serverApIV = await hkdfExpandLabel(serverApTrafficSecret, 'iv', new Uint8Array(0), 12);
 
-	// 6. Build HTTP/1.1 Request
+	const cryptoKeyClientAp = await subtle.importKey(
+		'raw',
+		clientApKeyRaw as BufferSource,
+		{ name: 'AES-GCM' },
+		false,
+		['encrypt']
+	);
+	const cryptoKeyServerAp = await subtle.importKey(
+		'raw',
+		serverApKeyRaw as BufferSource,
+		{ name: 'AES-GCM' },
+		false,
+		['decrypt']
+	);
+
+	// 10. Format and Send HTTP/1.1 Request (Split across TLS records if needed)
 	const method = (init.method || 'GET').toUpperCase();
 	const path = targetUrl.pathname + targetUrl.search || '/';
 	const reqHeaders = new SyHeaders(init.headers);
@@ -585,7 +801,7 @@ async function performBlindFetch(
 	if (!reqHeaders.has('accept')) reqHeaders.set('accept', '*/*');
 	if (!reqHeaders.has('connection')) reqHeaders.set('connection', 'close');
 
-	let bodyBytes: Uint8Array = new Uint8Array(0);
+	let bodyBytes = new Uint8Array(0);
 	if (init.body) {
 		if (typeof init.body === 'string') {
 			bodyBytes = new TextEncoder().encode(init.body);
@@ -608,105 +824,117 @@ async function performBlindFetch(
 
 	const rawHttpPayload = u8Concat(new TextEncoder().encode(headerText), bodyBytes);
 
-	// 7. Encrypt HTTP Application Data Record
-	const cryptoKeyClientApp = await crypto.subtle.importKey(
-		'raw',
-		clientAppKey as BufferSource,
-		{ name: 'AES-GCM' },
-		false,
-		['encrypt']
-	);
-
-	const innerPlaintext = u8Concat(rawHttpPayload, new Uint8Array([TLS_CONSTANTS.REC_APP_DATA]));
-	const appRecHeader = new Uint8Array([
-		TLS_CONSTANTS.REC_APP_DATA,
-		0x03,
-		0x03,
-		(innerPlaintext.length + 16) >> 8,
-		(innerPlaintext.length + 16) & 0xff
-	]);
-
-	const encryptedAppData = await crypto.subtle.encrypt(
-		{
-			name: 'AES-GCM',
-			iv: clientAppIV as BufferSource,
-			additionalData: appRecHeader as BufferSource,
-			tagLength: 128
-		},
-		cryptoKeyClientApp,
-		innerPlaintext as BufferSource
-	);
-
-	const appRecordToSend = u8Concat(appRecHeader, new Uint8Array(encryptedAppData));
-	tunnel.send(appRecordToSend);
-
-	// 8. Receive, Decrypt and Parse HTTP Response
-	while (true) {
-		const chunk = await tunnel.readNext();
-		if (!chunk) break;
-		serverBuffer = u8Concat(serverBuffer, chunk);
-	}
-	tunnel.close();
-
-	let responseBytes = new Uint8Array(0);
-
-	if (serverBuffer.length >= 5) {
-		const cryptoKeyServerApp = await crypto.subtle.importKey(
-			'raw',
-			serverAppKey as BufferSource,
-			{ name: 'AES-GCM' },
-			false,
-			['decrypt']
+	let clientApSeq = 0n;
+	const CHUNK_SIZE = 16384;
+	for (let offset = 0; offset < rawHttpPayload.length; offset += CHUNK_SIZE) {
+		const chunk = rawHttpPayload.slice(offset, offset + CHUNK_SIZE);
+		const appInner = u8Concat(chunk, new Uint8Array([TLS_CONSTANTS.REC_APP_DATA]));
+		const appHdr = new Uint8Array([
+			TLS_CONSTANTS.REC_APP_DATA,
+			0x03,
+			0x03,
+			(appInner.length + 16) >> 8,
+			(appInner.length + 16) & 0xff
+		]);
+		const appEnc = new Uint8Array(
+			await subtle.encrypt(
+				{ name: 'AES-GCM', iv: getRecordIV(clientApIV, clientApSeq++) as BufferSource, additionalData: appHdr as BufferSource, tagLength: 128 },
+				cryptoKeyClientAp,
+				appInner as BufferSource
+			)
 		);
+		tunnel.send(u8Concat(appHdr, appEnc));
+	}
 
+	// 11. Read & Decrypt Application HTTP Response
+	let serverApSeq = 0n;
+	let httpDecrypted = new Uint8Array(0);
+	let expectedTotalBytes: number | null = null;
+	let isChunked = false;
+
+	while (true) {
+		let rec;
 		try {
-			let readOffset = 0;
-			let decryptedAll = new Uint8Array(0);
-			let seq = 0;
+			rec = await readRecord();
+		} catch (_) {
+			break;
+		}
 
-			while (readOffset + 5 <= serverBuffer.length) {
-				const recLength = readU16(serverBuffer, readOffset + 3);
-				if (readOffset + 5 + recLength > serverBuffer.length) break;
+		if (rec.recType === TLS_CONSTANTS.REC_CHANGE_CIPHER_SPEC) continue;
+		if (rec.recType !== TLS_CONSTANTS.REC_APP_DATA) continue;
 
-				const ciphertext = serverBuffer.slice(readOffset + 5, readOffset + 5 + recLength);
-				const recHdr = serverBuffer.slice(readOffset, readOffset + 5);
+		const iv = getRecordIV(serverApIV, serverApSeq++);
+		let decU8: Uint8Array;
+		try {
+			const dec = await subtle.decrypt(
+				{ name: 'AES-GCM', iv: iv as BufferSource, additionalData: rec.fullRecord.slice(0, 5) as BufferSource, tagLength: 128 },
+				cryptoKeyServerAp,
+				rec.payload as BufferSource
+			);
+			decU8 = new Uint8Array(dec);
+		} catch (err: any) {
+			break;
+		}
 
-				const curIV = new Uint8Array(serverAppIV);
-				let tempSeq = BigInt(seq);
-				for (let i = 0; i < 8; i++) {
-					const idx = curIV.length - 1 - i;
-					if (idx >= 0 && idx < curIV.length) {
-						curIV[idx] = (curIV[idx] ?? 0) ^ Number(tempSeq & 0xffn);
+		let endPtr = decU8.length - 1;
+		while (endPtr >= 0 && decU8[endPtr] === 0) endPtr--;
+		const innerType = decU8[endPtr];
+		const innerData = decU8.slice(0, endPtr);
+
+		if (innerType === TLS_CONSTANTS.REC_APP_DATA) {
+			httpDecrypted = u8Concat(httpDecrypted, innerData);
+
+			// Check if we have received complete HTTP headers and body to terminate early
+			if (expectedTotalBytes === null) {
+				const headerEndPattern = [0x0d, 0x0a, 0x0d, 0x0a];
+				let headerEndIdx = -1;
+				for (let i = 0; i <= httpDecrypted.length - 4; i++) {
+					if (
+						httpDecrypted[i] === headerEndPattern[0] &&
+						httpDecrypted[i + 1] === headerEndPattern[1] &&
+						httpDecrypted[i + 2] === headerEndPattern[2] &&
+						httpDecrypted[i + 3] === headerEndPattern[3]
+					) {
+						headerEndIdx = i + 4;
+						break;
 					}
-					tempSeq >>= 8n;
 				}
 
-				try {
-					const dec = await crypto.subtle.decrypt(
-						{ name: 'AES-GCM', iv: curIV as BufferSource, additionalData: recHdr as BufferSource, tagLength: 128 },
-						cryptoKeyServerApp,
-						ciphertext as BufferSource
-					);
-					const decU8 = new Uint8Array(dec);
-					if (decU8.length > 0 && decU8[decU8.length - 1] === TLS_CONSTANTS.REC_APP_DATA) {
-						decryptedAll = u8Concat(decryptedAll, decU8.slice(0, decU8.length - 1));
-					} else {
-						decryptedAll = u8Concat(decryptedAll, decU8);
+				if (headerEndIdx !== -1) {
+					const headerStr = new TextDecoder('utf-8').decode(httpDecrypted.slice(0, headerEndIdx));
+					const clMatch = headerStr.match(/content-length:\s*(\d+)/i);
+					const teMatch = headerStr.match(/transfer-encoding:\s*chunked/i);
+					if (clMatch) {
+						expectedTotalBytes = headerEndIdx + parseInt(clMatch[1] ?? '0', 10);
+					} else if (teMatch) {
+						isChunked = true;
 					}
-					seq++;
-				} catch (_) {}
-				readOffset += 5 + recLength;
+				}
 			}
 
-			responseBytes = decryptedAll.length > 0 ? decryptedAll : serverBuffer;
-		} catch (_) {
-			responseBytes = serverBuffer;
+			if (expectedTotalBytes !== null && httpDecrypted.length >= expectedTotalBytes) {
+				break;
+			}
+
+			if (isChunked) {
+				// Check for terminating chunk 0\r\n\r\n
+				const last8 = new TextDecoder('ascii').decode(httpDecrypted.slice(Math.max(0, httpDecrypted.length - 8)));
+				if (last8.includes('0\r\n\r\n')) {
+					break;
+				}
+			}
+		} else if (innerType === TLS_CONSTANTS.REC_ALERT) {
+			break;
 		}
-	} else {
-		responseBytes = serverBuffer;
 	}
 
-	return parseRawHttpResponse(responseBytes, targetUrl.href);
+	tunnel.close();
+
+	if (httpDecrypted.length === 0) {
+		throw new Error(`Received empty or un-decryptable response from ${hostname}`);
+	}
+
+	return parseRawHttpResponse(httpDecrypted, targetUrl.href);
 }
 
 function decodeChunkedEncoding(bytes: Uint8Array): Uint8Array {
@@ -827,3 +1055,4 @@ export async function syfetch(
 
 	return performBlindFetch(url, options, proxyUrl);
 }
+

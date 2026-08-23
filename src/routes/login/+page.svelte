@@ -5,6 +5,7 @@
 	import { acc, loadStudentAccount } from '$lib/account.svelte';
 	import { brand } from '$lib/brand';
 	import LoadingBanner from '$lib/components/LoadingBanner.svelte';
+	import * as Accordion from '$lib/components/ui/accordion';
 	import * as Alert from '$lib/components/ui/alert';
 	import { Button } from '$lib/components/ui/button';
 	import { Checkbox } from '$lib/components/ui/checkbox';
@@ -17,7 +18,6 @@
 	import AlertCircleIcon from '@lucide/svelte/icons/alert-circle';
 	import InfoIcon from '@lucide/svelte/icons/info';
 	import LogInIcon from '@lucide/svelte/icons/log-in';
-	import ShieldCheckIcon from '@lucide/svelte/icons/shield-check';
 	import { fly } from 'svelte/transition';
 
 	if (browser && localStorage.getItem(LocalStorageKey.token) !== null) {
@@ -34,6 +34,69 @@
 	);
 	let disclaimerAccepted = $state(false);
 
+	interface ProxyPrivacyInfo {
+		requiresConsentCheckmark: boolean;
+		consentCheckmarkText?: string;
+	}
+
+	let proxyPrivacy = $state<ProxyPrivacyInfo | null>(null);
+	let proxyConsentAccepted = $state(false);
+
+	function getPrivacyEndpointUrl(rawUrl: string): string {
+		let url = rawUrl.trim();
+		if (!url) return '';
+		if (
+			!url.startsWith('http://') &&
+			!url.startsWith('https://') &&
+			!url.startsWith('ws://') &&
+			!url.startsWith('wss://')
+		) {
+			url = (url.includes('localhost') || url.includes('127.0.0.1') ? 'http://' : 'https://') + url;
+		}
+		url = url.replace(/^ws:\/\//, 'http://').replace(/^wss:\/\//, 'https://');
+		try {
+			const u = new URL(url);
+			return `${u.protocol}//${u.host}/privacy`;
+		} catch {
+			return `${url}/privacy`;
+		}
+	}
+
+	async function fetchProxyPrivacy(url: string) {
+		const endpoint = getPrivacyEndpointUrl(url);
+		if (!endpoint) {
+			proxyPrivacy = null;
+			return;
+		}
+		try {
+			const res = await fetch(endpoint);
+			if (res.ok) {
+				const json = await res.json();
+				if (json?.privacy) {
+					proxyPrivacy = {
+						requiresConsentCheckmark: json.privacy.requiresConsentCheckmark ?? true,
+						consentCheckmarkText: json.privacy.consentCheckmarkText
+					};
+					return;
+				}
+			}
+		} catch {
+			// Fallback if unreachable
+		}
+		const isDefaultOrPublic = !url.includes('localhost') && !url.includes('127.0.0.1');
+		proxyPrivacy = {
+			requiresConsentCheckmark: isDefaultOrPublic,
+			consentCheckmarkText:
+				'I understand that traffic through this blind proxy is encrypted directly on my device and the proxy operator has zero visibility into my credentials or data.'
+		};
+	}
+
+	$effect(() => {
+		if (browser) {
+			void fetchProxyPrivacy(syfetchUrl);
+		}
+	});
+
 	let loginError: string | undefined = $state();
 	let loggingIn = $state(false);
 
@@ -42,6 +105,11 @@
 
 		if (!disclaimerAccepted) {
 			loginError = 'Please accept the disclaimer before logging in.';
+			return;
+		}
+
+		if (proxyPrivacy?.requiresConsentCheckmark && !proxyConsentAccepted) {
+			loginError = 'Please accept the proxy privacy consent before logging in.';
 			return;
 		}
 
@@ -145,8 +213,7 @@
 						required
 					/>
 					<Field.Description>
-						Your device connects directly via blind zero-knowledge E2EE proxy. We never see your
-						password or your grades.
+						Your password and grades are private and stored on-device.
 					</Field.Description>
 				</Field.Field>
 
@@ -174,29 +241,40 @@
 					/>
 				</Field.Field>
 
-				<Field.Field>
-					<Field.Label for="syfetchUrl">syfetch Proxy URL</Field.Label>
+				<Accordion.Root type="single" class="w-full">
+					<Accordion.Item value="proxy-settings" class="border-none">
+						<Accordion.Trigger class="text-muted-foreground hover:text-foreground py-1 text-xs">
+							Proxy Settings
+						</Accordion.Trigger>
 
-					<Alert.Root>
-						<ShieldCheckIcon />
-						<Alert.Title class="line-clamp-none">
-							Bypasses CORS with zero-knowledge client-side TLS encryption.
-						</Alert.Title>
-					</Alert.Root>
+						<Accordion.Content class="pt-2 pb-0">
+							<Field.Field>
+								<Field.Label for="syfetchUrl" class="text-xs">Blind Proxy URL</Field.Label>
 
-					<Input
-						type="text"
-						id="syfetchUrl"
-						placeholder="syfetch.chronosirius.xyz"
-						autocomplete="on"
-						autocorrect="off"
-						bind:value={syfetchUrl}
-						required
-					/>
-					<Field.Description>
-						Default proxy server: <code>syfetch.chronosirius.xyz</code>
-					</Field.Description>
-				</Field.Field>
+								<Input
+									type="text"
+									id="syfetchUrl"
+									placeholder="syfetch.chronosirius.xyz"
+									autocomplete="on"
+									autocorrect="off"
+									bind:value={syfetchUrl}
+									class="text-sm"
+								/>
+								<Field.Description class="text-xs">
+									Due to browser restrictions, a blind proxy is required to connect to district portals.
+									<a
+										href="https://github.com/chronosirius/syfetch"
+										target="_blank"
+										rel="noopener noreferrer"
+										class="underline hover:text-foreground"
+									>
+										More information
+									</a>
+								</Field.Description>
+							</Field.Field>
+						</Accordion.Content>
+					</Accordion.Item>
+				</Accordion.Root>
 
 				<Dialog.Root bind:open={domainDialogOpen}>
 					<Dialog.Content>
@@ -249,6 +327,39 @@
 						my use complies with those terms.
 					</Label>
 				</div>
+
+				{#if proxyPrivacy?.requiresConsentCheckmark}
+					<div
+						class="hover:bg-muted/40 active:bg-muted/60 flex cursor-pointer items-start gap-3 rounded-lg p-2 transition-colors select-none"
+						onclick={() => (proxyConsentAccepted = !proxyConsentAccepted)}
+						onkeydown={(e) => {
+							if (e.key === ' ' || e.key === 'Enter') {
+								e.preventDefault();
+								proxyConsentAccepted = !proxyConsentAccepted;
+							}
+						}}
+						role="checkbox"
+						aria-checked={proxyConsentAccepted}
+						tabindex="0"
+					>
+						<div class="mt-0.5 flex size-5 shrink-0 items-center justify-center pointer-events-none">
+							<Checkbox
+								checked={proxyConsentAccepted}
+								id="proxy-consent"
+								name="proxy-consent"
+								class="size-5"
+							/>
+						</div>
+
+						<Label
+							for="proxy-consent"
+							class="text-tertiary-foreground cursor-pointer text-xs leading-relaxed pointer-events-none"
+						>
+							{proxyPrivacy.consentCheckmarkText ||
+								'I understand that traffic through this blind proxy is encrypted directly on my device and the proxy operator has zero visibility into my credentials or data.'}
+						</Label>
+					</div>
+				{/if}
 
 				<Field.Field>
 					<Button type="submit" class="w-full" variant="card">

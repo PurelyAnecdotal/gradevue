@@ -9,7 +9,6 @@
 	import * as Card from '$lib/components/ui/card';
 	import * as Table from '$lib/components/ui/table';
 	import CopyIcon from '@lucide/svelte/icons/copy';
-	import EyeIcon from '@lucide/svelte/icons/eye';
 	import { loadStudentInfo, studentInfoState } from './studentInfo.svelte';
 
 	loadStudentInfo();
@@ -41,18 +40,9 @@
 
 	const remove = (key: string) => localStorage.removeItem(key);
 
-	let showPassword = $state(false);
-	function togglePassword() {
-		showPassword = !showPassword;
-	}
-
 	function copyUsername() {
 		if (!acc.studentAccount) return;
 		navigator.clipboard.writeText(acc.studentAccount.userID);
-	}
-	function copyPassword() {
-		if (!acc.studentAccount) return;
-		navigator.clipboard.writeText(acc.studentAccount.password);
 	}
 	function copyDomain() {
 		if (!acc.studentAccount) return;
@@ -120,29 +110,6 @@
 							<CopyIcon />
 						</Button>
 					</dd>
-					<dt>Password</dt>
-					<dd class="flex items-center justify-end gap-2">
-						<span class="{showPassword ? '' : 'blur select-none'} transition-all">
-							{#if showPassword}
-								{acc.studentAccount.password}
-							{:else}
-								#Wa5$^yB%4R#6K^C
-							{/if}
-						</span>
-						{#if !showPassword}
-							<Button
-								onclick={togglePassword}
-								variant="outline"
-								size="icon-sm"
-								title="Show password"
-							>
-								<EyeIcon />
-							</Button>
-						{/if}
-						<Button onclick={copyPassword} variant="outline" size="icon-sm" title="Copy password">
-							<CopyIcon />
-						</Button>
-					</dd>
 					<dt>Domain</dt>
 					<dd class="flex items-center justify-end gap-2">
 						{acc.studentAccount.domain}
@@ -151,7 +118,7 @@
 						</Button>
 					</dd>
 					{#if acc.studentAccount.syfetchUrl}
-						<dt>syfetch Proxy</dt>
+						<dt>Blind Proxy</dt>
 						<dd class="flex items-center justify-end gap-2">
 							{acc.studentAccount.syfetchUrl}
 							<Button onclick={copySyfetchUrl} variant="outline" size="icon-sm" title="Copy proxy URL">

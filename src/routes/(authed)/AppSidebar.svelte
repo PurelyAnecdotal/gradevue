@@ -243,15 +243,17 @@
 				</Sidebar.MenuButton>
 			</Sidebar.MenuItem>
 
-			<Sidebar.MenuItem>
-				<Sidebar.MenuButton class="text-muted-foreground h-10 text-base">
-					{#snippet child({ props })}
-						<button onclick={data.exitDemo.onclick} {...props}>
-							<data.exitDemo.icon /> <span>{data.exitDemo.title}</span>
-						</button>
-					{/snippet}
-				</Sidebar.MenuButton>
-			</Sidebar.MenuItem>
+			{#if demoState.enabled}
+				<Sidebar.MenuItem>
+					<Sidebar.MenuButton class="text-muted-foreground h-10 text-base">
+						{#snippet child({ props })}
+							<button onclick={data.exitDemo.onclick} {...props}>
+								<data.exitDemo.icon /> <span>{data.exitDemo.title}</span>
+							</button>
+						{/snippet}
+					</Sidebar.MenuButton>
+				</Sidebar.MenuItem>
+			{/if}
 		</Sidebar.Menu>
 	</Sidebar.Footer>
 </Sidebar.Root>
