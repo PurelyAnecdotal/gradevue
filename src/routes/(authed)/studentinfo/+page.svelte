@@ -58,6 +58,10 @@
 		if (!acc.studentAccount) return;
 		navigator.clipboard.writeText(acc.studentAccount.domain);
 	}
+	function copySyfetchUrl() {
+		if (!acc.studentAccount?.syfetchUrl) return;
+		navigator.clipboard.writeText(acc.studentAccount.syfetchUrl);
+	}
 </script>
 
 <svelte:head>
@@ -146,6 +150,15 @@
 							<CopyIcon />
 						</Button>
 					</dd>
+					{#if acc.studentAccount.syfetchUrl}
+						<dt>syfetch Proxy</dt>
+						<dd class="flex items-center justify-end gap-2">
+							{acc.studentAccount.syfetchUrl}
+							<Button onclick={copySyfetchUrl} variant="outline" size="icon-sm" title="Copy proxy URL">
+								<CopyIcon />
+							</Button>
+						</dd>
+					{/if}
 				</dl>
 			</Card.Content>
 		</Card.Root>

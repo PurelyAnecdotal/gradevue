@@ -20,18 +20,18 @@
 
 			<Card.Content class="text-tertiary-foreground space-y-4">
 				<p>
-					{brand} was designed to keep students' information private.
+					{brand} is designed to keep students' information completely private and secure.
 				</p>
 
 				<p>
-					When a student used the {brand} interface, their own device transmitted their username and password
-					directly to the official student portal, which returned their student information directly to
-					their device.
+					When you use {brand}, your device communicates with your student portal using <code>syfetch</code>,
+					a zero-knowledge blind CORS proxy. TLS encryption is terminated directly on your device using WebCrypto,
+					meaning the proxy only relays opaque binary ciphertext and cannot see your credentials, headers, or grades.
 				</p>
 
 				<p>
-					{brand} servers did not receive any student data or login information. The GradeCompass interface
-					was purely client-side: all data was retrieved, processed, and stored on-device.
+					{brand} servers do not receive any student data or login information. The GradeCompass interface
+					is purely client-side: all data is retrieved, processed, and stored on-device.
 				</p>
 
 				<p>

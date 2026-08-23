@@ -53,17 +53,7 @@ export async function getBlobURLFromBase64String(base64: string) {
 	return URL.createObjectURL(blob);
 }
 
-export enum LocalStorageKey {
-	token = 'token',
-	gradebook = 'gradebook4',
-	seenAssignmentIDs = 'seenAssignmentIDs',
-	triedHypotheticalMode = 'triedHypotheticalMode',
-	attendance = 'attendance',
-	documents = 'documents',
-	mailData = 'mailData',
-	studentInfo = 'studentInfo',
-	demo = 'demo'
-}
+export * from './constants';
 
 export interface RecordState<T> {
 	data?: T;

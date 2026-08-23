@@ -98,38 +98,50 @@ export function parseResult<T>(resultStr: string): T {
 	return result;
 }
 
+import { demoMockDomain } from '$lib/constants';
+import { syfetch } from '$lib/syfetch';
+
 interface Credentials {
 	domain: string;
 	userID: string;
 	password: string;
+	syfetchUrl?: string;
 }
 
 async function fetchSoap(
 	operation: Operation,
 	methodName: MethodName,
-	{ domain, userID, password }: Credentials,
+	{ domain, userID, password, syfetchUrl }: Credentials,
 	params: Record<string, unknown> = {}
 ) {
-	const res = await fetch(`https://${domain}/Service/PXPCommunication.asmx`, {
-		method: 'POST',
-		headers: { 'Content-Type': 'application/soap+xml; charset=utf-8' },
-		body: builder.build({
-			'soap12:Envelope': {
-				'_xmlns:soap12': 'http://www.w3.org/2003/05/soap-envelope',
-				'soap12:Body': {
-					[operation]: {
-						_xmlns: 'http://edupoint.com/webservices/',
-						userID,
-						password,
-						skipLoginLog: true,
-						parent: false,
-						webServiceHandleName: 'PXPWebServices',
-						methodName,
-						paramStr: builder.build({ Params: params })
-					}
+	const url = `https://${domain}/Service/PXPCommunication.asmx`;
+	const body = builder.build({
+		'soap12:Envelope': {
+			'_xmlns:soap12': 'http://www.w3.org/2003/05/soap-envelope',
+			'soap12:Body': {
+				[operation]: {
+					_xmlns: 'http://edupoint.com/webservices/',
+					userID,
+					password,
+					skipLoginLog: true,
+					parent: false,
+					webServiceHandleName: 'PXPWebServices',
+					methodName,
+					paramStr: builder.build({ Params: params })
 				}
 			}
-		})
+		}
+	});
+
+	const fetchFn =
+		domain === demoMockDomain
+			? fetch
+			: (u: string, init?: RequestInit) => syfetch(u, init, syfetchUrl);
+
+	const res = await fetchFn(url, {
+		method: 'POST',
+		headers: { 'Content-Type': 'application/soap+xml; charset=utf-8' },
+		body
 	});
 
 	if (res.status !== 200) throw new Error(`HTTP ${res.status} when requesting ${operation}`);
@@ -171,18 +183,21 @@ export class StudentAccount {
 	domain: string;
 	userID: string;
 	password: string;
+	syfetchUrl?: string;
 
-	constructor(domain: string, userID: string, password: string) {
+	constructor(domain: string, userID: string, password: string, syfetchUrl?: string) {
 		this.domain = domain;
 		this.userID = userID;
 		this.password = password;
+		this.syfetchUrl = syfetchUrl;
 	}
 
 	get credentials(): Credentials {
 		return {
 			domain: this.domain,
 			userID: this.userID,
-			password: this.password
+			password: this.password,
+			syfetchUrl: this.syfetchUrl
 		};
 	}
 

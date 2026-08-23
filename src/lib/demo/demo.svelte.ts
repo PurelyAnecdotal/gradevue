@@ -1,10 +1,10 @@
 import { browser } from '$app/environment';
 import { goto } from '$app/navigation';
-import { LocalStorageKey } from '$lib';
 import { acc } from '$lib/account.svelte';
+import { demoMockDomain, LocalStorageKey } from '$lib/constants';
 import { StudentAccount } from '$lib/synergy';
 
-export const demoMockDomain = 'demo.gradecompass.com';
+export { demoMockDomain };
 
 export let demoState = $state({
 	enabled: browser && localStorage.getItem(LocalStorageKey.demo) === 'true'

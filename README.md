@@ -1,9 +1,6 @@
 # GradeCompass
 
-An advanced grade calculator.
-
-> [!WARNING]
-> GradeCompass is now obsolete. It is not compatible with the new API and cannot be updated to support it.
+An advanced grade calculator for StudentVUE powered by [syfetch](https://github.com/chronosirius/syfetch) for privacy-preserving, zero-knowledge CORS bypassing.
 
 ## Developing
 
