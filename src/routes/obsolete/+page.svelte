@@ -12,7 +12,7 @@
 	<main class="flex grow items-center">
 		<div class="m-4 max-w-xl space-y-2">
 			<BackButton />
-			
+
 			<Card.Root>
 				<Card.Header>
 					<Card.Title>{brand} is now obsolete</Card.Title>
