@@ -27,13 +27,11 @@ You can preview the production build with `bun run preview`.
 
 The GradeCompass project is open source and can be self-hosted. However, if you plan on hosting it for others on the public internet, keep in mind that the MIT license **does not grant trademark rights**. You cannot use the GradeCompass name or logo without permission. Otherwise, unaware users would think that we were responsible for your site.
 
-Therefore, you must change the **name** in [brand.ts](src/lib/brand.ts) and the **icons** in the [/static](static) folder to your own, distinct designs. (Simply changing a prefix or suffix of an existing name or modifying the icon *does not suffice*.) We advise you to be very careful of trademark confusion when choosing a name. Please also update the **contact email** and **repository link** in [brand.ts](src/lib/brand.ts) so your users don't get confused with our version. 
+Therefore, you must change the **name** in [brand.ts](src/lib/brand.ts) and the **icons** in the [/static](static) folder to your own, distinct designs. (Simply changing a prefix or suffix of an existing name or modifying the icon _does not suffice_.) We advise you to be very careful of trademark confusion when choosing a name. Please also update the **contact email** and **repository link** in [brand.ts](src/lib/brand.ts) so your users don't get confused with our version.
 
 <sup> This is not legal advice.</sup>
 
-
 Vercel and Netlify are both good options for hosting SvelteKit apps like GradeCompass.
-
 
 ## Contributing
 
