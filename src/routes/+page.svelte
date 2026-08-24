@@ -4,7 +4,7 @@
 	import { LocalStorageKey } from '$lib';
 	import { acc, loadStudentAccount } from '$lib/account.svelte';
 	import { brand, repoLink } from '$lib/brand';
-	import * as Alert from '$lib/components/ui/alert';
+	import ObsoleteAlert from '$lib/components/ObsoleteAlert.svelte';
 	import { Button } from '$lib/components/ui/button';
 	import * as Card from '$lib/components/ui/card';
 	import { demoState, openDemo } from '$lib/demo/demo.svelte';
@@ -14,7 +14,6 @@
 	import FolderLockIcon from '@lucide/svelte/icons/folder-lock';
 	import GithubIcon from '@lucide/svelte/icons/github';
 	import PlayIcon from '@lucide/svelte/icons/play';
-	import PowerIcon from '@lucide/svelte/icons/power';
 
 	if (browser && localStorage.getItem(LocalStorageKey.token) !== null && !demoState.enabled) {
 		if (!acc.studentAccount) loadStudentAccount();
@@ -71,13 +70,7 @@
 					<Card.Content>
 						<p>An advanced grade calculator.</p>
 
-						<Alert.Root variant="destructive" class="mt-4">
-							<PowerIcon />
-							<Alert.Title>GradeCompass is now obsolete.</Alert.Title>
-							<Alert.Description>
-								<a href="/obsolete" class="underline">Learn more</a>
-							</Alert.Description>
-						</Alert.Root>
+						<ObsoleteAlert />
 					</Card.Content>
 
 					<Card.Footer class="flex gap-2">

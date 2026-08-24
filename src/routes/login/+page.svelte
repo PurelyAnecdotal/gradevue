@@ -4,6 +4,7 @@
 	import { LocalStorageKey } from '$lib';
 	import { acc, loadStudentAccount } from '$lib/account.svelte';
 	import { brand } from '$lib/brand';
+	import BackButton from '$lib/components/BackButton.svelte';
 	import LoadingBanner from '$lib/components/LoadingBanner.svelte';
 	import * as Alert from '$lib/components/ui/alert';
 	import { Button } from '$lib/components/ui/button';
@@ -104,6 +105,8 @@
 <div class="flex min-h-screen flex-col">
 	<main class="flex grow items-center justify-center">
 		<form onsubmit={login} class="m-4 flex w-full max-w-md flex-col gap-4">
+			<BackButton />
+
 			<div class="mb-4 flex flex-col items-center gap-2">
 				<img src="/favicon.svg" class="h-8 w-8" alt={brand} />
 
