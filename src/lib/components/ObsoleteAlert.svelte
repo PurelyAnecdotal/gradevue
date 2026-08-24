@@ -5,7 +5,7 @@
 
 <Alert.Root variant="destructive" class="mt-4">
 	<PowerIcon />
-	<Alert.Title>GradeCompass is now obsolete.</Alert.Title>
+	<Alert.Title class="line-clamp-none">GradeCompass is now obsolete.</Alert.Title>
 	<Alert.Description>
 		<a href="/obsolete" class="underline">Learn more</a>
 	</Alert.Description>
